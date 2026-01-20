@@ -13,12 +13,19 @@ const authForm = reactive<{
     password: "",
 });
 
-const {email, password, username} = toRefs(authForm)
+const { email, password, username } = toRefs(authForm);
 
 const loading = ref(false);
 const error = ref("");
 
 const api = useNuxtApp().$api;
+
+const authStore = useAuthStore();
+
+const setToken = (token: string) => {
+    localStorage.setItem("AUTH_TOKEN", token);
+    authStore.token = token;
+};
 
 const checkEmail = async () => {
     if (!email.value.trim()) return;
@@ -27,11 +34,10 @@ const checkEmail = async () => {
     error.value = "";
 
     try {
-        const { data } = await api.auth.checkExist({ email: email.value });
-        if (data.exists) return (step.value = "login");
-        step.value = "register";
+        await api.auth.checkExist({ email: email.value });
+        step.value = "login";
     } catch (err: any) {
-        error.value = err.message || "Ошибка проверки email";
+        error.value = err.data.message || "Непредвиденная ошибка";
     } finally {
         loading.value = false;
     }
@@ -40,14 +46,14 @@ const checkEmail = async () => {
 const login = async () => {
     loading.value = true;
     try {
-        const { success, token, data } = await api.auth.login({
+        const { token } = await api.auth.login({
             email: email.value,
             password: password.value,
         });
-        localStorage.setItem("AUTH_TOKEN", token);
+        setToken(token);
         navigateTo({ name: "index" });
     } catch (err: any) {
-        error.value = err.message || "Ошибка проверки пароля";
+        error.value = err.data.message || "Ошибка ввода пароля";
     } finally {
         loading.value = false;
     }
@@ -61,10 +67,10 @@ const register = async () => {
             password: password.value,
             username: username.value,
         });
-        localStorage.setItem("AUTH_TOKEN", data.token);
+        setToken(data.token);
         navigateTo({ name: "index" });
     } catch (err: any) {
-        error.value = err.message || "Ошибка";
+        error.value = err.data.message || "Ошибка при регистрации";
     } finally {
         loading.value = false;
     }
@@ -89,28 +95,21 @@ const register = async () => {
 
             <div class="p-8">
                 <div v-if="step === 'email'" class="space-y-6">
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-[var(--text-secondary)] mb-2"
-                        >
-                            Email
-                        </label>
-                        <input
-                            v-model="email"
-                            type="email"
-                            placeholder="example@email.com"
-                            class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-[var(--radius)] focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30 transition"
-                            @keyup.enter="checkEmail"
-                        />
-                    </div>
+                    <UiInput
+                        :callback="checkEmail"
+                        label="Email"
+                        v-model="email"
+                        placeholder="example@email.com"
+                    />
 
-                    <button
+                    <UiButton
                         @click="checkEmail"
-                        :disabled="loading || !email.trim()"
-                        class="w-full py-3 bg-[var(--accent)] text-white rounded-[var(--radius)] font-medium hover:bg-[var(--accent-hover)] disabled:opacity-50 transition"
+                        :loading="loading"
+                        :disabled="!email.trim()"
+                        loadingText="Проверка..."
                     >
-                        {{ loading ? "Проверка..." : "Продолжить" }}
-                    </button>
+                        Продолжить
+                    </UiButton>
 
                     <p
                         v-if="error"
@@ -121,28 +120,21 @@ const register = async () => {
                 </div>
 
                 <div v-else-if="step === 'login'" class="space-y-6">
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-[var(--text-secondary)] mb-2"
-                        >
-                            Пароль
-                        </label>
-                        <input
-                            v-model="password"
-                            type="password"
-                            placeholder="••••••••"
-                            class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-[var(--radius)] focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30 transition"
-                            @keyup.enter="login"
-                        />
-                    </div>
+                    <UiInput
+                        :callback="login"
+                        label="Пароль"
+                        v-model="password"
+                        placeholder="••••••••"
+                    />
 
-                    <button
+                    <UiButton
                         @click="login"
-                        :disabled="loading || !password.trim()"
-                        class="w-full py-3 bg-[var(--accent)] text-white rounded-[var(--radius)] font-medium hover:bg-[var(--accent-hover)] disabled:opacity-50 transition"
+                        :loading="loading"
+                        :disabled="!password.trim()"
+                        loadingText="Вход..."
                     >
-                        {{ loading ? "Вход..." : "Войти" }}
-                    </button>
+                        Войти
+                    </UiButton>
 
                     <button
                         @click="step = 'email'"
@@ -160,44 +152,27 @@ const register = async () => {
                 </div>
 
                 <div v-else-if="step === 'register'" class="space-y-6">
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-[var(--text-secondary)] mb-2"
-                        >
-                            Username
-                        </label>
-                        <input
-                            v-model="username"
-                            type="text"
-                            placeholder="Ваше имя в чате"
-                            class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-[var(--radius)] focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30 transition"
-                        />
-                    </div>
+                    <UiInput
+                        label="Username"
+                        v-model="username"
+                        placeholder="Ваше имя в чате"
+                    />
 
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-[var(--text-secondary)] mb-2"
-                        >
-                            Пароль
-                        </label>
-                        <input
-                            v-model="password"
-                            type="password"
-                            placeholder="Придумайте надёжный пароль"
-                            class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-[var(--radius)] focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30 transition"
-                            @keyup.enter="register"
-                        />
-                    </div>
+                    <UiInput
+                        :callback="register"
+                        label="Пароль"
+                        v-model="password"
+                        placeholder="Придумайте надёжный пароль"
+                    />
 
-                    <button
+                    <UiButton
                         @click="register"
-                        :disabled="
-                            loading || !username.trim() || !password.trim()
-                        "
-                        class="w-full py-3 bg-[var(--accent)] text-white rounded-[var(--radius)] font-medium hover:bg-[var(--accent-hover)] disabled:opacity-50 transition"
+                        :loading="loading"
+                        :disabled="!username.trim() || !password.trim()"
+                        loadingText="Регистрация..."
                     >
-                        {{ loading ? "Регистрация..." : "Зарегистрироваться" }}
-                    </button>
+                        Зарегистрироваться
+                    </UiButton>
 
                     <button
                         @click="step = 'email'"

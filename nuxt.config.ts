@@ -9,7 +9,13 @@ export default defineNuxtConfig({
     runtimeConfig: {
         public: {
             apiBaseUrl: "",
+            socketUrl: ""
         },
     },
-    modules: ["@nuxtjs/tailwindcss", "@nuxt/icon"],
+    nitro: {
+        experimental: {
+            websocket: true,
+        },
+    },
+    modules: ["@nuxtjs/tailwindcss", "@nuxt/icon", "@pinia/nuxt"],
 });

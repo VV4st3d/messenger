@@ -1,4 +1,4 @@
-import {type LoginRes, type CheckExist, type CheckExistBody, type LoginBody, type RegisterBody, type RegisterRes} from '~/types/auth'
+import {type LoginRes, type CheckExist, type CheckExistBody, type LoginBody, type RegisterBody, type RegisterRes, type AuthMe} from '~/types/auth'
 
 export function createAuthRepository(appFetch: typeof $fetch) {
   return {
@@ -10,6 +10,9 @@ export function createAuthRepository(appFetch: typeof $fetch) {
     },
     login(body: LoginBody){
       return appFetch<LoginRes>("auth/login", {method: "POST", body})
+    },
+    me(){
+      return appFetch<AuthMe>("auth/me", {method: "GET"})
     }
   };
 }

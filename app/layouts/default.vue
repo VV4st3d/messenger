@@ -4,10 +4,7 @@ import { useAuth } from "~/composables/useAuth";
 import { useRouter } from "vue-router";
 import Sidebar from "~/components/Sidebar.vue";
 
-// const { isAuthenticated, user } = useAuth();
-
-const user: { avatarUrl?: string } = {};
-const isAuthenticated = false;
+const { isAuthenticated, user } = useAuth();
 
 const router = useRouter();
 
@@ -67,7 +64,8 @@ onMounted(() => {
         </header>
 
         <div class="flex flex-1 overflow-hidden relative">
-            <aside  v-if="isAuthenticated"
+            <aside
+                v-if="isAuthenticated"
                 :class="[
                     'fixed md:static inset-y-0 left-0 z-40 w-80 bg-[var(--bg-secondary)] border-r border-[var(--border)] transform transition-transform duration-300 ease-in-out',
                     showSidebar

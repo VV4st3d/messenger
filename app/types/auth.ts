@@ -18,3 +18,5 @@ export type RegisterRes = ResponseBody<User & {token: string}>
 export interface RegisterBody extends LoginBody {
     username: string
 }
+
+export type AuthMe = ResponseBody<Required<User>>

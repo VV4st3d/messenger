@@ -3,4 +3,8 @@ export interface User {
   username: string
   email: string
   displayName: string
+  avatarUrl?: string,
+  status?: 'offline' | 'online'
+  isOnline?: boolean,
+  createdAt?: string
 }

@@ -5,22 +5,18 @@ export default defineNuxtPlugin({
   parallel: true,
   setup(nuxtApp) {
     const config = useRuntimeConfig();
+    const authStore = useAuthStore()
     const appFetch = $fetch.create({
       retry: false,
       baseURL: config.public.apiBaseUrl,
       onRequest({ request, options, error }) {
         options.headers.append("Accept", `application/json`);
-
-        if (import.meta.browser) {
-          const authToken = localStorage.getItem("AUTH_TOKEN");
-          if (authToken) {
-            options.headers.append("Authorization", `Bearer ${authToken}`);
-          }
-        }
+        
+        options.headers.append("Authorization", `Bearer ${authStore.token}`)
       },
       async onResponseError({ response }) {
          if(response.status == 401){
-          nuxtApp.runWithContext(() => navigateTo('/auth/login'));
+          nuxtApp.runWithContext(() => navigateTo('/auth'));
         }
       },
     });

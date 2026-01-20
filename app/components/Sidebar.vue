@@ -1,5 +1,7 @@
 <script setup lang="ts">
+
 const activeTab = ref<"chats" | "friends">("chats");
+
 </script>
 
 <template>
@@ -81,8 +83,7 @@ const activeTab = ref<"chats" | "friends">("chats");
             class="p-4 border-t border-[var(--border)] flex items-center gap-3 bg-[var(--bg-tertiary)]"
         >
             <div class="relative">
-                <CommonAvatar :size="'sm'" />
-                <div class="avatar-status online"></div>
+                <CommonAvatar :size="'sm'" :online="true"/>
             </div>
             <div class="flex-1 min-w-0">
                 <div class="font-medium truncate">Твоё имя</div>
