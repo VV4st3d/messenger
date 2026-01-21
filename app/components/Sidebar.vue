@@ -1,7 +1,20 @@
 <script setup lang="ts">
-
 const activeTab = ref<"chats" | "friends">("chats");
 
+const authStore = useAuthStore();
+const friendsStore = useFriendsStore();
+
+const { user, isOnline } = toRefs(authStore);
+const { $api } = useNuxtApp();
+
+onMounted(async () => {
+    try {
+        const { data } = await $api.friend.getFriends();
+        friendsStore.setFriends(data);
+    } catch (error: any) {
+        console.log(error.message);
+    }
+});
 </script>
 
 <template>
@@ -75,7 +88,7 @@ const activeTab = ref<"chats" | "friends">("chats");
                 v-if="activeTab === 'friends'"
                 class="p-4 text-[var(--text-secondary)]"
             >
-                Список друзей будет здесь
+                <FriendList :friends="friendsStore.friends" />
             </div>
         </div>
 
@@ -83,16 +96,22 @@ const activeTab = ref<"chats" | "friends">("chats");
             class="p-4 border-t border-[var(--border)] flex items-center gap-3 bg-[var(--bg-tertiary)]"
         >
             <div class="relative">
-                <CommonAvatar :size="'sm'" :online="true"/>
+                <CommonAvatar
+                    :src="user?.avatarUrl"
+                    :size="'sm'"
+                    :online="isOnline"
+                />
             </div>
             <div class="flex-1 min-w-0">
-                <div class="font-medium truncate">Твоё имя</div>
-                <div class="text-xs text-[var(--text-tertiary)]">онлайн</div>
+                <div class="font-medium truncate">{{ user?.displayName }}</div>
+                <div class="text-xs text-[var(--text-tertiary)]">
+                    {{ isOnline ? "Онлайн" : "Оффлайн" }}
+                </div>
             </div>
             <button
-                class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
+                class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition cursor-pointer"
             >
-                ...
+                <UiIcon name="ellipsis-horizontal" size="24" />
             </button>
         </div>
     </div>

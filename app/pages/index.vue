@@ -1,11 +1,15 @@
 <script lang="ts" setup>
 const authStore = useAuthStore()
 
+const {$socket} = useNuxtApp()
+
+onMounted(() =>{
+  $socket.connect()
+})
 </script>
 
 <template>
     <div>
-        Main Page {{ authStore.user }}
         <NuxtPage />
     </div>
 </template>

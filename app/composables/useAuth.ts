@@ -1,15 +1,8 @@
-export function useAuth(){
-    const authStore = useAuthStore()
-    const user = authStore.user
-    const isAuthenticated = ref(false)
-
-    if (user) {
-        isAuthenticated.value = true
-    }else{
-        isAuthenticated.value = false
-    }
-
+export function useAuth() {
+    const authStore = useAuthStore();
+    const isAuthenticated = computed(() => !!authStore.user);
     return {
-        user, isAuthenticated
-    }
+        user: authStore.user,
+        isAuthenticated,
+    };
 }

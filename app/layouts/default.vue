@@ -6,8 +6,6 @@ import Sidebar from "~/components/Sidebar.vue";
 
 const { isAuthenticated, user } = useAuth();
 
-const router = useRouter();
-
 const showSidebar = ref(false);
 const isDark = ref(true);
 

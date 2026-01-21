@@ -7,7 +7,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
     size: "md",
-    src: '',
+    src: "",
     online: false,
 });
 
@@ -27,34 +27,33 @@ const statusSize = {
 </script>
 
 <template>
-    <div
-        class="relative inline-flex items-center justify-center overflow-hidden bg-[var(--bg-tertiary)] flex-shrink-0"
-        :class="sizeClasses[size]"
-    >
-        <img
-            v-if="src"
-            :src="src"
-            alt="Avatar"
-            class="w-full h-full object-cover rounded-full"
-            @error="hasError = true"
-        />
-        <svg
-            v-else
-            width="800px"
-            height="800px"
-            viewBox="0 0 16 16"
-            xmlns="http://www.w3.org/2000/svg"
+    <div class="relative inline-flex flex-shrink-0" :class="sizeClasses[size]">
+        <div
+            class="w-full h-full flex items-center justify-center overflow-hidden bg-[var(--bg-tertiary)] rounded-full"
         >
-            <path
-                stroke="var(--border)"
-                d="m 8 1 c -1.65625 0 -3 1.34375 -3 3 s 1.34375 3 3 3 s 3 -1.34375 3 -3 s -1.34375 -3 -3 -3 z m -1.5 7 c -2.492188 0 -4.5 2.007812 -4.5 4.5 v 0.5 c 0 1.109375 0.890625 2 2 2 h 8 c 1.109375 0 2 -0.890625 2 -2 v -0.5 c 0 -2.492188 -2.007812 -4.5 -4.5 -4.5 z m 0 0"
-                fill="var(--text-tertiary)"
+            <img
+                v-if="src && !hasError"
+                :src="src"
+                alt="Avatar"
+                class="w-full h-full object-cover"
+                @error="hasError = true"
             />
-        </svg>
+
+            <svg v-else viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    stroke="var(--border)"
+                    d="m 8 1 c -1.65625 0 -3 1.34375 -3 3 s 1.34375 3 3 3 s 3 -1.34375 3 -3 s -1.34375 -3 -3 -3 z m -1.5 7 c -2.492188 0 -4.5 2.007812 -4.5 4.5 v 0.5 c 0 1.109375 0.890625 2 2 2 h 8 c 1.109375 0 2 -0.890625 2 -2 v -0.5 c 0 -2.492188 -2.007812 -4.5 -4.5 -4.5 z m 0 0"
+                    fill="var(--text-tertiary)"
+                />
+            </svg>
+        </div>
+
         <div
             v-if="online"
+            style="bottom: 0; right: 0;"
             class="absolute rounded-full bg-[var(--online)] border-2 border-[var(--bg-secondary)]"
             :class="statusSize[size]"
         ></div>
     </div>
 </template>
+

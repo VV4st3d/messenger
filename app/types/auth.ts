@@ -1,5 +1,13 @@
 import type {ResponseBody} from './index'
-import type { User } from './user'
+
+
+export interface User {
+  id: string
+  username: string
+  email: string
+  displayName: string
+  avatarUrl?: string,
+}
 
 export type CheckExist = ResponseBody<{exists: boolean}>
 
@@ -19,4 +27,4 @@ export interface RegisterBody extends LoginBody {
     username: string
 }
 
-export type AuthMe = ResponseBody<Required<User>>
+export type AuthMe = ResponseBody<User>

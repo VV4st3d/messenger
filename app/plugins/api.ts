@@ -1,4 +1,5 @@
 import { createAuthRepository } from "~/repository/auth";
+import { createFriendsRepository } from "~/repository/friends";
 
 export default defineNuxtPlugin({
   name: "fetch",
@@ -23,6 +24,7 @@ export default defineNuxtPlugin({
 
     const api = {
       auth: createAuthRepository(appFetch),
+      friend: createFriendsRepository(appFetch),
     };
 
     return {

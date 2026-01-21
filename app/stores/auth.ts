@@ -1,9 +1,9 @@
 import { defineStore } from "pinia";
-import type { User } from "~/types/user";
+import type { User } from "~/types/auth";
 
 export const useAuthStore = defineStore('auth', ()=>{
     const user = ref<User | null>()
-
+    const isOnline = ref<boolean | undefined>()
     const setUser = (usr: User | null) => user.value = usr
 
     const token = useCookie('AUTH_TOKEN', {
@@ -11,5 +11,9 @@ export const useAuthStore = defineStore('auth', ()=>{
         watch: true
     })
 
-    return {user, setUser, token}
+    const setOnline = (value: boolean) => {
+        isOnline.value = value
+    }
+
+    return {user, setUser, token, setOnline, isOnline}
 })

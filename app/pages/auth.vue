@@ -46,10 +46,11 @@ const checkEmail = async () => {
 const login = async () => {
     loading.value = true;
     try {
-        const { token } = await api.auth.login({
+        const { token, data } = await api.auth.login({
             email: email.value,
             password: password.value,
         });
+        authStore.setUser(data)
         setToken(token);
         navigateTo({ name: "index" });
     } catch (err: any) {
@@ -68,6 +69,7 @@ const register = async () => {
             username: username.value,
         });
         setToken(data.token);
+        authStore.setUser(data)
         navigateTo({ name: "index" });
     } catch (err: any) {
         error.value = err.data.message || "Ошибка при регистрации";
