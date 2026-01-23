@@ -1,15 +1,16 @@
 <script lang="ts" setup>
-const authStore = useAuthStore()
+import { useNuxtApp } from '#app';
+import { onMounted } from 'vue';
 
-const {$socket} = useNuxtApp()
+const { $socket } = useNuxtApp();
 
-onMounted(() =>{
-  $socket.connect()
-})
+onMounted(() => {
+  $socket.connect();
+});
 </script>
 
 <template>
-    <div>
-        <NuxtPage />
-    </div>
+  <div>
+    <NuxtPage />
+  </div>
 </template>

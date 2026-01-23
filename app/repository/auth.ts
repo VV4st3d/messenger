@@ -1,18 +1,34 @@
-import {type LoginRes, type CheckExist, type CheckExistBody, type LoginBody, type RegisterBody, type RegisterRes, type AuthMe} from '~/types/auth'
+import type {
+  TAuthenticationRes,
+  TCheckExist,
+  TCheckExistBody,
+  ILoginBody,
+  IRegisterBody,
+  TUserInitRes,
+} from '~/shared/types';
 
 export function createAuthRepository(appFetch: typeof $fetch) {
   return {
-    checkExist(body: CheckExistBody){
-      return appFetch<CheckExist>("auth/check-email", {method: "POST", body})
+    checkExist(body: TCheckExistBody) {
+      return appFetch<TCheckExist>('auth/check-email', {
+        method: 'POST',
+        body,
+      });
     },
-    registration(body: RegisterBody){
-      return appFetch<RegisterRes>("auth/register", {method: "POST", body})
+    registration(body: IRegisterBody) {
+      return appFetch<TAuthenticationRes>('auth/register', {
+        method: 'POST',
+        body,
+      });
     },
-    login(body: LoginBody){
-      return appFetch<LoginRes>("auth/login", {method: "POST", body})
+    login(body: ILoginBody) {
+      return appFetch<TAuthenticationRes>('auth/login', {
+        method: 'POST',
+        body,
+      });
     },
-    me(){
-      return appFetch<AuthMe>("auth/me", {method: "GET"})
-    }
+    me() {
+      return appFetch<TUserInitRes>('auth/me', { method: 'GET' });
+    },
   };
 }

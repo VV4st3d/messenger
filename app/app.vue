@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import '@/assets/index.scss'
+import '@/assets/index.scss';
 </script>
 
 <template>
-    <NuxtLayout>
-        <NuxtPage />
-    </NuxtLayout>
+  <NuxtLayout>
+    <NuxtPage />
+  </NuxtLayout>
 </template>

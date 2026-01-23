@@ -1,13 +1,18 @@
+<script setup lang="ts">
+import type { IFriend } from '~/shared/types';
+
+defineProps<{ friends: IFriend[] }>();
+</script>
 <template>
   <div class="divide-y divide-[var(--border-subtle)]">
     <FriendItem
-      v-for="friend in props.friends"
+      v-for="friend in friends"
       :key="friend.id"
-      :friend = "friend"
+      :friend="friend"
       :online="friend.isOnline"
     />
     <div
-      v-if="!props.friends.length"
+      v-if="!friends.length"
       class="flex flex-col items-center justify-center h-full py-12 text-[var(--text-tertiary)]"
     >
       <UiIcon name="users" class="w-16 h-16 mb-4 opacity-50" />
@@ -18,9 +23,3 @@
     </div>
   </div>
 </template>
-
-<script setup lang="ts">
-import type { Friend } from '~/types/friends';
-
-const props = defineProps<{friends: Friend[] | []}>()
-</script>

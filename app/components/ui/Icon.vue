@@ -1,11 +1,3 @@
-<template>
-  <Icon 
-    :name="iconName" 
-    :size="size"
-    v-bind="$attrs" 
-  />
-</template>
-
 <script setup lang="ts">
 import { computed } from 'vue';
 
@@ -15,6 +7,10 @@ const props = defineProps<{
 }>();
 
 const iconName = computed(() => {
-  return `heroicons:${props.name}`;
+  return `heroicons:${props.name}-solid`;
 });
 </script>
+
+<template>
+  <Icon mode="svg" :name="iconName" :size="size" v-bind="$attrs" />
+</template>

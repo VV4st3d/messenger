@@ -1,9 +1,9 @@
-import type { Friends } from "~/types/friends";
+import type { TFriends } from '~/shared/types';
 
 export function createFriendsRepository(appFetch: typeof $fetch) {
   return {
-    getFriends(){
-      return appFetch<Friends>("friends", {method: "GET"})
+    getFriends() {
+      return appFetch<TFriends>('friends', { method: 'GET' });
     },
   };
 }

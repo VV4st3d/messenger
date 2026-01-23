@@ -1,6 +1,12 @@
-export default defineNuxtRouteMiddleware(async (to, from) => {
-    const authStore = useAuthStore();
+import { defineNuxtRouteMiddleware, navigateTo } from '#app';
+import { useAuthStore } from '#imports';
+import { RouteNames, getRouteAuth } from '@/shared/const';
 
-    if (!authStore.user && to.path !== "/auth") return navigateTo({name: 'auth'});
-    else if (authStore.user && to.path === '/auth') return navigateTo({name: 'index'})
+export default defineNuxtRouteMiddleware(async (to, _from) => {
+  const authStore = useAuthStore();
+
+  if (!authStore.user && to.path !== getRouteAuth())
+    return navigateTo({ name: RouteNames.AUTH });
+  else if (authStore.user && to.path === getRouteAuth())
+    return navigateTo({ name: RouteNames.MAIN });
 });

@@ -1,12 +1,11 @@
-import { defineStore } from "pinia";
-import type { User } from "~/types/auth";
-import type { Friend } from "~/types/friends";
+import { defineStore } from 'pinia';
+import { ref } from 'vue';
+import type { IFriend } from '~/shared/types';
 
-export const useFriendsStore = defineStore('friends', ()=>{
-    const friends = ref<Friend[] | []>([])
+export const useFriendsStore = defineStore('friends', () => {
+  const friends = ref<IFriend[]>([]);
 
-    const setFriends = (data: Friend[]) => friends.value = data 
+  const setFriends = (payload: IFriend[]) => (friends.value = payload);
 
-
-    return {friends, setFriends}
-})
+  return { friends, setFriends };
+});
