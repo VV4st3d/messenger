@@ -1,6 +1,7 @@
 import { defineNuxtPlugin, navigateTo, useRuntimeConfig } from '#app';
 import { useAuthStore } from '#imports';
 import { createAuthRepository } from '~/repository/auth';
+import { createChatsRepository } from '~/repository/chats';
 import { createFriendsRepository } from '~/repository/friends';
 import { RouteNames } from '~/shared/const';
 
@@ -28,6 +29,7 @@ export default defineNuxtPlugin({
     const api = {
       auth: createAuthRepository(appFetch),
       friend: createFriendsRepository(appFetch),
+      chats: createChatsRepository(appFetch),
     };
 
     return {

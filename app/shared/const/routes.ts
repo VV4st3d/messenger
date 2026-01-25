@@ -4,3 +4,5 @@ export const RouteNames = {
 } as const;
 
 export const getRouteAuth = () => '/auth';
+export const getRouteChats = () => '/chats';
+export const getRouteChat = (id: string) => `/chat/${id}`;

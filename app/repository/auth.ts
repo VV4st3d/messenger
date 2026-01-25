@@ -1,3 +1,8 @@
+import {
+  getAPIRouteAuthMe,
+  getAPIRouteLogin,
+  getAPIRouteRegister,
+} from '~/shared/const';
 import type {
   TAuthenticationRes,
   TCheckExist,
@@ -10,25 +15,25 @@ import type {
 export function createAuthRepository(appFetch: typeof $fetch) {
   return {
     checkExist(body: TCheckExistBody) {
-      return appFetch<TCheckExist>('auth/check-email', {
+      return appFetch<TCheckExist>(getAPIRouteAuthMe(), {
         method: 'POST',
         body,
       });
     },
     registration(body: IRegisterBody) {
-      return appFetch<TAuthenticationRes>('auth/register', {
+      return appFetch<TAuthenticationRes>(getAPIRouteRegister(), {
         method: 'POST',
         body,
       });
     },
     login(body: ILoginBody) {
-      return appFetch<TAuthenticationRes>('auth/login', {
+      return appFetch<TAuthenticationRes>(getAPIRouteLogin(), {
         method: 'POST',
         body,
       });
     },
     me() {
-      return appFetch<TUserInitRes>('auth/me', { method: 'GET' });
+      return appFetch<TUserInitRes>(getAPIRouteAuthMe(), { method: 'GET' });
     },
   };
 }

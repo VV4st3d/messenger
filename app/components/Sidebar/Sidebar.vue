@@ -1,14 +1,22 @@
 <script setup lang="ts">
 import { useNuxtApp } from '#app';
-import { storeToRefs, useAuthStore, useFriendsStore } from '#imports';
+import {
+  storeToRefs,
+  useAuthStore,
+  useFriendsStore,
+} from '#imports';
 import { computed, onMounted, ref } from 'vue';
 import type { TTabs } from './types';
 import FriendList from '../Friend/FriendList.vue';
+import { useChatsStore } from '~/stores/chats';
 
 const activeTab = ref<TTabs>('chats');
 
 const authStore = useAuthStore();
 const friendsStore = useFriendsStore();
+const chatStore = useChatsStore();
+
+const chats = computed(() => chatStore.chats);
 
 const friends = computed(() => friendsStore.friends);
 
@@ -29,8 +37,18 @@ const handleGetFriends = async () => {
   }
 };
 
+const handleGetChats = async () => {
+  try {
+    const { data } = await $api.chats.getChats();
+    chatStore.setChats(data);
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 onMounted(() => {
   handleGetFriends();
+  handleGetChats();
 });
 </script>
 
@@ -66,29 +84,7 @@ onMounted(() => {
         v-if="activeTab === 'chats'"
         class="divide-y divide-[var(--border-subtle)]"
       >
-        <div
-          v-for="i in 8"
-          :key="i"
-          class="chat-item flex items-center gap-4 p-4 hover:bg-[rgba(255,255,255,0.04)] transition-colors cursor-pointer"
-          :class="{
-            'bg-[rgba(var(--accent),0.12)] border-l-3 border-[var(--accent)]':
-              i === 1,
-          }"
-        >
-          <div class="relative">
-            <div
-              class="avatar w-12 h-12 rounded-full bg-[var(--bg-tertiary)]"
-            />
-            <div class="avatar-status online" />
-          </div>
-          <div class="flex-1 min-w-0">
-            <div class="font-medium truncate">Имя собеседника</div>
-            <div class="text-sm text-[var(--text-secondary)] truncate">
-              Последнее сообщение...
-            </div>
-          </div>
-          <div class="text-xs text-[var(--text-tertiary)]">14:32</div>
-        </div>
+        <Chats :chats="chats" />
       </div>
 
       <div
@@ -119,9 +115,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.chat-item {
-  @apply p-4 flex items-center gap-4 hover:bg-[rgba(255,255,255,0.04)] transition-colors cursor-pointer;
-}
-</style>
