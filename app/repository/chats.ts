@@ -1,24 +1,20 @@
-import {
-  getAPIRouteChatInfo,
-  getAPIRouteChats,
-  getAPIRouteMessages,
-} from '~/shared/const';
-import type {
-  TMessages,
-  TChat,
-  TChats,
-} from '~/shared/types';
+import { API_ROUTES } from '~/shared/const';
+import type { TMessages, TChat, TChats } from '~/shared/types';
 
 export function createChatsRepository(appFetch: typeof $fetch) {
   return {
     getChats() {
-      return appFetch<TChats>(getAPIRouteChats(), { method: 'GET' });
+      return appFetch<TChats>(API_ROUTES.getRouteChats(), { method: 'GET' });
     },
     getChat(id: string) {
-      return appFetch<TChat>(getAPIRouteChatInfo(id), { method: 'GET' });
+      return appFetch<TChat>(API_ROUTES.getRouteChatInfo(id), {
+        method: 'GET',
+      });
     },
     getMessages(id: string) {
-      return appFetch<TMessages>(getAPIRouteMessages(id), { method: 'GET' });
+      return appFetch<TMessages>(API_ROUTES.getRouteMessages(id), {
+        method: 'GET',
+      });
     },
   };
 }

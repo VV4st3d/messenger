@@ -1,10 +1,5 @@
 <script setup lang="ts">
-import { useNuxtApp } from '#app';
-import {
-  storeToRefs,
-  useAuthStore,
-  useFriendsStore,
-} from '#imports';
+import { storeToRefs, useAuthStore, useFriendsStore } from '#imports';
 import { computed, onMounted, ref } from 'vue';
 import type { TTabs } from './types';
 import FriendList from '../Friend/FriendList.vue';
@@ -21,7 +16,6 @@ const chats = computed(() => chatStore.chats);
 const friends = computed(() => friendsStore.friends);
 
 const { user, isOnline } = storeToRefs(authStore);
-const { $api } = useNuxtApp();
 
 const additionalClassses = (currentTab: TTabs) =>
   activeTab.value === currentTab
@@ -30,8 +24,7 @@ const additionalClassses = (currentTab: TTabs) =>
 
 const handleGetFriends = async () => {
   try {
-    const { data } = await $api.friend.getFriends();
-    friendsStore.setFriends(data);
+    await friendsStore.getFriendsHandler();
   } catch (error) {
     console.log(error);
   }
@@ -39,8 +32,7 @@ const handleGetFriends = async () => {
 
 const handleGetChats = async () => {
   try {
-    const { data } = await $api.chats.getChats();
-    chatStore.setChats(data);
+    await useChatsStore().getChatsHandler();
   } catch (error) {
     console.log(error);
   }

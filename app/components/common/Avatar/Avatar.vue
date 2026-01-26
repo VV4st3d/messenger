@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import { sizeClasses, statusSize } from './consts';
+import { AVATAR_SIZE_CLASSES, STATUS_SIZE_CLASSES } from './consts';
 
 interface Props {
   src?: string;
@@ -18,7 +18,10 @@ const hasError = ref(false);
 </script>
 
 <template>
-  <div class="relative inline-flex flex-shrink-0" :class="sizeClasses[size]">
+  <div
+    class="relative inline-flex flex-shrink-0"
+    :class="AVATAR_SIZE_CLASSES[size]"
+  >
     <div
       class="w-full h-full flex items-center justify-center overflow-hidden bg-[var(--bg-tertiary)] rounded-full"
     >
@@ -37,7 +40,7 @@ const hasError = ref(false);
       v-if="online"
       style="bottom: 0; right: 0"
       class="absolute rounded-full bg-[var(--online)] border-2 border-[var(--bg-secondary)]"
-      :class="statusSize[size]"
+      :class="STATUS_SIZE_CLASSES[size]"
     />
   </div>
 </template>

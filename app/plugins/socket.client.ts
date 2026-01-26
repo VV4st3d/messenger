@@ -45,7 +45,6 @@ export default defineNuxtPlugin(() => {
         });
 
         socketConn.on(SOCKET_EVENTS.USER_STATUS, (data: UserStatus) => {
-          console.log(data);
           authStore.setOnline(data.online);
         });
 

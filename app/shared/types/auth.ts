@@ -1,4 +1,4 @@
-import type { TResponseBody } from '../../types/base-body';
+import type { TResponseBody } from './base-body';
 
 export interface IUser {
   id: string;

@@ -1,10 +1,12 @@
-import { getAPIRouteFriends } from '~/shared/const';
+import { API_ROUTES } from '~/shared/const';
 import type { TFriends } from '~/shared/types';
 
 export function createFriendsRepository(appFetch: typeof $fetch) {
   return {
     getFriends() {
-      return appFetch<TFriends>(getAPIRouteFriends(), { method: 'GET' });
+      return appFetch<TFriends>(API_ROUTES.getRouteFriends(), {
+        method: 'GET',
+      });
     },
   };
 }

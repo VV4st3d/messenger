@@ -15,7 +15,7 @@ export interface IChat {
   lastMessage?: IMessage;
 }
 
-interface IParticipant {
+export interface IParticipant {
   id: string;
   username: string;
   email: string;

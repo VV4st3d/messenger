@@ -33,11 +33,6 @@ const { $api } = useNuxtApp();
 
 const authStore = useAuthStore();
 
-const setToken = (token: string) => {
-  localStorage.setItem('AUTH_TOKEN', token);
-  authStore.token = token;
-};
-
 const handleCheckEmail = async () => {
   if (!email.value.trim()) return;
 
@@ -57,12 +52,10 @@ const handleCheckEmail = async () => {
 const handleLogin = async () => {
   loading.value = true;
   try {
-    const { token, data } = await $api.auth.login({
+    await authStore.loginHandler({
       email: email.value,
       password: password.value,
     });
-    authStore.setUser(data);
-    setToken(token);
     navigateTo({ name: RouteNames.MAIN });
   } catch (err: any) {
     error.value = err.data.message || 'Ошибка ввода пароля';
@@ -74,13 +67,11 @@ const handleLogin = async () => {
 const handleRegister = async () => {
   loading.value = true;
   try {
-    const { data, token } = await $api.auth.registration({
+    await authStore.registerHandler({
       email: email.value,
       password: password.value,
       username: username.value,
     });
-    setToken(token);
-    authStore.setUser(data);
     navigateTo({ name: RouteNames.MAIN });
   } catch (err: any) {
     error.value = err.data.message || 'Ошибка при регистрации';

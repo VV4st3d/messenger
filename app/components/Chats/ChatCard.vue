@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { computed, formatLastMessageDate, useAuth } from '#imports';
+import { formatLastMessageDate } from '#imports';
+import { useCompanion } from '~/composables/useCompanion';
 import type { IChat } from '~/shared/types';
 
 const props = defineProps<{ chat: IChat }>();
 
-const { user } = useAuth();
-const companion = computed(() =>
-  props.chat.participants.find((usr) => usr.id !== user.value?.id),
-);
+const companion = useCompanion(props.chat);
 </script>
 
 <template>

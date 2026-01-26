@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { computed, useAuth } from '#imports';
+import { useCompanion } from '#imports';
 import type { IChat } from '~/shared/types';
 
 const props = defineProps<{ chat: IChat | null }>();
-const { user } = useAuth();
-const companion = computed(() =>
-  props.chat?.participants.find((usr) => usr.id !== user.value?.id),
-);
+const companion = useCompanion(props.chat);
 </script>
 
 <template>

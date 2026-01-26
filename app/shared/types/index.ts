@@ -13,6 +13,7 @@ export type {
   TChat,
   TChats,
   IChat,
+  IParticipant,
   TMessages,
   IMessage,
   IMessageBody,

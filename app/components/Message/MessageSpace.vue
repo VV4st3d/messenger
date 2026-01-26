@@ -6,11 +6,13 @@ const props = defineProps<{
   messages: IMessage[];
 }>();
 
-const scrollToMe = useTemplateRef<HTMLDivElement>('scrollToMe');
+const ANCHOR_NAME = 'bottomRef';
+
+const scrollAnchorRef = useTemplateRef<HTMLDivElement>(ANCHOR_NAME);
 
 async function scrollToElement() {
   await nextTick();
-  scrollToMe.value?.scrollIntoView({ behavior: 'smooth' });
+  scrollAnchorRef.value?.scrollIntoView({ behavior: 'smooth' });
 }
 
 watch(
@@ -30,7 +32,7 @@ watch(
         :key="message.id"
         :message="message"
       />
-      <div ref="scrollToMe" style="display: hidden"/>
+      <div :ref="ANCHOR_NAME" style="display: hidden" />
     </div>
 
     <div

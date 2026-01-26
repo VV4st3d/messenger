@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import type { ButtonHTMLAttributes } from 'vue';
+
 interface Props {
   loading?: boolean;
   disabled?: boolean;
   loadingText?: string;
-  type?: 'button' | 'submit' | 'reset';
+  type?: ButtonHTMLAttributes['type'];
 }
 
 withDefaults(defineProps<Props>(), {

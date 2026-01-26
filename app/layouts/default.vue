@@ -17,12 +17,16 @@ const toggleTheme = () => {
   );
 };
 
-onMounted(() => {
+const restoreTheme = () => {
   const savedTheme = localStorage.getItem(LOCALSTORAGE_THEME_KEY);
   if (savedTheme === Themes.LIGHT_THEME) {
     isDark.value = false;
     document.documentElement.classList.add(Themes.LIGHT_THEME);
   }
+};
+
+onMounted(() => {
+  restoreTheme();
 });
 </script>
 

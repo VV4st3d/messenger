@@ -1,6 +1,6 @@
 import { defineNuxtPlugin, useAuthStore, useNuxtApp } from '#imports';
 import { useRoute } from 'vue-router';
-import { getRouteAuth } from '~/shared/const';
+import { ROUTES } from '~/shared/const';
 
 export default defineNuxtPlugin({
   name: 'init',
@@ -8,7 +8,7 @@ export default defineNuxtPlugin({
   dependsOn: ['fetch'],
   async setup() {
     const route = useRoute();
-    if (route.path === getRouteAuth()) return;
+    if (route.path === ROUTES.getRouteAuth()) return;
     const { $api } = useNuxtApp();
     const authStore = useAuthStore();
 

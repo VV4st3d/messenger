@@ -1,4 +1,4 @@
-export const formatLastMessageDate = (dateString: string) => {
+export const formatLastMessageDate = (dateString: string): string => {
   if (!dateString) return '';
   const date = new Date(dateString);
   const now = new Date();

@@ -17,12 +17,11 @@ const chatStore = useCurrentChatStore();
 
 const { chat } = storeToRefs(chatStore);
 
-const { $api, $socket } = useNuxtApp();
+const { $socket } = useNuxtApp();
 
 const handleGetChatInfo = async () => {
   try {
-    const { data } = await $api.chats.getChat(chatId);
-    chatStore.setChat(data);
+    await useCurrentChatStore().getChatInfoHandler(chatId);
   } catch (error) {
     console.log(error);
   }
@@ -30,8 +29,7 @@ const handleGetChatInfo = async () => {
 
 const handleGetMessages = async () => {
   try {
-    const { data } = await $api.chats.getMessages(chatId);
-    chatStore.setMessages(data);
+    await useCurrentChatStore().getMessagesHandler(chatId);
   } catch (error) {
     console.log(error);
   }

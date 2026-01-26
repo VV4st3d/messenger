@@ -1,10 +1,12 @@
 <script setup lang="ts">
-import { formatLastMessageDate, useAuth } from '#imports';
+import { computed, formatLastMessageDate, useAuth } from '#imports';
 import type { IMessage } from '~/shared/types';
 const props = defineProps<{ message: IMessage }>();
 const { user } = useAuth();
 
-const formattedTime = formatLastMessageDate(props.message.createdAt);
+const formattedTime = computed(() =>
+  formatLastMessageDate(props.message.createdAt),
+);
 </script>
 
 <template>
