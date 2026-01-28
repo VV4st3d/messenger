@@ -1,21 +1,27 @@
-import { defineNuxtPlugin, useAuthStore, useNuxtApp } from '#imports';
-import { useRoute } from 'vue-router';
-import { ROUTES } from '~/shared/const';
+import {
+  defineNuxtPlugin,
+  useAsyncData,
+  useAuthStore,
+  useNuxtApp,
+} from '#imports';
 
 export default defineNuxtPlugin({
   name: 'init',
-  parallel: true,
   dependsOn: ['fetch'],
   async setup() {
-    const route = useRoute();
-    if (route.path === ROUTES.getRouteAuth()) return;
     const { $api } = useNuxtApp();
     const authStore = useAuthStore();
 
     try {
-      const response = await $api.auth.me();
-      if (response.success) {
-        authStore.setUser(response.data);
+      const { data } = await useAsyncData('user-init', () => $api.auth.me());
+      if (data.value?.success) {
+        authStore.setUser(data.value.data);
+        if (import.meta.client) {
+          const { $socket } = useNuxtApp();
+          if ($socket) {
+            $socket.connect();
+          }
+        }
       } else {
         authStore.setUser(null);
       }

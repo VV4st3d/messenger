@@ -1,16 +1,35 @@
-import { useNuxtApp } from '#imports';
+import { useAuthStore, useNuxtApp } from '#imports';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
+import { SOCKET_EMIT_EVENTS, SOCKET_ON_EVENTS } from '~/shared/const';
+
 import type { IChat, IMessage } from '~/shared/types';
 
 export const useCurrentChatStore = defineStore('currentChat', () => {
-  const { $api } = useNuxtApp();
+  const { $api, $socket } = useNuxtApp();
   const chat = ref<Omit<IChat, 'lastMessage'> | null>(null);
   const messages = ref<IMessage[]>([]);
+  const authStore = useAuthStore();
 
   const setChat = (payload: IChat) => (chat.value = payload);
   const setMessages = (payload: IMessage[]) => (messages.value = payload);
   const pushMessage = (payload: IMessage) => messages.value.push(payload);
+
+  const bindEvents = () => {
+    if (chat.value) {
+      $socket.emit(SOCKET_EMIT_EVENTS.JOIN_CHAT, chat.value.id);
+    }
+    $socket.on(SOCKET_ON_EVENTS.NEW_MESSAGE, (payload) => pushMessage(payload));
+  };
+
+  const sendMessageHandler = (content: string) => {
+    if (chat.value)
+      $socket.emit(SOCKET_EMIT_EVENTS.SEND_MESSAGE, {
+        chatId: chat.value?.id,
+        content,
+        type: 'text',
+      });
+  };
 
   const getChatInfoHandler = async (chatId: string) => {
     try {
@@ -33,6 +52,8 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   };
 
   return {
+    sendMessageHandler,
+    bindEvents,
     chat,
     setChat,
     messages,

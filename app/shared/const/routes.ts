@@ -5,7 +5,7 @@ export const RouteNames = {
 
 export const ROUTES = {
   getRouteAuth() {
-    return 'auth';
+    return '/auth';
   },
   getRouteChats() {
     return '/chats';

@@ -40,8 +40,8 @@ const handleCheckEmail = async () => {
   error.value = '';
 
   try {
-    await $api.auth.checkExist({ email: email.value });
-    step.value = 'login';
+    const { data } = await $api.auth.checkExist({ email: email.value });
+    step.value = data.exists ? 'login' : 'register';
   } catch (err: any) {
     error.value = err.data.message || 'Непредвиденная ошибка';
   } finally {
@@ -52,10 +52,17 @@ const handleCheckEmail = async () => {
 const handleLogin = async () => {
   loading.value = true;
   try {
-    await authStore.loginHandler({
+    const { data, token: responseToken } = await $api.auth.login({
       email: email.value,
       password: password.value,
     });
+
+    authStore.setUser(data);
+    authStore.token = responseToken;
+    // await authStore.loginHandler({
+    //   email: email.value,
+    //   password: password.value,
+    // });
     navigateTo({ name: RouteNames.MAIN });
   } catch (err: any) {
     error.value = err.data.message || 'Ошибка ввода пароля';

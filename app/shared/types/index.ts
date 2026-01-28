@@ -8,7 +8,13 @@ export type {
   TCheckExistBody,
   TAuthenticationRes,
 } from './auth';
-export type { UserStatus, TSocketPayload } from './socket';
+export type {
+  UserStatus,
+  TSocketEmitPayload,
+  TSocketOnPayload,
+  TSOCKET_EMIT_EVENTS,
+  TSOCKET_ON_EVENTS,
+} from './socket';
 export type {
   TChat,
   TChats,
@@ -19,3 +25,5 @@ export type {
   IMessageBody,
   TSendMessageResponse,
 } from './chat';
+
+export type { valueOf } from './helpers';

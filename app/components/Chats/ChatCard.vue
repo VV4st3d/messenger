@@ -5,7 +5,7 @@ import type { IChat } from '~/shared/types';
 
 const props = defineProps<{ chat: IChat }>();
 
-const companion = useCompanion(props.chat);
+const companion = useCompanion(() => props.chat);
 </script>
 
 <template>

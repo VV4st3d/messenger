@@ -7,7 +7,7 @@ import {
   useNuxtApp,
 } from '#imports';
 import { useRoute } from 'vue-router';
-import { SOCKET_EVENTS } from '~/shared/const';
+import ChatFooter from '~/components/Chat/ChatFooter.vue';
 
 const { params } = useRoute();
 const chatId = params.id as string;
@@ -36,19 +36,14 @@ const handleGetMessages = async () => {
 };
 
 const handleSendMessage = () => {
-  $socket.emit(SOCKET_EVENTS.SEND_MESSAGE, {
-    chatId,
-    content: messageText.value,
-    type: 'text',
-  });
+  chatStore.sendMessageHandler(messageText.value);
   messageText.value = '';
 };
 
 onMounted(async () => {
-  await $socket.connect();
-  $socket.emit(SOCKET_EVENTS.JOIN_CHAT, chatId);
-  handleGetChatInfo();
-  handleGetMessages();
+  await handleGetChatInfo();
+  await handleGetMessages();
+  chatStore.bindEvents();
 });
 </script>
 
@@ -58,23 +53,10 @@ onMounted(async () => {
 
     <MessageSpace :messages="chatStore.messages" />
 
-    <footer class="chat-input-container">
-      <button>
-        <UiIcon name="paper-clip" size="24" />
-      </button>
-
-      <textarea
-        v-model="messageText"
-        placeholder="Напишите сообщение..."
-        rows="1"
-        class="flex-1 resize-none bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-[var(--radius)] px-4 py-3 focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30 transition"
-        @keyup.enter="handleSendMessage"
-      />
-
-      <button :disabled="!messageText" @click="handleSendMessage">
-        <UiIcon name="paper-airplane" size="24" />
-      </button>
-    </footer>
+    <ChatFooter
+      v-model="messageText"
+      :handle-send-message="handleSendMessage"
+    />
   </div>
 </template>
 

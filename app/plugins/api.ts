@@ -1,13 +1,11 @@
-import { defineNuxtPlugin, navigateTo, useRuntimeConfig } from '#app';
+import { defineNuxtPlugin, useRuntimeConfig } from '#app';
 import { useAuthStore } from '#imports';
 import { createAuthRepository } from '~/repository/auth';
 import { createChatsRepository } from '~/repository/chats';
 import { createFriendsRepository } from '~/repository/friends';
-import { RouteNames } from '~/shared/const';
 
 export default defineNuxtPlugin({
   name: 'fetch',
-  parallel: true,
   setup(nuxtApp) {
     const config = useRuntimeConfig();
     const authStore = useAuthStore();
@@ -21,7 +19,7 @@ export default defineNuxtPlugin({
       },
       async onResponseError({ response }) {
         if (response.status == 401) {
-          nuxtApp.runWithContext(() => navigateTo({ name: RouteNames.AUTH }));
+          authStore.setUser(null);
         }
       },
     });

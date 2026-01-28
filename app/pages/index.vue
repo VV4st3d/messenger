@@ -1,16 +1,19 @@
 <script lang="ts" setup>
 import { useNuxtApp } from '#app';
-import { onMounted, onUnmounted } from 'vue';
+import { useAuthStore } from '#imports';
+import { onMounted } from 'vue';
 
 const { $socket } = useNuxtApp();
+const authStore = useAuthStore();
 
 onMounted(() => {
-  $socket.connect();
+  // authStore.bindEvents()
+  // $socket.connect();
 });
 
-onUnmounted(() => {
-  $socket.disconnect();
-});
+// onUnmounted(() => {
+//   $socket.disconnect();
+// });
 </script>
 
 <template>
