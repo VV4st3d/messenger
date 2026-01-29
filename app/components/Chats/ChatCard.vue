@@ -1,14 +1,18 @@
 <script setup lang="ts">
-import { computed, formatLastMessageDate, useCurrentChatStore } from '#imports';
+import {
+  formatLastMessageDate,
+  storeToRefs,
+  useCurrentChatStore,
+} from '#imports';
 import { useCompanion } from '~/composables/useCompanion';
 import type { IChat } from '~/shared/types';
+import TypingIndicator from '../common/Typing/TypingIndicator.vue';
 
 const props = defineProps<{ chat: IChat }>();
 
 const companion = useCompanion(() => props.chat);
 
-const currentChatStore = useCurrentChatStore();
-const isTyping = computed(() => currentChatStore.typing?.isTyping);
+const { typing } = storeToRefs(useCurrentChatStore());
 </script>
 
 <template>
@@ -40,7 +44,14 @@ const isTyping = computed(() => currentChatStore.typing?.isTyping);
         v-if="chat.lastMessage"
         class="text-sm text-[var(--text-secondary)] truncate leading-tight"
       >
-        {{ isTyping ? 'Печатает...' : chat.lastMessage.content }}
+        <TypingIndicator
+          v-if="typing?.isTyping && typing.chatId === chat.id"
+          :show="typing.isTyping"
+        />
+
+        <span v-else>
+          {{ chat.lastMessage.content }}
+        </span>
       </div>
     </div>
   </div>
