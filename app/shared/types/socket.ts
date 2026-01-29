@@ -14,6 +14,8 @@ export type TSocketOnPayload<T extends keyof IOnEvents> = IOnEvents[T];
 interface IEmitEvents {
   joinChat: string;
   sendMessage: { chatId: string; content: string; type: 'text' | 'file' };
+  typing: string;
+  stopTyping: string;
 }
 
 interface IOnEvents {
@@ -21,7 +23,15 @@ interface IOnEvents {
   disconnect: null;
   connect: null;
   newMessage: IMessage;
+  typing: ITyping;
 }
 
 export type TSOCKET_EMIT_EVENTS = valueOf<typeof SOCKET_EMIT_EVENTS>;
 export type TSOCKET_ON_EVENTS = valueOf<typeof SOCKET_ON_EVENTS>;
+
+export interface ITyping {
+  userId: string;
+  chatId: string;
+  username?: string;
+  isTyping: boolean;
+}

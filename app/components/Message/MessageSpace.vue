@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { nextTick, useTemplateRef, watch } from 'vue';
+import { useCurrentChatStore } from '#imports';
+import { computed, nextTick, useTemplateRef, watch } from 'vue';
 import type { IMessage } from '~/shared/types';
 
 const props = defineProps<{
@@ -14,6 +15,9 @@ async function scrollToElement() {
   await nextTick();
   scrollAnchorRef.value?.scrollIntoView({ behavior: 'smooth' });
 }
+
+const currentChatStore = useCurrentChatStore();
+const isTyping = computed(() => currentChatStore.typing?.isTyping);
 
 watch(
   () => props.messages,
@@ -32,6 +36,7 @@ watch(
         :key="message.id"
         :message="message"
       />
+      <div v-if="isTyping" class="typing-indicator">Печатает...</div>
       <div :ref="ANCHOR_NAME" style="display: hidden" />
     </div>
 

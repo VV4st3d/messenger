@@ -1,25 +1,36 @@
-import { useAuthStore, useNuxtApp } from '#imports';
+import { useNuxtApp } from '#imports';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { SOCKET_EMIT_EVENTS, SOCKET_ON_EVENTS } from '~/shared/const';
 
-import type { IChat, IMessage } from '~/shared/types';
+import type { IChat, IMessage, ITyping } from '~/shared/types';
 
 export const useCurrentChatStore = defineStore('currentChat', () => {
   const { $api, $socket } = useNuxtApp();
   const chat = ref<Omit<IChat, 'lastMessage'> | null>(null);
   const messages = ref<IMessage[]>([]);
-  const authStore = useAuthStore();
+  const typing = ref<ITyping>();
 
   const setChat = (payload: IChat) => (chat.value = payload);
   const setMessages = (payload: IMessage[]) => (messages.value = payload);
   const pushMessage = (payload: IMessage) => messages.value.push(payload);
 
   const bindEvents = () => {
+    $socket.on(SOCKET_ON_EVENTS.NEW_MESSAGE, (payload) => pushMessage(payload));
+    $socket.on('typing', (payload) => {
+      typing.value = payload;
+    });
     if (chat.value) {
       $socket.emit(SOCKET_EMIT_EVENTS.JOIN_CHAT, chat.value.id);
     }
-    $socket.on(SOCKET_ON_EVENTS.NEW_MESSAGE, (payload) => pushMessage(payload));
+  };
+
+  const handleStopTyping = () => {
+    if (chat.value) $socket.emit(SOCKET_EMIT_EVENTS.STOP_TYPING, chat.value.id);
+  };
+
+  const handleStartTypeing = () => {
+    if (chat.value) $socket.emit(SOCKET_EMIT_EVENTS.TYPING, chat.value.id);
   };
 
   const sendMessageHandler = (content: string) => {
@@ -52,6 +63,9 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   };
 
   return {
+    typing,
+    handleStopTyping,
+    handleStartTypeing,
     sendMessageHandler,
     bindEvents,
     chat,

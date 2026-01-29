@@ -14,6 +14,7 @@ export type {
   TSocketOnPayload,
   TSOCKET_EMIT_EVENTS,
   TSOCKET_ON_EVENTS,
+  ITyping,
 } from './socket';
 export type {
   TChat,

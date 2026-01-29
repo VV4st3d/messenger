@@ -5,10 +5,13 @@ import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 import { shallowRef } from 'vue';
 import { SOCKET_ON_EVENTS } from '~/shared/const';
-import type { TSOCKET_EMIT_EVENTS, TSOCKET_ON_EVENTS,
+import type {
+  TSOCKET_EMIT_EVENTS,
+  TSOCKET_ON_EVENTS,
   TSocketEmitPayload,
   TSocketOnPayload,
-  UserStatus } from '~/shared/types';
+  UserStatus,
+} from '~/shared/types';
 
 export default defineNuxtPlugin({
   name: 'socket',
@@ -39,7 +42,6 @@ export default defineNuxtPlugin({
               nuxtApp.hooks.hook('app:suspense:resolve', resolve);
             });
           }
-
           authStore.setOnline(payload.online);
         });
       },

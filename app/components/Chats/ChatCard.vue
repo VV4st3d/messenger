@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { formatLastMessageDate } from '#imports';
+import { computed, formatLastMessageDate, useCurrentChatStore } from '#imports';
 import { useCompanion } from '~/composables/useCompanion';
 import type { IChat } from '~/shared/types';
 
 const props = defineProps<{ chat: IChat }>();
 
 const companion = useCompanion(() => props.chat);
+
+const currentChatStore = useCurrentChatStore();
+const isTyping = computed(() => currentChatStore.typing?.isTyping);
 </script>
 
 <template>
@@ -37,7 +40,7 @@ const companion = useCompanion(() => props.chat);
         v-if="chat.lastMessage"
         class="text-sm text-[var(--text-secondary)] truncate leading-tight"
       >
-        {{ chat.lastMessage.content }}
+        {{ isTyping ? 'Печатает...' : chat.lastMessage.content }}
       </div>
     </div>
   </div>
