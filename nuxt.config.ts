@@ -12,5 +12,11 @@ export default defineNuxtConfig({
       socketUrl: '',
     },
   },
-  modules: ['@nuxtjs/tailwindcss', '@nuxt/icon', '@pinia/nuxt', '@nuxt/eslint'],
+  modules: [
+    '@nuxtjs/tailwindcss',
+    '@nuxt/icon',
+    '@pinia/nuxt',
+    '@nuxt/eslint',
+    '@vueuse/nuxt',
+  ],
 });

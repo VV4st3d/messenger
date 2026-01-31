@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import {
   onMounted,
+  onUnmounted,
   ref,
   storeToRefs,
   useCurrentChatStore,
-  useNuxtApp,
 } from '#imports';
 import { useRoute } from 'vue-router';
 import ChatFooter from '~/components/Chat/ChatFooter.vue';
@@ -16,8 +16,6 @@ const messageText = ref<string>('');
 const chatStore = useCurrentChatStore();
 
 const { chat } = storeToRefs(chatStore);
-
-const { $socket } = useNuxtApp();
 
 const handleGetChatInfo = async () => {
   try {
@@ -44,6 +42,10 @@ onMounted(async () => {
   await handleGetChatInfo();
   await handleGetMessages();
   chatStore.bindEvents();
+});
+
+onUnmounted(() => {
+  chatStore.unbindEvents();
 });
 </script>
 

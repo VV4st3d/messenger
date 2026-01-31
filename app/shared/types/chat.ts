@@ -2,7 +2,11 @@ import type { TResponseBody } from './base-body';
 
 export type TChats = TResponseBody<IChat[]>;
 export type TChat = TResponseBody<Omit<IChat, 'lastMessage'>>;
-export type TMessages = TResponseBody<IMessage[]>;
+export type TMessages = TResponseBody<{
+  messages: IMessage[];
+  hasMore: boolean;
+  total: number;
+}>;
 export type TSendMessageResponse = TResponseBody<IMessage>;
 
 export interface IChat {
@@ -45,4 +49,9 @@ export interface IMessageBody {
   chatId: string;
   content: string;
   type: 'text';
+}
+
+export interface IGetMessageQuery {
+  limit?: number;
+  lastCreatedAt?: string;
 }

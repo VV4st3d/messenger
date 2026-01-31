@@ -10,7 +10,7 @@ const formattedTime = computed(() =>
 </script>
 
 <template>
-  <div class="flex flex-col gap-4">
+  <div class="flex flex-col">
     <div
       v-if="message.senderId !== user?.id"
       class="flex items-end gap-2 max-w-[85%] sm:max-w-[70%]"

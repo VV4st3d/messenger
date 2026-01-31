@@ -21,13 +21,15 @@
   "dependencies": {
     "@nuxt/icon": "^2.2.0",
     "@pinia/nuxt": "^0.11.3",
+    "@vueuse/nuxt": "^14.2.0",
     "date-fns": "^4.1.0",
     "nuxt": "^4.2.2",
     "pinia": "^3.0.4",
     "socket.io-client": "^4.8.3",
     "vue": "^3.5.26",
     "vue-router": "^4.6.4",
-    "vue-toastification": "^2.0.0-rc.5"
+    "vue-toastification": "^2.0.0-rc.5",
+    "vue-virtual-scroller": "^2.0.0-beta.8"
   },
   "devDependencies": {
     "@iconify/vue": "^5.0.0",

@@ -1,9 +1,14 @@
 <script setup lang="ts">
-import { useCompanion } from '#imports';
+import { computed, useCompanion, useCurrentChatStore } from '#imports';
 import type { IChat } from '~/shared/types';
+import TypingIndicator from '../common/Typing/TypingIndicator.vue';
 
 const props = defineProps<{ chat: IChat | null }>();
 const companion = useCompanion(() => props.chat);
+
+const currentChatStore = useCurrentChatStore();
+
+const isTyping = computed(() => currentChatStore.typing?.isTyping);
 </script>
 
 <template>
@@ -23,7 +28,8 @@ const companion = useCompanion(() => props.chat);
         <h2 class="font-semibold text-lg truncate max-w-[200px]">
           {{ chat?.name }}
         </h2>
-        <p class="text-xs text-[var(--text-secondary)]">
+        <TypingIndicator v-if="isTyping" :show="isTyping" />
+        <p v-else class="text-xs text-[var(--text-secondary)]">
           {{ companion?.isOnline ? 'Онлайн' : 'Оффлайн' }}
         </p>
       </div>

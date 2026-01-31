@@ -25,6 +25,7 @@ export type {
   IMessage,
   IMessageBody,
   TSendMessageResponse,
+  IGetMessageQuery,
 } from './chat';
 
 export type { valueOf } from './helpers';
