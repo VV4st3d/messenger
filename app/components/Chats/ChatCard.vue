@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import {
+  computed,
   formatLastMessageDate,
-  storeToRefs,
-  useCurrentChatStore,
 } from '#imports';
 import { useCompanion } from '~/composables/useCompanion';
-import type { IChat } from '~/shared/types';
+import type { IChat, ITyping } from '~/shared/types';
 import TypingIndicator from '../common/Typing/TypingIndicator.vue';
 
-const props = defineProps<{ chat: IChat }>();
+const props = defineProps<{ chat: IChat; typing: ITyping | undefined }>();
 
 const companion = useCompanion(() => props.chat);
 
-const { typing } = storeToRefs(useCurrentChatStore());
+const formattedTime = computed(
+  () =>
+    props.chat.lastMessage?.createdAt &&
+    formatLastMessageDate(props.chat.lastMessage.createdAt),
+);
 </script>
 
 <template>
@@ -36,7 +39,7 @@ const { typing } = storeToRefs(useCurrentChatStore());
           v-if="chat.lastMessage"
           class="text-xs text-[var(--text-tertiary)] whitespace-nowrap"
         >
-          {{ formatLastMessageDate(chat.lastMessage.createdAt) }}
+          {{ formattedTime }}
         </span>
       </div>
 

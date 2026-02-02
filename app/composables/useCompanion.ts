@@ -3,7 +3,7 @@ import type { ComputedRef, MaybeRefOrGetter } from 'vue';
 import type { IChat, IParticipant } from '~/shared/types';
 
 export const useCompanion = (
-  chatItem: MaybeRefOrGetter<IChat | null>,
+  chatItem: MaybeRefOrGetter<IChat | undefined>,
 ): ComputedRef<IParticipant | null | undefined> => {
   const { user } = useAuth();
   return computed(() => {
@@ -11,6 +11,5 @@ export const useCompanion = (
     if (chat?.type === 'private') {
       return chat.participants.find((usr) => usr.id !== user.value?.id);
     }
-    return null;
   });
 };

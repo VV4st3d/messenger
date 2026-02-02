@@ -13,7 +13,7 @@ export const useChatsStore = defineStore('chats', () => {
       const { data } = await $api.chats.getChats();
       setChats(data);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw error;
     }
   };

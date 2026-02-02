@@ -5,7 +5,7 @@ export function useAuth() {
   const authStore = useAuthStore();
   const { user } = storeToRefs(authStore);
 
-  const isAuthenticated = computed(() => !!user.value);
+  const isAuthenticated = computed(() => !!user.value?.id);
 
   return {
     user,

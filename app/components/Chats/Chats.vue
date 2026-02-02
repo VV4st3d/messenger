@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ROUTES } from '~/shared/const';
-import type { IChat } from '~/shared/types';
+import type { IChat, ITyping } from '~/shared/types';
 
-defineProps<{ chats: IChat[] }>();
+defineProps<{ chats: IChat[]; typing: ITyping | undefined }>();
 </script>
 
 <template>
@@ -17,6 +17,7 @@ defineProps<{ chats: IChat[] }>();
       :to="ROUTES.getRouteChat(chat.id)"
     >
       <ChatsChatCard
+        :typing="typing"
         :class="isActive ? 'active_link' : null"
         class="p-4"
         :chat="chat"

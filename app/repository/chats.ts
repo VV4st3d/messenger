@@ -1,6 +1,6 @@
 import { API_ROUTES } from '~/shared/const';
 import type {
-  TMessages,
+  TMessengesResponse,
   TChat,
   TChats,
   IGetMessageQuery,
@@ -17,7 +17,7 @@ export function createChatsRepository(appFetch: typeof $fetch) {
       });
     },
     getMessages(id: string, query?: IGetMessageQuery) {
-      return appFetch<TMessages>(API_ROUTES.getRouteMessages(id), {
+      return appFetch<TMessengesResponse>(API_ROUTES.getRouteMessages(id), {
         method: 'GET',
         query: {
           ...query,

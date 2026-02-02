@@ -38,8 +38,7 @@ const hasError = ref(false);
 
     <div
       v-if="online"
-      style="bottom: 0; right: 0"
-      class="absolute rounded-full bg-[var(--online)] border-2 border-[var(--bg-secondary)]"
+      class="absolute rounded-full bg-[var(--online)] border-[var(--bg-secondary)]"
       :class="STATUS_SIZE_CLASSES[size]"
     />
   </div>

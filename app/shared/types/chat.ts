@@ -2,7 +2,7 @@ import type { TResponseBody } from './base-body';
 
 export type TChats = TResponseBody<IChat[]>;
 export type TChat = TResponseBody<Omit<IChat, 'lastMessage'>>;
-export type TMessages = TResponseBody<{
+export type TMessengesResponse = TResponseBody<{
   messages: IMessage[];
   hasMore: boolean;
   total: number;

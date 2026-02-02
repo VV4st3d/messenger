@@ -1,15 +1,21 @@
 <script setup lang="ts">
-import { storeToRefs, useAuthStore, useFriendsStore } from '#imports';
+import {
+  storeToRefs,
+  useAuthStore,
+  useCurrentChatStore,
+  useFriendsStore,
+} from '#imports';
 import { computed, onMounted, ref } from 'vue';
-import type { TTabs } from './types';
+import type { TSidebarTabs } from './types';
 import FriendList from '../Friend/FriendList.vue';
 import { useChatsStore } from '~/stores/chats';
 
-const activeTab = ref<TTabs>('chats');
+const activeTab = ref<TSidebarTabs>('chats');
 
 const authStore = useAuthStore();
 const friendsStore = useFriendsStore();
 const chatStore = useChatsStore();
+const currentChatStore = useCurrentChatStore();
 
 const chats = computed(() => chatStore.chats);
 
@@ -17,7 +23,11 @@ const friends = computed(() => friendsStore.friends);
 
 const { user, isOnline } = storeToRefs(authStore);
 
-const additionalClassses = (currentTab: TTabs) =>
+const typing = computed(() => currentChatStore.typing);
+
+const isUserOnline = computed(() => (isOnline ? 'Онлайн' : 'Оффлайн'));
+
+const additionalClassses = (currentTab: TSidebarTabs) =>
   activeTab.value === currentTab
     ? 'border-b-2 border-[var(--accent)] text-[var(--accent)]'
     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]';
@@ -76,7 +86,7 @@ onMounted(() => {
         v-if="activeTab === 'chats'"
         class="divide-y divide-[var(--border-subtle)]"
       >
-        <Chats :chats="chats" />
+        <Chats :typing="typing" :chats="chats" />
       </div>
 
       <div
@@ -96,7 +106,7 @@ onMounted(() => {
       <div class="flex-1 min-w-0">
         <div class="font-medium truncate">{{ user?.displayName }}</div>
         <div class="text-xs text-[var(--text-tertiary)]">
-          {{ isOnline ? 'Онлайн' : 'Оффлайн' }}
+          {{ isUserOnline }}
         </div>
       </div>
       <button

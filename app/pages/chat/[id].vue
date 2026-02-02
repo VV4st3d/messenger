@@ -15,11 +15,20 @@ const messageText = ref<string>('');
 
 const chatStore = useCurrentChatStore();
 
-const { chat } = storeToRefs(chatStore);
+const { chat, typing, lastMessageDate } = storeToRefs(chatStore);
+const {
+  getMessagesHandler,
+  sendMessageHandler,
+  bindEvents,
+  unbindEvents,
+  getChatInfoHandler,
+  resetMessages,
+  handleStartTyping,
+} = chatStore;
 
 const handleGetChatInfo = async () => {
   try {
-    await useCurrentChatStore().getChatInfoHandler(chatId);
+    await getChatInfoHandler(chatId);
   } catch (error) {
     console.log(error);
   }
@@ -27,36 +36,42 @@ const handleGetChatInfo = async () => {
 
 const handleGetMessages = async () => {
   try {
-    await useCurrentChatStore().getMessagesHandler(chatId);
+    await getMessagesHandler(chatId);
   } catch (error) {
     console.log(error);
   }
 };
 
 const handleSendMessage = () => {
-  chatStore.sendMessageHandler(messageText.value);
+  sendMessageHandler(messageText.value);
   messageText.value = '';
 };
 
 onMounted(async () => {
-  await handleGetChatInfo();
-  await handleGetMessages();
-  chatStore.bindEvents();
+  await Promise.all([handleGetChatInfo(), handleGetMessages()]);
+  bindEvents();
 });
 
 onUnmounted(() => {
-  chatStore.unbindEvents();
+  unbindEvents();
 });
 </script>
 
 <template>
   <div class="flex flex-col h-full">
-    <ChatHeader :chat="chat" />
+    <ChatHeader :typing="typing" :chat="chat" />
 
-    <MessageSpace :messages="chatStore.messages" />
+    <MessageSpace
+      :get-messeges="getMessagesHandler"
+      :reset-messages="resetMessages"
+      :last-message-date="lastMessageDate"
+      :chat="chat"
+      :messages="chatStore.messages"
+    />
 
     <ChatFooter
       v-model="messageText"
+      :handle-start-typing="handleStartTyping"
       :handle-send-message="handleSendMessage"
     />
   </div>

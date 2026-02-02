@@ -14,7 +14,7 @@ export const useFriendsStore = defineStore('friends', () => {
       const { data } = await $api.friend.getFriends();
       setFriends(data);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 

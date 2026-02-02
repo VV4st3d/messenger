@@ -12,7 +12,7 @@ defineProps<{ friends: IFriend[] }>();
       :online="friend.isOnline"
     />
     <div
-      v-if="!friends.length"
+      v-if="friends.length === 0"
       class="flex flex-col items-center justify-center h-full py-12 text-[var(--text-tertiary)]"
     >
       <UiIcon name="users" class="w-16 h-16 mb-4 opacity-50" />

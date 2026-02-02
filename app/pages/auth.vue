@@ -3,9 +3,10 @@
 import { navigateTo, useNuxtApp } from '#app';
 import { useAuthStore } from '#imports';
 import { computed, reactive, ref, toRefs } from 'vue';
+import { AUTH_STEP } from '~/components/Auth/const';
+import Login from '~/components/Auth/Login.vue';
+import Register from '~/components/Auth/Register.vue';
 import { RouteNames } from '~/shared/const';
-
-type TAuthStep = 'email' | 'login' | 'register';
 
 interface IAuthForm {
   email: string;
@@ -13,11 +14,10 @@ interface IAuthForm {
   password: string;
 }
 
-const isRegDisbaled = computed(
-  () => !username.value.trim() || !password.value.trim(),
-);
+const { $api } = useNuxtApp();
+const authStore = useAuthStore();
 
-const step = ref<TAuthStep>('email');
+const step = ref<AUTH_STEP>(AUTH_STEP.EMAIL);
 const authForm = reactive<IAuthForm>({
   email: '',
   username: '',
@@ -29,9 +29,16 @@ const { email, password, username } = toRefs(authForm);
 const loading = ref(false);
 const error = ref('');
 
-const { $api } = useNuxtApp();
+const setStep = (payload: AUTH_STEP) => {
+  step.value = payload;
+};
 
-const authStore = useAuthStore();
+const isRegDisabled = computed(
+  () => !username.value.trim() || !password.value.trim(),
+);
+
+const isLoginDisabled = computed(() => !password.value.trim());
+const isDisabledContinue = computed(() => !email.value.trim());
 
 const handleCheckEmail = async () => {
   if (!email.value.trim()) return;
@@ -41,7 +48,7 @@ const handleCheckEmail = async () => {
 
   try {
     const { data } = await $api.auth.checkExist({ email: email.value });
-    step.value = data.exists ? 'login' : 'register';
+    step.value = data.exists ? AUTH_STEP.LOGIN : AUTH_STEP.REGISTER;
   } catch (err: any) {
     error.value = err.data.message || 'Непредвиденная ошибка';
   } finally {
@@ -52,20 +59,13 @@ const handleCheckEmail = async () => {
 const handleLogin = async () => {
   loading.value = true;
   try {
-    const { data, token: responseToken } = await $api.auth.login({
+    await authStore.loginHandler({
       email: email.value,
       password: password.value,
     });
-
-    authStore.setUser(data);
-    authStore.token = responseToken;
-    // await authStore.loginHandler({
-    //   email: email.value,
-    //   password: password.value,
-    // });
     navigateTo({ name: RouteNames.MAIN });
   } catch (err: any) {
-    error.value = err.data.message || 'Ошибка ввода пароля';
+    error.value = err.data.message || 'Ошибка при авторизации';
   } finally {
     loading.value = false;
   }
@@ -101,7 +101,7 @@ const handleRegister = async () => {
       </div>
 
       <div class="p-8">
-        <div v-if="step === 'email'" class="space-y-6">
+        <div v-if="step === AUTH_STEP.EMAIL" class="space-y-6">
           <UiInput
             v-model="email"
             :on-enter="handleCheckEmail"
@@ -111,7 +111,7 @@ const handleRegister = async () => {
 
           <UiButton
             :loading="loading"
-            :disabled="!email.trim()"
+            :disabled="isDisabledContinue"
             loading-text="Проверка..."
             @click="handleCheckEmail"
           >
@@ -123,68 +123,29 @@ const handleRegister = async () => {
           </p>
         </div>
 
-        <div v-else-if="step === 'login'" class="space-y-6">
-          <UiInput
+        <div v-else-if="step === AUTH_STEP.LOGIN" class="space-y-6">
+          <Login
             v-model="password"
-            :on-enter="handleLogin"
-            label="Пароль"
-            placeholder="••••••••"
+            :set-step="setStep"
+            :error="error"
+            :is-disabled="isLoginDisabled"
+            :step="step"
+            :handle-login="handleLogin"
+            :is-loading="loading"
           />
-
-          <UiButton
-            :loading="loading"
-            :disabled="!password.trim()"
-            loading-text="Вход..."
-            @click="handleLogin"
-          >
-            Войти
-          </UiButton>
-
-          <button
-            class="text-[var(--accent)] hover:text-[var(--accent-hover)] text-sm mt-4"
-            @click="step = 'email'"
-          >
-            ← Изменить email
-          </button>
-
-          <p v-if="error" class="text-[var(--danger)] text-sm text-center mt-4">
-            {{ error }}
-          </p>
         </div>
 
-        <div v-else-if="step === 'register'" class="space-y-6">
-          <UiInput
-            v-model="username"
-            label="Username"
-            placeholder="Ваше имя в чате"
+        <div v-else-if="step === AUTH_STEP.REGISTER" class="space-y-6">
+          <Register
+            v-model:password="password"
+            v-model:username="username"
+            :set-step="setStep"
+            :is-loading="loading"
+            :step="step"
+            :handle-register="handleRegister"
+            :is-disabled="isRegDisabled"
+            :error="error"
           />
-
-          <UiInput
-            v-model="password"
-            :on-enter="handleRegister"
-            label="Пароль"
-            placeholder="Придумайте надёжный пароль"
-          />
-
-          <UiButton
-            :loading="loading"
-            :disabled="isRegDisbaled"
-            loading-text="Регистрация..."
-            @click="handleRegister"
-          >
-            Зарегистрироваться
-          </UiButton>
-
-          <button
-            class="text-[var(--accent)] hover:text-[var(--accent-hover)] text-sm mt-4"
-            @click="step = 'email'"
-          >
-            ← Изменить email
-          </button>
-
-          <p v-if="error" class="text-[var(--danger)] text-sm text-center mt-4">
-            {{ error }}
-          </p>
         </div>
       </div>
     </div>

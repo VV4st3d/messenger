@@ -17,6 +17,10 @@ const toggleTheme = () => {
   );
 };
 
+const toggleSidebar = () => {
+  showSidebar.value = !showSidebar.value;
+};
+
 const restoreTheme = () => {
   const savedTheme = localStorage.getItem(LOCALSTORAGE_THEME_KEY);
   if (savedTheme === Themes.LIGHT_THEME) {
@@ -39,7 +43,7 @@ onMounted(() => {
     >
       <button
         class="md:hidden text-2xl p-2 hover:text-[var(--accent)] transition"
-        @click="showSidebar = !showSidebar"
+        @click="toggleSidebar"
       >
         <UiIcon :name="'bars-3'" class="w-8 h-8" />
       </button>

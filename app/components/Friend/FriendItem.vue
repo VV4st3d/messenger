@@ -1,9 +1,14 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import type { IFriend } from '~/shared/types';
 
-defineProps<{
+const props = defineProps<{
   friend: IFriend;
 }>();
+
+const userStatus = computed(() =>
+  props.friend.isOnline ? 'Онлайн' : 'Был недавно',
+);
 </script>
 
 <template>
@@ -23,7 +28,7 @@ defineProps<{
         {{ friend.displayName }}
       </div>
       <div class="text-sm text-[var(--text-secondary)] truncate">
-        {{ friend.isOnline ? 'Онлайн' : 'Был недавно' }}
+        {{ userStatus }}
       </div>
     </div>
 

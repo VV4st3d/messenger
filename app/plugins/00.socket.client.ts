@@ -6,8 +6,8 @@ import { io } from 'socket.io-client';
 import { shallowRef } from 'vue';
 import { SOCKET_ON_EVENTS } from '~/shared/const';
 import type {
-  TSOCKET_EMIT_EVENTS,
-  TSOCKET_ON_EVENTS,
+  TSocketEmitEvents,
+  TSocketOnEvents,
   TSocketEmitPayload,
   TSocketOnPayload,
   UserStatus,
@@ -46,17 +46,14 @@ export default defineNuxtPlugin({
         });
       },
 
-      on<T extends TSOCKET_ON_EVENTS>(
+      on<T extends TSocketOnEvents>(
         event: T,
         callback: (data: TSocketOnPayload<T>) => void,
       ) {
         socketInstance.value?.on(event, callback as any);
       },
 
-      emit<T extends TSOCKET_EMIT_EVENTS>(
-        event: T,
-        data: TSocketEmitPayload<T>,
-      ) {
+      emit<T extends TSocketEmitEvents>(event: T, data: TSocketEmitPayload<T>) {
         if (!socketInstance.value?.connected) {
           console.warn(`Socket not connected.`);
           return;
@@ -64,7 +61,7 @@ export default defineNuxtPlugin({
         socketInstance.value.emit(event, data);
       },
 
-      off(event: TSOCKET_ON_EVENTS) {
+      off(event: TSocketOnEvents) {
         socketInstance.value?.off(event);
       },
 

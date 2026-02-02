@@ -1,1 +1,1 @@
-export type TTabs = 'friends' | 'chats';
+export type TSidebarTabs = 'friends' | 'chats';

@@ -6,7 +6,7 @@ import { createFriendsRepository } from '~/repository/friends';
 
 export default defineNuxtPlugin({
   name: 'fetch',
-  setup(nuxtApp) {
+  setup() {
     const config = useRuntimeConfig();
     const authStore = useAuthStore();
     const appFetch = $fetch.create({

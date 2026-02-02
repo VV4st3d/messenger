@@ -12,19 +12,18 @@ import type {
 
 export const useCurrentChatStore = defineStore('currentChat', () => {
   const { $api, $socket } = useNuxtApp();
-  const chat = ref<Omit<IChat, 'lastMessage'> | null>(null);
+  const chat = ref<Omit<IChat, 'lastMessage'> | undefined>(undefined);
   const messages = ref<IMessage[]>([]);
   const typing = ref<ITyping>();
   const lastMessageDate = ref<string>();
-
   const setChat = (payload: IChat) => (chat.value = payload);
+  const setTyping = (payload: ITyping) => (typing.value = payload);
   const pushMessage = (payload: IMessage) => messages.value.push(payload);
+  const resetMessages = () => (messages.value = []);
 
   const bindEvents = () => {
-    $socket.on(SOCKET_ON_EVENTS.NEW_MESSAGE, (payload) => pushMessage(payload));
-    $socket.on(SOCKET_ON_EVENTS.TYPING, (payload) => {
-      typing.value = payload;
-    });
+    $socket.on(SOCKET_ON_EVENTS.NEW_MESSAGE, pushMessage);
+    $socket.on(SOCKET_ON_EVENTS.TYPING, setTyping);
     if (chat.value) {
       $socket.emit(SOCKET_EMIT_EVENTS.JOIN_CHAT, chat.value.id);
     }
@@ -44,7 +43,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   };
 
   const sendMessageHandler = (content: string) => {
-    if (chat.value)
+    if (chat.value?.id)
       $socket.emit(SOCKET_EMIT_EVENTS.SEND_MESSAGE, {
         chatId: chat.value?.id,
         content,
@@ -52,12 +51,12 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
       });
   };
 
-  const getChatInfoHandler = async (chatId: string) => {
+  const getChatInfoHandler = async (chatId: string): Promise<void> => {
     try {
       const { data } = await $api.chats.getChat(chatId);
       setChat(data);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw error;
     }
   };
@@ -65,13 +64,13 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   const getMessagesHandler = async (
     chatId: string,
     query?: IGetMessageQuery,
-  ) => {
+  ): Promise<void> => {
     try {
       const { data } = await $api.chats.getMessages(chatId, query);
       lastMessageDate.value = data.messages[0]?.createdAt;
       messages.value.unshift(...data.messages);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw error;
     }
   };
@@ -79,16 +78,17 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   return {
     unbindEvents,
     typing,
-    handleStopTyping,
-    handleStartTyping,
-    sendMessageHandler,
     bindEvents,
     chat,
-    setChat,
     messages,
-    pushMessage,
+    setChat,
+    lastMessageDate,
+    handleStopTyping,
+    resetMessages,
+    handleStartTyping,
+    sendMessageHandler,
     getChatInfoHandler,
     getMessagesHandler,
-    lastMessageDate,
+    pushMessage,
   };
 });

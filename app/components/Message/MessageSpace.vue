@@ -1,36 +1,31 @@
 <script setup lang="ts">
 import {
-  storeToRefs,
-  useCurrentChatStore,
   useIntersectionObserver,
 } from '#imports';
-import {
-  nextTick,
-  onUnmounted,
-  ref,
-  useTemplateRef,
-  watch,
-} from 'vue';
-import type { IMessage } from '~/shared/types';
-import { REFS } from './const';
+import { nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import type { IChat, IGetMessageQuery, IMessage } from '~/shared/types';
+import { MIN_MESSAGE_SIZE, REFS } from './const';
+import type MessageCard from './MessageCard.vue';
 
 const props = defineProps<{
   messages: IMessage[];
+  chat: IChat | undefined;
+  lastMessageDate: string | undefined;
+  resetMessages: () => void;
+  getMesseges: (chatId: string, query?: IGetMessageQuery) => Promise<void>;
 }>();
 
 const scroller = useTemplateRef(REFS.REF_SCROLLER);
-const targetMessage = useTemplateRef(REFS.REF_TARGET_MESSAGE);
+const targetMessage = useTemplateRef<InstanceType<typeof MessageCard>>(
+  REFS.REF_TARGET_MESSAGE,
+);
 
 const isInitialScroll = ref(true);
 const isPrepending = ref(false);
 const prevScrollHeight = ref(0);
 const prevScrollTop = ref(0);
 
-const currentChatStore = useCurrentChatStore();
-
-const { chat, lastMessageDate } = storeToRefs(currentChatStore);
-
-const scrollToBottom = async (smooth = true) => {
+const scrollToBottom = async (smooth: boolean) => {
   await nextTick();
   if (!scroller.value) return;
   const el = scroller.value.$el || scroller.value;
@@ -48,44 +43,44 @@ const saveScrollPosition = () => {
 const { pause, resume } = useIntersectionObserver(
   targetMessage,
   async ([entry]) => {
-    if (!entry?.isIntersecting) return;
-
-    pause();
-
-    isPrepending.value = true;
-    saveScrollPosition();
-
-    if (chat.value?.id)
-      await currentChatStore.getMessagesHandler(chat.value.id, {
-        lastCreatedAt: lastMessageDate.value,
-      });
-
-    await nextTick();
-
-    const el = scroller.value.$el;
-    const heightDiff = el.scrollHeight - prevScrollHeight.value;
-
-    el.scrollTop = prevScrollTop.value + heightDiff;
-
-    isPrepending.value = false;
-    resume();
+    if (!entry?.isIntersecting || !scroller.value.$el || !targetMessage) return;
+    await onIntersection();
   },
 );
 
+const onIntersection = async (): Promise<void> => {
+  pause();
+
+  isPrepending.value = true;
+  saveScrollPosition();
+
+  if (props.chat?.id)
+    await props.getMesseges(props.chat.id, {
+      lastCreatedAt: props.lastMessageDate,
+    });
+
+  await nextTick();
+
+  const el = scroller.value.$el;
+
+  const heightDiff = el.scrollHeight - prevScrollHeight.value;
+
+  el.scrollTop = prevScrollTop.value + heightDiff;
+
+  isPrepending.value = false;
+  resume();
+};
+
 onUnmounted(() => {
-  currentChatStore.messages = [];
+  props.resetMessages();
 });
 
 watch(
   () => props.messages.length,
   (value) => {
     if (value === 0 || isPrepending.value) return;
-    if (isInitialScroll.value) {
-      scrollToBottom(false);
-      isInitialScroll.value = false;
-      return;
-    }
-    scrollToBottom();
+    scrollToBottom(!isInitialScroll.value);
+    isInitialScroll.value = false;
   },
 );
 </script>
@@ -96,7 +91,7 @@ watch(
       <DynamicScroller
         :ref="REFS.REF_SCROLLER"
         :items="messages"
-        :min-item-size="24"
+        :min-item-size="MIN_MESSAGE_SIZE"
         class="scroller"
         key-field="id"
       >
@@ -110,7 +105,7 @@ watch(
             <div class="pb-6">
               <MessageCard
                 :ref="
-                  item.createdAt === currentChatStore.lastMessageDate
+                  item.createdAt === lastMessageDate
                     ? REFS.REF_TARGET_MESSAGE
                     : undefined
                 "
@@ -121,26 +116,7 @@ watch(
         </template>
       </DynamicScroller>
     </div>
-
-    <div
-      v-else
-      class="absolute inset-0 flex flex-col items-center justify-center text-center px-6"
-    >
-      <div
-        class="w-24 h-24 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center mb-6"
-      >
-        <UiIcon
-          name="chat-bubble-left-right"
-          class="w-12 h-12 text-[var(--text-tertiary)]"
-        />
-      </div>
-      <h3 class="text-xl font-semibold text-[var(--text-primary)] mb-3">
-        Пока сообщений нет
-      </h3>
-      <p class="text-[var(--text-secondary)] max-w-md mb-8">
-        Начните разговор!
-      </p>
-    </div>
+    <MessageEmptySpace v-else />
   </div>
 </template>
 

@@ -14,4 +14,4 @@ export interface IFriend {
   updatedAt: string;
 }
 
-export type TFriends = TResponseBody<IFriend[]>;
+export type TFriendsResponse = TResponseBody<IFriend[]>;

@@ -7,44 +7,45 @@ import type { ILoginBody, IRegisterBody, IUser } from '~/shared/types';
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<IUser | null>(null);
   const isOnline = ref<boolean | null>(null);
-  const setUser = (payload: IUser | null) => (user.value = payload);
-
-  const { $api } = useNuxtApp();
 
   const token = useCookie(AUTH_TOKEN_COOKIE_NAME, {
     maxAge: AUTH_TOKEN_MAX_AGE,
     watch: true,
   });
+  const setUser = (payload: IUser | null) => (user.value = payload);
 
   const setOnline = (payload: boolean) => {
     isOnline.value = payload;
   };
 
-  const loginHandler = async (payload: ILoginBody) => {
+  const loginHandler = async (payload: ILoginBody): Promise<void> => {
+    const { $api } = useNuxtApp();
     try {
-      const { data, token: responseToken } = await $api.auth.login(payload);
-      token.value = responseToken;
+      const { data, token: accessToken } = await $api.auth.login(payload);
+      token.value = accessToken;
       setUser(data);
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      throw error;
     }
   };
 
-  const registerHandler = async (payload: IRegisterBody) => {
+  const registerHandler = async (payload: IRegisterBody): Promise<void> => {
+    const { $api } = useNuxtApp();
     try {
-      const { data, token: responseToken } =
+      const { data, token: accessToken } =
         await $api.auth.registration(payload);
       setUser(data);
-      token.value = responseToken;
+      token.value = accessToken;
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 
   return {
     user,
-    setUser,
     token,
+    setUser,
     setOnline,
     isOnline,
     loginHandler,

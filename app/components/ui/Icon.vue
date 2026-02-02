@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-type sizeValues = '14' | '16' | '20' | '24';
+type TSizeValues = '14' | '16' | '20' | '24';
 
 const props = defineProps<{
   name: string;
-  size?: sizeValues;
+  size?: TSizeValues;
 }>();
 
 const iconName = computed(() => {

@@ -1,11 +1,18 @@
 <script setup lang="ts">
-import { useCurrentChatStore, useThrottling } from '#imports';
+import { useThrottling } from '#imports';
+import { TYPING_MESSAGE_DELAY } from './const';
 
 const messageText = defineModel<string>();
-defineProps<{ handleSendMessage: () => void }>();
-const { handleStartTyping } = useCurrentChatStore();
+interface IProps {
+  handleSendMessage: () => void;
+  handleStartTyping: () => void;
+}
+const props = defineProps<IProps>();
 
-const startTyping = useThrottling(handleStartTyping, 2000);
+const startTyping = useThrottling(
+  props.handleStartTyping,
+  TYPING_MESSAGE_DELAY,
+);
 
 const onTypeMessage = () => {
   startTyping();

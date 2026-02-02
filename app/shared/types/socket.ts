@@ -26,8 +26,8 @@ interface IOnEvents {
   typing: ITyping;
 }
 
-export type TSOCKET_EMIT_EVENTS = valueOf<typeof SOCKET_EMIT_EVENTS>;
-export type TSOCKET_ON_EVENTS = valueOf<typeof SOCKET_ON_EVENTS>;
+export type TSocketEmitEvents = valueOf<typeof SOCKET_EMIT_EVENTS>;
+export type TSocketOnEvents = valueOf<typeof SOCKET_ON_EVENTS>;
 
 export interface ITyping {
   userId: string;

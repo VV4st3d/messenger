@@ -1,0 +1,1 @@
+export const TYPING_MESSAGE_DELAY = 2000;
