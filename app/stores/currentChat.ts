@@ -2,7 +2,6 @@ import { useNuxtApp } from '#imports';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { SOCKET_EMIT_EVENTS, SOCKET_ON_EVENTS } from '~/shared/const';
-
 import type {
   IChat,
   IGetMessageQuery,
@@ -15,11 +14,15 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   const chat = ref<Omit<IChat, 'lastMessage'> | undefined>(undefined);
   const messages = ref<IMessage[]>([]);
   const typing = ref<ITyping>();
+  const foundMessages = ref<IMessage[]>([]);
   const lastMessageDate = ref<string>();
+  const hasMore = ref<boolean>();
   const setChat = (payload: IChat) => (chat.value = payload);
   const setTyping = (payload: ITyping) => (typing.value = payload);
   const pushMessage = (payload: IMessage) => messages.value.push(payload);
   const resetMessages = () => (messages.value = []);
+  const setFoundMessages = (payload: IMessage[]) =>
+    (foundMessages.value = payload);
 
   const bindEvents = () => {
     $socket.on(SOCKET_ON_EVENTS.NEW_MESSAGE, pushMessage);
@@ -68,7 +71,25 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     try {
       const { data } = await $api.chats.getMessages(chatId, query);
       lastMessageDate.value = data.messages[0]?.createdAt;
+      hasMore.value = data.hasMore;
       messages.value.unshift(...data.messages);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  };
+
+  const handleFindMessages = async (
+    chatId: string,
+    query: { query: string },
+  ): Promise<void> => {
+    if (!query.query.length) {
+      foundMessages.value = [];
+      return;
+    }
+    try {
+      const { data } = await $api.chats.getChatMessagesBySearch(chatId, query);
+      setFoundMessages(data);
     } catch (error) {
       console.error(error);
       throw error;
@@ -78,9 +99,12 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   return {
     unbindEvents,
     typing,
+    hasMore,
     bindEvents,
     chat,
     messages,
+    foundMessages,
+    handleFindMessages,
     setChat,
     lastMessageDate,
     handleStopTyping,

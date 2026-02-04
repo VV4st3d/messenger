@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import type { ButtonHTMLAttributes } from 'vue';
 
-interface Props {
+interface IProps {
   loading?: boolean;
   disabled?: boolean;
   loadingText?: string;
   type?: ButtonHTMLAttributes['type'];
 }
 
-withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<IProps>(), {
   loading: false,
   disabled: false,
   loadingText: 'Загрузка...',

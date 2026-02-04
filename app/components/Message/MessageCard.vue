@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, formatLastMessageDate, useAuth } from '#imports';
 import type { IMessage } from '~/shared/types';
+import Icon from '../ui/Icon.vue';
 const props = defineProps<{ message: IMessage }>();
 const { user } = useAuth();
 
@@ -12,7 +13,7 @@ const formattedTime = computed(() =>
 <template>
   <div class="flex flex-col">
     <div
-      v-if="message.senderId !== user?.id"
+      v-if="message.sender.id !== user?.id"
       class="flex items-end gap-2 max-w-[85%] sm:max-w-[70%]"
     >
       <div class="flex flex-col">
@@ -54,19 +55,12 @@ const formattedTime = computed(() =>
             <span class="text-[10px] uppercase font-medium opacity-70">
               {{ formattedTime }}
             </span>
-            <svg
-              class="w-3 h-3 opacity-70"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
+            <Icon
+              v-if="message.isRead"
+              is-not-default
+              :name="'solar:check-read-linear'"
+            />
+            <Icon v-else is-not-default :name="'lineicons:check'" />
           </div>
         </div>
       </div>

@@ -1,7 +1,5 @@
 <script setup lang="ts">
-import {
-  useIntersectionObserver,
-} from '#imports';
+import { useIntersectionObserver } from '#imports';
 import { nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue';
 import type { IChat, IGetMessageQuery, IMessage } from '~/shared/types';
 import { MIN_MESSAGE_SIZE, REFS } from './const';
@@ -11,6 +9,7 @@ const props = defineProps<{
   messages: IMessage[];
   chat: IChat | undefined;
   lastMessageDate: string | undefined;
+  hasMore: boolean | undefined;
   resetMessages: () => void;
   getMesseges: (chatId: string, query?: IGetMessageQuery) => Promise<void>;
 }>();
@@ -43,7 +42,13 @@ const saveScrollPosition = () => {
 const { pause, resume } = useIntersectionObserver(
   targetMessage,
   async ([entry]) => {
-    if (!entry?.isIntersecting || !scroller.value.$el || !targetMessage) return;
+    if (
+      !entry?.isIntersecting ||
+      !scroller.value.$el ||
+      !targetMessage ||
+      !props.hasMore
+    )
+      return;
     await onIntersection();
   },
 );

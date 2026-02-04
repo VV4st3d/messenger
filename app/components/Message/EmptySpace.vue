@@ -1,4 +1,6 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Icon from '../ui/Icon.vue';
+</script>
 
 <template>
   <div
@@ -7,7 +9,7 @@
     <div
       class="w-24 h-24 rounded-full bg-[var(--bg-tertiary)] flex items-center justify-center mb-6"
     >
-      <UiIcon
+      <Icon
         name="chat-bubble-left-right"
         class="w-12 h-12 text-[var(--text-tertiary)]"
       />

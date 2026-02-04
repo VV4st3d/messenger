@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { ref } from 'vue';
 
-export const useThrottling = (
-  callback: (...args: any[]) => void,
+export const useThrottling = <T extends (...args: any[]) => void>(
+  callback: T,
   delay: number,
 ) => {
   const isThrottling = ref(false);
 
-  return (...args: any) => {
+  return (...args: Parameters<T>) => {
     if (isThrottling.value) {
       return;
     }

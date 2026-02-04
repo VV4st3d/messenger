@@ -26,4 +26,7 @@ export const API_ROUTES = {
   getRouteSendMessage() {
     return 'messages';
   },
+  getRouteSearchMessages(id: string) {
+    return `messages/${id}/search`;
+  },
 };

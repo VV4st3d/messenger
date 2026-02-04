@@ -12,10 +12,12 @@ import ChatFooter from '~/components/Chat/ChatFooter.vue';
 const { params } = useRoute();
 const chatId = params.id as string;
 const messageText = ref<string>('');
+const isSearching = ref(false);
 
 const chatStore = useCurrentChatStore();
 
-const { chat, typing, lastMessageDate } = storeToRefs(chatStore);
+const { chat, typing, lastMessageDate, hasMore, foundMessages } =
+  storeToRefs(chatStore);
 const {
   getMessagesHandler,
   sendMessageHandler,
@@ -24,7 +26,11 @@ const {
   getChatInfoHandler,
   resetMessages,
   handleStartTyping,
+  handleFindMessages,
 } = chatStore;
+
+const onToggleSearchingDropdown = () =>
+  (isSearching.value = !isSearching.value);
 
 const handleGetChatInfo = async () => {
   try {
@@ -58,10 +64,19 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
-    <ChatHeader :typing="typing" :chat="chat" />
+  <div class="flex flex-col h-full" @click="isSearching = false">
+    <ChatHeader
+      :found-messages="foundMessages"
+      :handle-find-message="handleFindMessages"
+      :is-searching="isSearching"
+      :on-open-searching-dropdown="onToggleSearchingDropdown"
+      :typing="typing"
+      :chat="chat"
+      :chat-id="chatId"
+    />
 
     <MessageSpace
+      :has-more="hasMore"
       :get-messeges="getMessagesHandler"
       :reset-messages="resetMessages"
       :last-message-date="lastMessageDate"

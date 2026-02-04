@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import Icon from '~/components/ui/Icon.vue';
 import { useAuth } from '~/composables/useAuth';
 import { LOCALSTORAGE_THEME_KEY, Themes } from '~/shared/const';
 
@@ -45,7 +46,7 @@ onMounted(() => {
         class="md:hidden text-2xl p-2 hover:text-[var(--accent)] transition"
         @click="toggleSidebar"
       >
-        <UiIcon :name="'bars-3'" class="w-8 h-8" />
+        <Icon :name="'bars-3'" class="w-8 h-8" />
       </button>
 
       <h1 class="text-xl font-bold tracking-tight">Messenger</h1>
@@ -55,13 +56,13 @@ onMounted(() => {
           class="text-xl p-2 hover:text-[var(--accent)] transition cursor-pointer"
           @click="toggleTheme"
         >
-          <UiIcon
+          <Icon
             v-if="!isDark"
             :name="'moon'"
             :variant="'outline'"
             class="w-6 h-6"
           />
-          <UiIcon v-else :name="'sun'" :variant="'outline'" class="w-6 h-6" />
+          <Icon v-else :name="'sun'" :variant="'outline'" class="w-6 h-6" />
         </button>
       </div>
     </header>

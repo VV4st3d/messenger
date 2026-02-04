@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { IFriend } from '~/shared/types';
+import Avatar from '../common/Avatar/Avatar.vue';
+import Icon from '../ui/Icon.vue';
 
 const props = defineProps<{
   friend: IFriend;
@@ -16,11 +18,7 @@ const userStatus = computed(() =>
     class="friend-item flex items-center gap-4 p-4 hover:bg-[rgba(255,255,255,0.04)] transition-colors cursor-pointer"
   >
     <div class="relative flex-shrink-0">
-      <CommonAvatar
-        :src="friend.avatarUrl"
-        size="md"
-        :online="friend.isOnline"
-      />
+      <Avatar :src="friend.avatarUrl" size="md" :online="friend.isOnline" />
     </div>
 
     <div class="flex-1 min-w-0">
@@ -36,12 +34,12 @@ const userStatus = computed(() =>
       <button
         class="text-[var(--text-tertiary)] hover:text-[var(--accent)] transition p-1.5 rounded-full hover:bg-[rgba(var(--accent),0.1)] cursor-pointer"
       >
-        <UiIcon name="chat-bubble-left-right" size="20" />
+        <Icon name="chat-bubble-left-right" size="20" />
       </button>
       <button
         class="text-[var(--text-tertiary)] hover:text-[var(--danger)] transition p-1.5 rounded-full hover:bg-[rgba(var(--danger),0.1)] cursor-pointer"
       >
-        <UiIcon name="trash" size="20" />
+        <Icon name="trash" size="20" />
       </button>
     </div>
   </div>

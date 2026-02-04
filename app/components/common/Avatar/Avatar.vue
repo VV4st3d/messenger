@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import { AVATAR_SIZE_CLASSES, STATUS_SIZE_CLASSES } from './consts';
+import Icon from '~/components/ui/Icon.vue';
 
-interface Props {
+interface IProps {
   src?: string;
   size?: 'sm' | 'md' | 'lg';
   online?: boolean | null;
 }
 
-withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<IProps>(), {
   size: 'md',
   src: '',
   online: false,
@@ -33,7 +34,7 @@ const hasError = ref(false);
         @error="hasError = true"
       >
 
-      <UiIcon v-else name="user" class="defaultAvatar" />
+      <Icon v-else name="user" class="defaultAvatar" />
     </div>
 
     <div

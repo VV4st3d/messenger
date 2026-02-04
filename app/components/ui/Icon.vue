@@ -6,10 +6,11 @@ type TSizeValues = '14' | '16' | '20' | '24';
 const props = defineProps<{
   name: string;
   size?: TSizeValues;
+  isNotDefault?: boolean;
 }>();
 
 const iconName = computed(() => {
-  return `heroicons:${props.name}-solid`;
+  return props.isNotDefault ? props.name : `heroicons:${props.name}-solid`;
 });
 </script>
 

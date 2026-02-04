@@ -1,3 +1,4 @@
+import type { IUser } from './auth';
 import type { TResponseBody } from './base-body';
 
 export type TChats = TResponseBody<IChat[]>;
@@ -7,6 +8,7 @@ export type TMessengesResponse = TResponseBody<{
   hasMore: boolean;
   total: number;
 }>;
+export type TMessengesFindResponse = TResponseBody<IMessage[]>;
 export type TSendMessageResponse = TResponseBody<IMessage>;
 
 export interface IChat {
@@ -36,7 +38,7 @@ export interface IParticipant {
 export interface IMessage {
   id: string;
   chatId: string;
-  senderId: string;
+  sender: IUser;
   content: string;
   type: 'text';
   isRead: boolean;

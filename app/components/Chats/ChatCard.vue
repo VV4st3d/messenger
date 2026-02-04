@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import {
-  computed,
-  formatLastMessageDate,
-} from '#imports';
+import { computed, formatLastMessageDate } from '#imports';
 import { useCompanion } from '~/composables/useCompanion';
 import type { IChat, ITyping } from '~/shared/types';
 import TypingIndicator from '../common/Typing/TypingIndicator.vue';
+import Avatar from '../common/Avatar/Avatar.vue';
 
 const props = defineProps<{ chat: IChat; typing: ITyping | undefined }>();
 
@@ -22,7 +20,7 @@ const formattedTime = computed(
   <div
     class="flex items-center gap-3 hover:bg-[var(--bg-hover)] cursor-pointer transition-colors"
   >
-    <CommonAvatar
+    <Avatar
       size="md"
       :src="companion?.avatarUrl"
       :online="companion?.isOnline"

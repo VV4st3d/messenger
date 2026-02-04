@@ -9,6 +9,8 @@ import { computed, onMounted, ref } from 'vue';
 import type { TSidebarTabs } from './types';
 import FriendList from '../Friend/FriendList.vue';
 import { useChatsStore } from '~/stores/chats';
+import Avatar from '../common/Avatar/Avatar.vue';
+import Icon from '../ui/Icon.vue';
 
 const activeTab = ref<TSidebarTabs>('chats');
 
@@ -101,7 +103,7 @@ onMounted(() => {
       class="p-4 border-t border-[var(--border)] flex items-center gap-3 bg-[var(--bg-tertiary)]"
     >
       <div class="relative">
-        <CommonAvatar :src="user?.avatarUrl" :size="'sm'" :online="isOnline" />
+        <Avatar :src="user?.avatarUrl" :size="'sm'" :online="isOnline" />
       </div>
       <div class="flex-1 min-w-0">
         <div class="font-medium truncate">{{ user?.displayName }}</div>
@@ -112,7 +114,7 @@ onMounted(() => {
       <button
         class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition cursor-pointer"
       >
-        <UiIcon name="ellipsis-horizontal" size="24" />
+        <Icon name="ellipsis-horizontal" size="24" />
       </button>
     </div>
   </div>

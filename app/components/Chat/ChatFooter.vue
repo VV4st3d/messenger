@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useThrottling } from '#imports';
+import Icon from '../ui/Icon.vue';
 import { TYPING_MESSAGE_DELAY } from './const';
 
 const messageText = defineModel<string>();
@@ -21,7 +22,7 @@ const onTypeMessage = () => {
 <template>
   <footer class="chat-input-container">
     <button>
-      <UiIcon name="paper-clip" size="24" />
+      <Icon name="paper-clip" size="24" />
     </button>
 
     <textarea
@@ -30,11 +31,11 @@ const onTypeMessage = () => {
       rows="1"
       class="flex-1 resize-none bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-[var(--radius)] px-4 py-3 focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30 transition"
       @input="onTypeMessage"
-      @keyup.enter="handleSendMessage"
+      @keydown.enter.exact.prevent="handleSendMessage"
     />
 
     <button :disabled="!messageText" @click="handleSendMessage">
-      <UiIcon name="paper-airplane" size="24" />
+      <Icon name="paper-airplane" size="24" />
     </button>
   </footer>
 </template>
