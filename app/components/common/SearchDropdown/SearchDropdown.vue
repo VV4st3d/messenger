@@ -3,21 +3,27 @@ import { ref, useDebounce } from '#imports';
 import type { IMessage } from '~/shared/types';
 import Avatar from '../Avatar/Avatar.vue';
 import Icon from '~/components/ui/Icon.vue';
+import { SEARCH_MESSAGE_DELAY } from '../../../shared/const/delay';
 
 interface IProps {
-  handleFindMessage: (
+  handleFindMessage?: (
     chatId: string,
     query: { query: string },
   ) => Promise<void>;
   foundMessages: IMessage[];
-  chatId: string;
+  chatId?: string;
+  noInput?: boolean;
+  onMessageClick: (chatId: string) => Promise<void>;
 }
 const props = defineProps<IProps>();
 
 const queryInput = ref<string>('');
-const handleFindMessagesDebounced = useDebounce(props.handleFindMessage, 700);
+const handleFindMessagesDebounced = props.handleFindMessage
+  ? useDebounce(props.handleFindMessage, SEARCH_MESSAGE_DELAY)
+  : null;
 
 const onSearch = () => {
+  if (!handleFindMessagesDebounced || !props.chatId) return;
   handleFindMessagesDebounced(props.chatId, {
     query: queryInput.value,
   });
@@ -26,9 +32,9 @@ const onSearch = () => {
 
 <template>
   <div
-    class="absolute top-full right-0 mt-2 w-full bg-[var(--bg-primary)] border border-[var(--border)] rounded-xl shadow-lg overflow-hidden z-50"
+    class="absolute top-full right-0 w-full bg-[var(--bg-primary)] border border-[var(--border)] shadow-lg overflow-hidden z-50"
   >
-    <div class="p-3 border-b border-[var(--border)]">
+    <div v-if="!noInput" class="p-3 border-b border-[var(--border)]">
       <div
         class="flex items-center gap-2 bg-[var(--bg-secondary)] rounded-lg px-3 py-2"
       >
@@ -48,25 +54,30 @@ const onSearch = () => {
     </div>
 
     <div v-if="foundMessages.length > 0" class="max-h-[320px] overflow-y-auto">
-      <div
+      <NuxtLink
         v-for="message in foundMessages"
         :key="message.id"
-        class="px-4 py-3 cursor-pointer hover:bg-[var(--bg-secondary)] transition flex gap-3"
+        :to="`/chat/${message.chat.id}`"
       >
-        <div class="flex-shrink-0">
-          <Avatar :src="message.sender?.avatarUrl" size="sm" />
-        </div>
+        <div
+          class="px-4 py-3 cursor-pointer hover:bg-[var(--bg-secondary)] transition flex gap-3"
+          @click="onMessageClick(message.id)"
+        >
+          <div class="flex-shrink-0">
+            <Avatar :src="message.sender?.avatarUrl" size="sm" />
+          </div>
 
-        <div class="flex flex-col gap-1 min-w-0">
-          <p class="text-sm text-[var(--text-primary)] truncate">
-            {{ message.sender.displayName }}
-          </p>
+          <div class="flex flex-col gap-1 min-w-0">
+            <p class="text-sm text-[var(--text-primary)] truncate">
+              {{ message.sender?.displayName }}
+            </p>
 
-          <p class="text-xs text-[var(--text-secondary)] truncate">
-            {{ message.content }}
-          </p>
+            <p class="text-xs text-[var(--text-secondary)] truncate">
+              {{ message.content }}
+            </p>
+          </div>
         </div>
-      </div>
+      </NuxtLink>
     </div>
     <div
       v-else

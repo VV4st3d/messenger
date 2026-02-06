@@ -1,28 +1,104 @@
 <script setup lang="ts">
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useIntersectionObserver } from '#imports';
-import { nextTick, onUnmounted, ref, useTemplateRef, watch } from 'vue';
+import {
+  computed,
+  nextTick,
+  onUnmounted,
+  ref,
+  useTemplateRef,
+  watch,
+  type Ref,
+} from 'vue';
 import type { IChat, IGetMessageQuery, IMessage } from '~/shared/types';
-import { MIN_MESSAGE_SIZE, REFS } from './const';
+import { DIRECTION, MIN_MESSAGE_SIZE, REFS } from './const';
 import type MessageCard from './MessageCard.vue';
 
 const props = defineProps<{
   messages: IMessage[];
   chat: IChat | undefined;
-  lastMessageDate: string | undefined;
-  hasMore: boolean | undefined;
+  firstMessageDateInList: string | undefined;
+  lastMessageDateInList: string | undefined;
+  hasMoreTop: boolean | undefined;
+  hasMoreBottom: boolean | undefined;
+  isFoundBySearch: boolean;
+  anchorMessageId: string | undefined;
   resetMessages: () => void;
   getMesseges: (chatId: string, query?: IGetMessageQuery) => Promise<void>;
 }>();
 
 const scroller = useTemplateRef(REFS.REF_SCROLLER);
-const targetMessage = useTemplateRef<InstanceType<typeof MessageCard>>(
-  REFS.REF_TARGET_MESSAGE,
-);
+const targetMessageTop = ref<InstanceType<typeof MessageCard> | null>(null);
+const targetMessageBottom = ref<InstanceType<typeof MessageCard> | null>(null);
 
 const isInitialScroll = ref(true);
 const isPrepending = ref(false);
 const prevScrollHeight = ref(0);
 const prevScrollTop = ref(0);
+
+const foundMessage = ref<HTMLElement | null>(null);
+const hasScrolledToAnchor = ref(false);
+
+const anchorIndex = computed(() => {
+  if (!props.anchorMessageId) return -1;
+  return props.messages.findIndex((m) => m.id === props.anchorMessageId);
+});
+
+const setRef = (createdAt: string, el: any, id: string) => {
+  if (createdAt === props.firstMessageDateInList) {
+    targetMessageTop.value = el;
+  } else if (targetMessageTop.value === el) {
+    targetMessageTop.value = null;
+  }
+  if (createdAt === props.lastMessageDateInList) {
+    targetMessageBottom.value = el;
+  } else if (targetMessageBottom.value === el) {
+    targetMessageBottom.value = null;
+  }
+
+  if (id === props.anchorMessageId && !hasScrolledToAnchor.value) {
+    if (el?.$el) {
+      foundMessage.value = el.$el;
+
+      nextTick(() => {
+        nextTick(async () => {
+          if (
+            anchorIndex.value < 0 ||
+            !scroller.value ||
+            !props.isFoundBySearch
+          ) {
+            return;
+          }
+          scroller.value.scrollToItem(anchorIndex.value);
+
+          await nextTick();
+          await new Promise((r) => setTimeout(r, 80));
+
+          if (foundMessage.value && scroller.value?.$el) {
+            const scrollerEl = scroller.value.$el;
+            const msgRect = foundMessage.value.getBoundingClientRect();
+            const scrollerRect = scrollerEl.getBoundingClientRect();
+
+            const offsetToCenter =
+              msgRect.top -
+              scrollerRect.top -
+              scrollerRect.height / 2 +
+              msgRect.height / 2;
+
+            const targetScrollTop = scrollerEl.scrollTop + offsetToCenter;
+
+            scrollerEl.scrollTo({
+              top: targetScrollTop,
+              behavior: 'smooth',
+            });
+          }
+
+          hasScrolledToAnchor.value = true;
+        });
+      });
+    }
+  }
+};
 
 const scrollToBottom = async (smooth: boolean) => {
   await nextTick();
@@ -34,43 +110,73 @@ const scrollToBottom = async (smooth: boolean) => {
 };
 
 const saveScrollPosition = () => {
-  const el = scroller.value.$el;
+  const el = scroller.value?.$el;
+  if (!el) return;
   prevScrollHeight.value = el.scrollHeight;
   prevScrollTop.value = el.scrollTop;
 };
 
-const { pause, resume } = useIntersectionObserver(
-  targetMessage,
-  async ([entry]) => {
+const createIntersectionObserver = (
+  target: Ref<InstanceType<typeof MessageCard> | null>,
+  direction: DIRECTION,
+  hasMore: () => boolean,
+  getAnchorDate: () => string | undefined,
+) => {
+  const observer = useIntersectionObserver([target], async ([entry]) => {
     if (
       !entry?.isIntersecting ||
-      !scroller.value.$el ||
-      !targetMessage ||
-      !props.hasMore
+      !scroller.value?.$el ||
+      !target.value ||
+      !hasMore()
     )
       return;
-    await onIntersection();
-  },
+
+    const anchorDate = getAnchorDate();
+    if (!anchorDate) return;
+
+    await onIntersect(observer.pause, observer.resume, direction, anchorDate);
+  });
+  return observer;
+};
+
+createIntersectionObserver(
+  targetMessageTop,
+  DIRECTION.BEFORE,
+  () => props.hasMoreTop,
+  () => props.firstMessageDateInList,
 );
 
-const onIntersection = async (): Promise<void> => {
+createIntersectionObserver(
+  targetMessageBottom,
+  DIRECTION.AFTER,
+  () => props.hasMoreBottom,
+  () => props.lastMessageDateInList,
+);
+
+const onIntersect = async (
+  pause: () => void,
+  resume: () => void,
+  direction: DIRECTION,
+  anchorMessageDate: string,
+): Promise<void> => {
   pause();
-
   isPrepending.value = true;
-  saveScrollPosition();
+  if (direction === DIRECTION.BEFORE) saveScrollPosition();
 
-  if (props.chat?.id)
+  if (props.chat?.id) {
     await props.getMesseges(props.chat.id, {
-      lastCreatedAt: props.lastMessageDate,
+      direction,
+      cursorCreatedAt: anchorMessageDate,
     });
+  }
 
   await nextTick();
-
-  const el = scroller.value.$el;
-
-  const heightDiff = el.scrollHeight - prevScrollHeight.value;
-
-  el.scrollTop = prevScrollTop.value + heightDiff;
+  if (direction === DIRECTION.BEFORE) {
+    const el = scroller.value?.$el;
+    if (!el) return;
+    const heightDiff = el.scrollHeight - prevScrollHeight.value;
+    el.scrollTop = prevScrollTop.value + heightDiff;
+  }
 
   isPrepending.value = false;
   resume();
@@ -83,7 +189,7 @@ onUnmounted(() => {
 watch(
   () => props.messages.length,
   (value) => {
-    if (value === 0 || isPrepending.value) return;
+    if (value === 0 || isPrepending.value || props.isFoundBySearch) return;
     scrollToBottom(!isInitialScroll.value);
     isInitialScroll.value = false;
   },
@@ -109,12 +215,11 @@ watch(
           >
             <div class="pb-6">
               <MessageCard
-                :ref="
-                  item.createdAt === lastMessageDate
-                    ? REFS.REF_TARGET_MESSAGE
-                    : undefined
-                "
+                :ref="(el) => setRef(item.createdAt, el, item.id)"
                 :message="item"
+                :is-anchor="
+                  item.id === props.anchorMessageId && props.isFoundBySearch
+                "
               />
             </div>
           </DynamicScrollerItem>

@@ -1,24 +1,32 @@
 <script setup lang="ts">
-import { computed, formatLastMessageDate, useAuth } from '#imports';
+import { computed } from 'vue';
+import { formatLastMessageDate, useAuth } from '#imports';
 import type { IMessage } from '~/shared/types';
 import Icon from '../ui/Icon.vue';
-const props = defineProps<{ message: IMessage }>();
+
+const props = defineProps<{
+  message: IMessage;
+  isAnchor?: boolean;
+}>();
+
 const { user } = useAuth();
 
 const formattedTime = computed(() =>
   formatLastMessageDate(props.message.createdAt),
 );
+
+const isOwn = computed(() => props.message.sender?.id === user.value?.id);
 </script>
 
 <template>
-  <div class="flex flex-col">
-    <div
-      v-if="message.sender.id !== user?.id"
-      class="flex items-end gap-2 max-w-[85%] sm:max-w-[70%]"
-    >
+  <div
+    class="flex flex-col message-card"
+    :class="{ 'highlight-active': isAnchor }"
+  >
+    <div v-if="!isOwn" class="flex items-end gap-2 max-w-[85%] sm:max-w-[70%]">
       <div class="flex flex-col">
         <div
-          class="message-other relative p-3 rounded-2xl rounded-bl-none shadow-sm bg-[var(--message-other)] border border-[var(--border-color)]"
+          class="message-other relative p-3 rounded-2xl rounded-bl-none shadow-sm bg-[var(--message-other)] border border-[var(--border-color)] transition-all duration-300"
         >
           <p
             class="text-[var(--text-primary)] leading-relaxed break-words whitespace-pre-wrap overflow-hidden"
@@ -43,7 +51,7 @@ const formattedTime = computed(() =>
     >
       <div class="flex flex-col items-end">
         <div
-          class="message-own relative p-3 rounded-2xl rounded-br-none shadow-md bg-[var(--message-own)] text-white"
+          class="message-own relative p-3 rounded-2xl rounded-br-none shadow-md bg-[var(--message-own)] text-white transition-all duration-300"
         >
           <p
             class="leading-relaxed break-words whitespace-pre-wrap overflow-hidden"
@@ -58,9 +66,9 @@ const formattedTime = computed(() =>
             <Icon
               v-if="message.isRead"
               is-not-default
-              :name="'solar:check-read-linear'"
+              name="solar:check-read-linear"
             />
-            <Icon v-else is-not-default :name="'lineicons:check'" />
+            <Icon v-else is-not-default name="lineicons:check" />
           </div>
         </div>
       </div>
@@ -74,14 +82,28 @@ const formattedTime = computed(() =>
   word-wrap: break-word;
   word-break: break-word;
 }
-
 .whitespace-pre-wrap {
   white-space: pre-wrap;
 }
 
-.message-other,
-.message-own {
-  transition: transform 0.1s ease;
-  will-change: transform;
+.highlight-active .message-own,
+.highlight-active .message-other {
+  animation: highlightSubtle 2s ease-in-out forwards;
+  z-index: 1;
+}
+
+@keyframes highlightSubtle {
+  0% {
+    filter: brightness(1);
+    box-shadow: 0 0 0 rgba(99, 102, 241, 0);
+  }
+  30% {
+    filter: brightness(1.2);
+    box-shadow: 0 0 12px 2px rgba(99, 102, 241, 0.3);
+  }
+  100% {
+    filter: brightness(1);
+    box-shadow: 0 0 0 rgba(99, 102, 241, 0);
+  }
 }
 </style>

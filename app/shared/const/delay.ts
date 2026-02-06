@@ -1,0 +1,1 @@
+export const SEARCH_MESSAGE_DELAY = 700;

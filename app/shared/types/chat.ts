@@ -5,11 +5,13 @@ export type TChats = TResponseBody<IChat[]>;
 export type TChat = TResponseBody<Omit<IChat, 'lastMessage'>>;
 export type TMessengesResponse = TResponseBody<{
   messages: IMessage[];
-  hasMore: boolean;
+  hasMoreTop: boolean;
+  hasMoreBottom: boolean;
   total: number;
 }>;
 export type TMessengesFindResponse = TResponseBody<IMessage[]>;
 export type TSendMessageResponse = TResponseBody<IMessage>;
+export type TMessagesListById = TResponseBody<IFoundMessageData>;
 
 export interface IChat {
   id: string;
@@ -19,6 +21,13 @@ export interface IChat {
   updatedAt: string;
   participants: IParticipant[];
   lastMessage?: IMessage;
+}
+
+export interface IMessageChat {
+  id: string;
+  type: 'private' | 'group';
+  createAt: string;
+  updateAt: string;
 }
 
 export interface IParticipant {
@@ -37,8 +46,8 @@ export interface IParticipant {
 
 export interface IMessage {
   id: string;
-  chatId: string;
   sender: IUser;
+  chat: IMessageChat;
   content: string;
   type: 'text';
   isRead: boolean;
@@ -55,5 +64,13 @@ export interface IMessageBody {
 
 export interface IGetMessageQuery {
   limit?: number;
-  lastCreatedAt?: string;
+  cursorCreatedAt?: string;
+  direction?: 'before' | 'after';
+}
+
+export interface IFoundMessageData {
+  messages: IMessage[];
+  anchorMessageId: string;
+  hasMoreTop: boolean;
+  hasMoreBottom: boolean;
 }

@@ -16,9 +16,20 @@ const isSearching = ref(false);
 
 const chatStore = useCurrentChatStore();
 
-const { chat, typing, lastMessageDate, hasMore, foundMessages } =
-  storeToRefs(chatStore);
 const {
+  chat,
+  typing,
+  firstMessageDateInList,
+  lastMessageDateInList,
+  hasMoreTop,
+  hasMoreBottom,
+  foundMessages,
+  isFoundBySearch,
+  anchorMessageId,
+  isFinding,
+} = storeToRefs(chatStore);
+const {
+  handleMessagesById,
   getMessagesHandler,
   sendMessageHandler,
   bindEvents,
@@ -54,7 +65,9 @@ const handleSendMessage = () => {
 };
 
 onMounted(async () => {
-  await Promise.all([handleGetChatInfo(), handleGetMessages()]);
+  await handleGetChatInfo();
+  if (chatStore.messages.length === 0 && !isFinding.value)
+    await handleGetMessages();
   bindEvents();
 });
 
@@ -66,6 +79,7 @@ onUnmounted(() => {
 <template>
   <div class="flex flex-col h-full" @click="isSearching = false">
     <ChatHeader
+      :on-message-click="handleMessagesById"
       :found-messages="foundMessages"
       :handle-find-message="handleFindMessages"
       :is-searching="isSearching"
@@ -76,10 +90,14 @@ onUnmounted(() => {
     />
 
     <MessageSpace
-      :has-more="hasMore"
+      :anchor-message-id="anchorMessageId"
+      :is-found-by-search="isFoundBySearch"
+      :has-more-top="hasMoreTop"
+      :has-more-bottom="hasMoreBottom"
       :get-messeges="getMessagesHandler"
       :reset-messages="resetMessages"
-      :last-message-date="lastMessageDate"
+      :first-message-date-in-list="firstMessageDateInList"
+      :last-message-date-in-list="lastMessageDateInList"
       :chat="chat"
       :messages="chatStore.messages"
     />

@@ -17,6 +17,7 @@ interface IProps {
     chatId: string,
     query: { query: string },
   ) => Promise<void>;
+  onMessageClick: (chatId: string) => Promise<void>;
 }
 
 const props = defineProps<IProps>();
@@ -67,6 +68,8 @@ const isTyping = computed(() => props.typing?.isTyping);
       </button>
       <SearchDropdown
         v-if="isSearching"
+        :on-message-click="onMessageClick"
+        class="rounded-xl"
         :chat-id="chatId"
         :found-messages="foundMessages"
         :handle-find-message="handleFindMessage"

@@ -5,6 +5,7 @@ import type {
   TChat,
   TChats,
   IGetMessageQuery,
+  TMessagesListById,
 } from '~/shared/types';
 
 export function createChatsRepository(appFetch: typeof $fetch) {
@@ -26,11 +27,28 @@ export function createChatsRepository(appFetch: typeof $fetch) {
       });
     },
     getChatMessagesBySearch(id: string, query: { query: string }) {
-      return appFetch<Omit<TMessengesFindResponse, 'data.hasMore' | 'total'>>(
+      return appFetch<TMessengesFindResponse>(
         API_ROUTES.getRouteSearchMessages(id),
         {
           method: 'GET',
           query,
+        },
+      );
+    },
+    getGlobalChatsMessagesBySearch(query: { query: string }) {
+      return appFetch<TMessengesFindResponse>(
+        API_ROUTES.getRouteGlobalSearchMessages(),
+        {
+          method: 'GET',
+          query,
+        },
+      );
+    },
+    getMessagesListByMessageId(id: string) {
+      return appFetch<TMessagesListById>(
+        API_ROUTES.getRouteMessagesByMessageId(id),
+        {
+          method: 'GET',
         },
       );
     },

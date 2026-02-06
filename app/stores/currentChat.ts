@@ -15,17 +15,30 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   const messages = ref<IMessage[]>([]);
   const typing = ref<ITyping>();
   const foundMessages = ref<IMessage[]>([]);
-  const lastMessageDate = ref<string>();
-  const hasMore = ref<boolean>();
+  const anchorMessageId = ref<string>();
+  const firstMessageDateInList = ref<string>();
+  const lastMessageDateInList = ref<string>();
+  const hasMoreTop = ref<boolean>();
+  const hasMoreBottom = ref<boolean>();
+  const isFoundBySearch = ref<boolean>(false);
+  const isFinding = ref<boolean>(false);
   const setChat = (payload: IChat) => (chat.value = payload);
   const setTyping = (payload: ITyping) => (typing.value = payload);
   const pushMessage = (payload: IMessage) => messages.value.push(payload);
   const resetMessages = () => (messages.value = []);
+  const setMessages = (payload: IMessage[]) => (messages.value = payload);
   const setFoundMessages = (payload: IMessage[]) =>
     (foundMessages.value = payload);
 
   const bindEvents = () => {
-    $socket.on(SOCKET_ON_EVENTS.NEW_MESSAGE, pushMessage);
+    $socket.on(SOCKET_ON_EVENTS.NEW_MESSAGE, async (payload) => {
+      if (!isFoundBySearch.value) {
+        pushMessage(payload);
+        return;
+      }
+      isFoundBySearch.value = false;
+      if (chat.value?.id) await getMessagesHandler(chat.value?.id);
+    });
     $socket.on(SOCKET_ON_EVENTS.TYPING, setTyping);
     if (chat.value) {
       $socket.emit(SOCKET_EMIT_EVENTS.JOIN_CHAT, chat.value.id);
@@ -68,11 +81,27 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     chatId: string,
     query?: IGetMessageQuery,
   ): Promise<void> => {
+    isFoundBySearch.value = false;
     try {
       const { data } = await $api.chats.getMessages(chatId, query);
-      lastMessageDate.value = data.messages[0]?.createdAt;
-      hasMore.value = data.hasMore;
-      messages.value.unshift(...data.messages);
+      switch (query?.direction) {
+        case 'after':
+          messages.value.push(...data.messages);
+          hasMoreBottom.value = data.hasMoreBottom;
+          lastMessageDateInList.value =
+            data.messages[data.messages.length - 1]?.createdAt;
+          break;
+        case 'before':
+          firstMessageDateInList.value = data.messages[0]?.createdAt;
+          messages.value.unshift(...data.messages);
+          hasMoreTop.value = data.hasMoreTop;
+          break;
+        default:
+          firstMessageDateInList.value = data.messages[0]?.createdAt;
+          messages.value = data.messages;
+          hasMoreTop.value = data.hasMoreTop;
+          break;
+      }
     } catch (error) {
       console.error(error);
       throw error;
@@ -96,23 +125,50 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     }
   };
 
+  const handleMessagesById = async (chatId: string) => {
+    try {
+      isFinding.value = true;
+      const { data } = await $api.chats.getMessagesListByMessageId(chatId);
+      setMessages(data.messages);
+
+      anchorMessageId.value = data.anchorMessageId;
+      hasMoreTop.value = data.hasMoreTop;
+      hasMoreBottom.value = data.hasMoreBottom;
+
+      firstMessageDateInList.value = data.messages[0]?.createdAt;
+      lastMessageDateInList.value =
+        data.messages[data.messages.length - 1]?.createdAt;
+
+      isFoundBySearch.value = true;
+    } catch (error) {
+      console.log(error);
+    } finally {
+      isFinding.value = false;
+    }
+  };
+
   return {
-    unbindEvents,
+    isFinding,
     typing,
-    hasMore,
-    bindEvents,
+    hasMoreTop,
+    hasMoreBottom,
     chat,
     messages,
     foundMessages,
-    handleFindMessages,
+    firstMessageDateInList,
+    lastMessageDateInList,
+    anchorMessageId,
+    isFoundBySearch,
     setChat,
-    lastMessageDate,
+    handleFindMessages,
     handleStopTyping,
+    handleMessagesById,
     resetMessages,
     handleStartTyping,
     sendMessageHandler,
     getChatInfoHandler,
     getMessagesHandler,
-    pushMessage,
+    unbindEvents,
+    bindEvents,
   };
 });

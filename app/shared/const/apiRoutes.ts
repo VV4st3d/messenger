@@ -29,4 +29,10 @@ export const API_ROUTES = {
   getRouteSearchMessages(id: string) {
     return `messages/${id}/search`;
   },
+  getRouteGlobalSearchMessages() {
+    return `messages/search`;
+  },
+  getRouteMessagesByMessageId(id: string) {
+    return `messages/${id}/context`;
+  },
 };
