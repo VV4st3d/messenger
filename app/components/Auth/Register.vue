@@ -1,38 +1,65 @@
 <script setup lang="ts">
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { computed, navigateTo, ref, type useAuthStore } from '#imports';
+import { RouteNames } from '~/shared/const';
 import type { AUTH_STEP as TAuthStep } from './const';
 import { AUTH_STEP } from './const';
+import Input from '../ui/Input.vue';
+import Button from '../ui/Button.vue';
 
-const username = defineModel<string>('username');
-const password = defineModel<string>('password');
+const username = ref('');
+const password = ref('');
 interface IProps {
-  handleRegister: () => Promise<void>;
+  authStore: ReturnType<typeof useAuthStore>;
   isLoading: boolean;
-  isDisabled: boolean;
   step: TAuthStep;
+  email: string;
   error: string | undefined;
   setStep: (arg: TAuthStep) => void;
+  setError: (error: string) => void;
+  setLoading: (value: boolean) => void;
 }
-defineProps<IProps>();
+const props = defineProps<IProps>();
+
+const handleRegister = async () => {
+  props.setLoading(true);
+  try {
+    await props.authStore.registerHandler({
+      email: props.email,
+      password: password.value,
+      username: username.value,
+    });
+    navigateTo({ name: RouteNames.MAIN });
+  } catch (err: any) {
+    props.setError(err.data.message || 'Ошибка при регистрации');
+  } finally {
+    props.setLoading(false);
+  }
+};
+
+const isRegistrationButtonDisabled = computed(
+  () => !username.value.trim() || !password.value.trim(),
+);
 </script>
 
 <template>
-  <UiInput v-model="username" label="Username" placeholder="Ваше имя в чате" />
+  <Input v-model="username" label="Username" placeholder="Ваше имя в чате" />
 
-  <UiInput
+  <Input
     v-model="password"
     :on-enter="handleRegister"
     label="Пароль"
     placeholder="Придумайте надёжный пароль"
   />
 
-  <UiButton
+  <Button
     :loading="isLoading"
-    :disabled="isDisabled"
+    :disabled="isRegistrationButtonDisabled"
     loading-text="Регистрация..."
     @click="handleRegister"
   >
     Зарегистрироваться
-  </UiButton>
+  </Button>
 
   <button
     class="text-[var(--accent)] hover:text-[var(--accent-hover)] text-sm mt-4"

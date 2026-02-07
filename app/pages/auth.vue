@@ -1,30 +1,19 @@
 <script setup lang="ts">
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { navigateTo, useNuxtApp } from '#app';
+import { useNuxtApp } from '#app';
 import { useAuthStore } from '#imports';
-import { computed, reactive, ref, toRefs } from 'vue';
+import { computed, ref } from 'vue';
 import { AUTH_STEP } from '~/components/Auth/const';
 import Login from '~/components/Auth/Login.vue';
 import Register from '~/components/Auth/Register.vue';
-import { RouteNames } from '~/shared/const';
-
-interface IAuthForm {
-  email: string;
-  username: string;
-  password: string;
-}
+import Button from '~/components/ui/Button.vue';
+import Input from '~/components/ui/Input.vue';
 
 const { $api } = useNuxtApp();
 const authStore = useAuthStore();
 
 const step = ref<AUTH_STEP>(AUTH_STEP.EMAIL);
-const authForm = reactive<IAuthForm>({
-  email: '',
-  username: '',
-  password: '',
-});
-
-const { email, password, username } = toRefs(authForm);
+const email = ref('');
 
 const loading = ref(false);
 const error = ref('');
@@ -33,11 +22,13 @@ const setStep = (payload: AUTH_STEP) => {
   step.value = payload;
 };
 
-const isRegDisabled = computed(
-  () => !username.value.trim() || !password.value.trim(),
-);
+const setError = (payload: string) => {
+  error.value = payload;
+};
+const setLoading = (payload: boolean) => {
+  loading.value = payload;
+};
 
-const isLoginDisabled = computed(() => !password.value.trim());
 const isDisabledContinue = computed(() => !email.value.trim());
 
 const handleCheckEmail = async () => {
@@ -51,37 +42,6 @@ const handleCheckEmail = async () => {
     step.value = data.exists ? AUTH_STEP.LOGIN : AUTH_STEP.REGISTER;
   } catch (err: any) {
     error.value = err.data.message || 'Непредвиденная ошибка';
-  } finally {
-    loading.value = false;
-  }
-};
-
-const handleLogin = async () => {
-  loading.value = true;
-  try {
-    await authStore.loginHandler({
-      email: email.value,
-      password: password.value,
-    });
-    navigateTo({ name: RouteNames.MAIN });
-  } catch (err: any) {
-    error.value = err.data.message || 'Ошибка при авторизации';
-  } finally {
-    loading.value = false;
-  }
-};
-
-const handleRegister = async () => {
-  loading.value = true;
-  try {
-    await authStore.registerHandler({
-      email: email.value,
-      password: password.value,
-      username: username.value,
-    });
-    navigateTo({ name: RouteNames.MAIN });
-  } catch (err: any) {
-    error.value = err.data.message || 'Ошибка при регистрации';
   } finally {
     loading.value = false;
   }
@@ -102,21 +62,21 @@ const handleRegister = async () => {
 
       <div class="p-8">
         <div v-if="step === AUTH_STEP.EMAIL" class="space-y-6">
-          <UiInput
+          <Input
             v-model="email"
             :on-enter="handleCheckEmail"
             label="Email"
             placeholder="example@email.com"
           />
 
-          <UiButton
+          <Button
             :loading="loading"
             :disabled="isDisabledContinue"
             loading-text="Проверка..."
             @click="handleCheckEmail"
           >
             Продолжить
-          </UiButton>
+          </Button>
 
           <p v-if="error" class="text-[var(--danger)] text-sm text-center mt-4">
             {{ error }}
@@ -125,26 +85,27 @@ const handleRegister = async () => {
 
         <div v-else-if="step === AUTH_STEP.LOGIN" class="space-y-6">
           <Login
-            v-model="password"
+            :email="email"
+            :auth-store="authStore"
+            :set-loading="setLoading"
             :set-step="setStep"
             :error="error"
-            :is-disabled="isLoginDisabled"
             :step="step"
-            :handle-login="handleLogin"
             :is-loading="loading"
+            :set-error="setError"
           />
         </div>
 
         <div v-else-if="step === AUTH_STEP.REGISTER" class="space-y-6">
           <Register
-            v-model:password="password"
-            v-model:username="username"
+            :email="email"
             :set-step="setStep"
+            :auth-store="authStore"
             :is-loading="loading"
             :step="step"
-            :handle-register="handleRegister"
-            :is-disabled="isRegDisabled"
             :error="error"
+            :set-loading="setLoading"
+            :set-error="setError"
           />
         </div>
       </div>

@@ -12,17 +12,19 @@ import {
 } from 'vue';
 import type { IChat, IGetMessageQuery, IMessage } from '~/shared/types';
 import { DIRECTION, MIN_MESSAGE_SIZE, REFS } from './const';
+
 import type MessageCard from './MessageCard.vue';
 
 const props = defineProps<{
   messages: IMessage[];
-  chat: IChat | undefined;
-  firstMessageDateInList: string | undefined;
-  lastMessageDateInList: string | undefined;
-  hasMoreTop: boolean | undefined;
-  hasMoreBottom: boolean | undefined;
+  chat: IChat | null;
+  userId: string | undefined;
+  firstMessageDateInList: string;
+  lastMessageDateInList: string;
+  hasMoreTop: boolean;
+  hasMoreBottom: boolean;
   isFoundBySearch: boolean;
-  anchorMessageId: string | undefined;
+  anchorMessageId: string;
   resetMessages: () => void;
   getMesseges: (chatId: string, query?: IGetMessageQuery) => Promise<void>;
 }>();
@@ -35,8 +37,8 @@ const isInitialScroll = ref(true);
 const isPrepending = ref(false);
 const prevScrollHeight = ref(0);
 const prevScrollTop = ref(0);
+const isReadyToScroll = ref(false);
 
-const foundMessage = ref<HTMLElement | null>(null);
 const hasScrolledToAnchor = ref(false);
 
 const anchorIndex = computed(() => {
@@ -44,12 +46,13 @@ const anchorIndex = computed(() => {
   return props.messages.findIndex((m) => m.id === props.anchorMessageId);
 });
 
-const setRef = (createdAt: string, el: any, id: string) => {
+const initRefs = async (createdAt: string, el: any, id: string) => {
   if (createdAt === props.firstMessageDateInList) {
     targetMessageTop.value = el;
   } else if (targetMessageTop.value === el) {
     targetMessageTop.value = null;
   }
+
   if (createdAt === props.lastMessageDateInList) {
     targetMessageBottom.value = el;
   } else if (targetMessageBottom.value === el) {
@@ -57,46 +60,10 @@ const setRef = (createdAt: string, el: any, id: string) => {
   }
 
   if (id === props.anchorMessageId && !hasScrolledToAnchor.value) {
-    if (el?.$el) {
-      foundMessage.value = el.$el;
-
-      nextTick(() => {
-        nextTick(async () => {
-          if (
-            anchorIndex.value < 0 ||
-            !scroller.value ||
-            !props.isFoundBySearch
-          ) {
-            return;
-          }
-          scroller.value.scrollToItem(anchorIndex.value);
-
-          await nextTick();
-          await new Promise((r) => setTimeout(r, 80));
-
-          if (foundMessage.value && scroller.value?.$el) {
-            const scrollerEl = scroller.value.$el;
-            const msgRect = foundMessage.value.getBoundingClientRect();
-            const scrollerRect = scrollerEl.getBoundingClientRect();
-
-            const offsetToCenter =
-              msgRect.top -
-              scrollerRect.top -
-              scrollerRect.height / 2 +
-              msgRect.height / 2;
-
-            const targetScrollTop = scrollerEl.scrollTop + offsetToCenter;
-
-            scrollerEl.scrollTo({
-              top: targetScrollTop,
-              behavior: 'smooth',
-            });
-          }
-
-          hasScrolledToAnchor.value = true;
-        });
-      });
-    }
+    if (!el?.$el || !scroller.value) return;
+    await nextTick();
+    scroller.value.scrollToItem(anchorIndex.value);
+    hasScrolledToAnchor.value = true;
   }
 };
 
@@ -189,7 +156,9 @@ onUnmounted(() => {
 watch(
   () => props.messages.length,
   (value) => {
-    if (value === 0 || isPrepending.value || props.isFoundBySearch) return;
+    isReadyToScroll.value =
+      value !== 0 && !isPrepending.value && !props.isFoundBySearch;
+    if (!isReadyToScroll.value) return;
     scrollToBottom(!isInitialScroll.value);
     isInitialScroll.value = false;
   },
@@ -215,7 +184,8 @@ watch(
           >
             <div class="pb-6">
               <MessageCard
-                :ref="(el) => setRef(item.createdAt, el, item.id)"
+                :ref="(el) => initRefs(item.createdAt, el, item.id)"
+                :user-id="userId"
                 :message="item"
                 :is-anchor="
                   item.id === props.anchorMessageId && props.isFoundBySearch

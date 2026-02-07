@@ -11,17 +11,17 @@ import type {
 
 export const useCurrentChatStore = defineStore('currentChat', () => {
   const { $api, $socket } = useNuxtApp();
-  const chat = ref<Omit<IChat, 'lastMessage'> | undefined>(undefined);
+  const chat = ref<Omit<IChat, 'lastMessage'> | null>(null);
   const messages = ref<IMessage[]>([]);
-  const typing = ref<ITyping>();
+  const typing = ref<ITyping | null>(null);
   const foundMessages = ref<IMessage[]>([]);
-  const anchorMessageId = ref<string>();
-  const firstMessageDateInList = ref<string>();
-  const lastMessageDateInList = ref<string>();
-  const hasMoreTop = ref<boolean>();
-  const hasMoreBottom = ref<boolean>();
-  const isFoundBySearch = ref<boolean>(false);
-  const isFinding = ref<boolean>(false);
+  const anchorMessageId = ref('');
+  const firstMessageDateInList = ref('');
+  const lastMessageDateInList = ref('');
+  const hasMoreTop = ref(false);
+  const hasMoreBottom = ref(false);
+  const isFoundBySearch = ref(false);
+  const isFinding = ref(false);
   const setChat = (payload: IChat) => (chat.value = payload);
   const setTyping = (payload: ITyping) => (typing.value = payload);
   const pushMessage = (payload: IMessage) => messages.value.push(payload);
@@ -72,7 +72,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
       const { data } = await $api.chats.getChat(chatId);
       setChat(data);
     } catch (error) {
-      console.error(error);
+      console.error('error while trying to get chat info: ', error);
       throw error;
     }
   };
@@ -89,21 +89,21 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
           messages.value.push(...data.messages);
           hasMoreBottom.value = data.hasMoreBottom;
           lastMessageDateInList.value =
-            data.messages[data.messages.length - 1]?.createdAt;
+            data.messages[data.messages.length - 1]?.createdAt ?? '';
           break;
         case 'before':
-          firstMessageDateInList.value = data.messages[0]?.createdAt;
+          firstMessageDateInList.value = data.messages[0]?.createdAt ?? '';
           messages.value.unshift(...data.messages);
           hasMoreTop.value = data.hasMoreTop;
           break;
         default:
-          firstMessageDateInList.value = data.messages[0]?.createdAt;
+          firstMessageDateInList.value = data.messages[0]?.createdAt ?? '';
           messages.value = data.messages;
           hasMoreTop.value = data.hasMoreTop;
           break;
       }
     } catch (error) {
-      console.error(error);
+      console.error('error during getting messages: ', error);
       throw error;
     }
   };
@@ -117,10 +117,13 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
       return;
     }
     try {
-      const { data } = await $api.chats.getChatMessagesBySearch(chatId, query);
+      const { data = [] } = await $api.chats.getChatMessagesBySearch(
+        chatId,
+        query,
+      );
       setFoundMessages(data);
     } catch (error) {
-      console.error(error);
+      console.error('error during finding messages: ', error);
       throw error;
     }
   };
@@ -135,13 +138,13 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
       hasMoreTop.value = data.hasMoreTop;
       hasMoreBottom.value = data.hasMoreBottom;
 
-      firstMessageDateInList.value = data.messages[0]?.createdAt;
+      firstMessageDateInList.value = data.messages[0]?.createdAt ?? '';
       lastMessageDateInList.value =
-        data.messages[data.messages.length - 1]?.createdAt;
+        data.messages[data.messages.length - 1]?.createdAt ?? '';
 
       isFoundBySearch.value = true;
     } catch (error) {
-      console.log(error);
+      console.log('error during finding messages by id: ', error);
     } finally {
       isFinding.value = false;
     }

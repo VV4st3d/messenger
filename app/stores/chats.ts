@@ -17,7 +17,7 @@ export const useChatsStore = defineStore('chats', () => {
       const { data } = await $api.chats.getChats();
       setChats(data);
     } catch (error) {
-      console.error(error);
+      console.error('error during finding chats', error);
       throw error;
     }
   };
@@ -31,7 +31,7 @@ export const useChatsStore = defineStore('chats', () => {
       const { data } = await $api.chats.getGlobalChatsMessagesBySearch(query);
       setGlobalFoundMessages(data);
     } catch (error) {
-      console.error(error);
+      console.error('error during finding messages', error);
     }
   };
 

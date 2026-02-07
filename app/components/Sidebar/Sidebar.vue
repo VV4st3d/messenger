@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  getStatus,
   storeToRefs,
   useAuthStore,
   useCurrentChatStore,
@@ -10,10 +11,10 @@ import { computed, ref, watch } from 'vue';
 import type { TSidebarTabs } from './types';
 import FriendList from '../Friend/FriendList.vue';
 import { useChatsStore } from '~/stores/chats';
-import Avatar from '../common/Avatar/Avatar.vue';
 import Icon from '../ui/Icon.vue';
-import SearchDropdown from '../common/SearchDropdown/SearchDropdown.vue';
-import { SEARCH_MESSAGE_DELAY } from '~/shared/const/delay';
+import { SEARCH_MESSAGE_DELAY_MS } from '~/shared/const/delay';
+import SearchDropdown from '../ui/SearchDropdown.vue';
+import Avatar from '../ui/Avatar/Avatar.vue';
 
 const activeTab = ref<TSidebarTabs>('chats');
 const queryInput = ref<string>('');
@@ -29,7 +30,7 @@ const { user, isOnline } = storeToRefs(authStore);
 const chats = computed(() => chatStore.chats);
 const friends = computed(() => friendsStore.friends);
 const typing = computed(() => currentChatStore.typing);
-const isUserOnline = computed(() => (isOnline ? 'Онлайн' : 'Оффлайн'));
+const status = getStatus(() => isOnline.value);
 const foundGlobalMessages = computed(() => chatStore.globalFoundMessage);
 
 const additionalClassses = (currentTab: TSidebarTabs) =>
@@ -55,12 +56,17 @@ const handleGetChats = async () => {
 
 const handleSearchGlobalMessagesDebounced = useDebounce(
   chatStore.handleGetGlobalMessages,
-  SEARCH_MESSAGE_DELAY,
+  SEARCH_MESSAGE_DELAY_MS,
 );
 
 const handleSearchGlobalMessages = () => {
   isSidebarDropdownOpen.value = true;
   handleSearchGlobalMessagesDebounced({ query: queryInput.value });
+};
+
+const onClickFoundMessage = async (chatId: string): Promise<void> => {
+  await currentChatStore.handleMessagesById(chatId);
+  isSidebarDropdownOpen.value = false;
 };
 
 watch(
@@ -95,10 +101,8 @@ watch(
       >
       <SearchDropdown
         v-if="foundGlobalMessages.length > 0 && isSidebarDropdownOpen"
-        :on-message-click="currentChatStore.handleMessagesById"
-        :no-input="true"
+        :on-message-click="onClickFoundMessage"
         :found-messages="foundGlobalMessages"
-        @click.stop
       />
     </div>
 
@@ -144,7 +148,7 @@ watch(
       <div class="flex-1 min-w-0">
         <div class="font-medium truncate">{{ user?.displayName }}</div>
         <div class="text-xs text-[var(--text-tertiary)]">
-          {{ isUserOnline }}
+          {{ status }}
         </div>
       </div>
       <button

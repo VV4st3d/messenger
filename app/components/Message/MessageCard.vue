@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { formatLastMessageDate, useAuth } from '#imports';
+import { formatLastMessageDate } from '#imports';
 import type { IMessage } from '~/shared/types';
 import Icon from '../ui/Icon.vue';
 
 const props = defineProps<{
   message: IMessage;
   isAnchor?: boolean;
+  userId: string | undefined;
 }>();
-
-const { user } = useAuth();
 
 const formattedTime = computed(() =>
   formatLastMessageDate(props.message.createdAt),
 );
 
-const isOwn = computed(() => props.message.sender?.id === user.value?.id);
+const isOwn = computed(() => props.message.sender?.id === props.userId);
 </script>
 
 <template>

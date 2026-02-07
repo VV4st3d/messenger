@@ -1,1 +1,1 @@
-export const SEARCH_MESSAGE_DELAY = 700;
+export const SEARCH_MESSAGE_DELAY_MS = 700;

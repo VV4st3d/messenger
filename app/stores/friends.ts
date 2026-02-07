@@ -11,10 +11,10 @@ export const useFriendsStore = defineStore('friends', () => {
 
   const getFriendsHandler = async () => {
     try {
-      const { data } = await $api.friend.getFriends();
+      const { data = [] } = await $api.friend.getFriends();
       setFriends(data);
     } catch (error) {
-      console.error(error);
+      console.error('error during finding friends: ', error);
     }
   };
 

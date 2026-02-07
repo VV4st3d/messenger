@@ -2,7 +2,7 @@
 import { ROUTES } from '~/shared/const';
 import type { IChat, ITyping } from '~/shared/types';
 
-defineProps<{ chats: IChat[]; typing: ITyping | undefined }>();
+defineProps<{ chats: IChat[]; typing: ITyping | null }>();
 </script>
 
 <template>

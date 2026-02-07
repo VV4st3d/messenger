@@ -3,7 +3,7 @@ import type { ComputedRef, MaybeRefOrGetter } from 'vue';
 import type { IChat, IParticipant } from '~/shared/types';
 
 export const useCompanion = (
-  chatItem: MaybeRefOrGetter<IChat | undefined>,
+  chatItem: MaybeRefOrGetter<IChat | null>,
 ): ComputedRef<IParticipant | null | undefined> => {
   const { user } = useAuth();
   return computed(() => {

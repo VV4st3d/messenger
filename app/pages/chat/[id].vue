@@ -1,20 +1,28 @@
 <script setup lang="ts">
 import {
+  computed,
   onMounted,
   onUnmounted,
   ref,
   storeToRefs,
+  useAuthStore,
   useCurrentChatStore,
+  useDebounce,
 } from '#imports';
 import { useRoute } from 'vue-router';
 import ChatFooter from '~/components/Chat/ChatFooter.vue';
+import { SEARCH_MESSAGE_DELAY_MS } from '~/shared/const/delay';
 
 const { params } = useRoute();
 const chatId = params.id as string;
 const messageText = ref<string>('');
 const isSearching = ref(false);
+const queryInput = ref('');
 
 const chatStore = useCurrentChatStore();
+const authStore = useAuthStore();
+
+const userId = computed(() => authStore.user?.id);
 
 const {
   chat,
@@ -42,6 +50,21 @@ const {
 
 const onToggleSearchingDropdown = () =>
   (isSearching.value = !isSearching.value);
+
+const handleFindMessagesDebounced = useDebounce(
+  handleFindMessages,
+  SEARCH_MESSAGE_DELAY_MS,
+);
+const onSearch = () => {
+  handleFindMessagesDebounced(chatId, {
+    query: queryInput.value,
+  });
+};
+
+const onClickFoundMessage = async (chatId: string): Promise<void> => {
+  await handleMessagesById(chatId);
+  isSearching.value = false;
+};
 
 const handleGetChatInfo = async () => {
   try {
@@ -79,10 +102,11 @@ onUnmounted(() => {
 <template>
   <div class="flex flex-col h-full" @click="isSearching = false">
     <ChatHeader
-      :on-message-click="handleMessagesById"
+      v-model="queryInput"
+      :on-message-click="onClickFoundMessage"
       :found-messages="foundMessages"
-      :handle-find-message="handleFindMessages"
       :is-searching="isSearching"
+      :on-search="onSearch"
       :on-open-searching-dropdown="onToggleSearchingDropdown"
       :typing="typing"
       :chat="chat"
@@ -90,6 +114,7 @@ onUnmounted(() => {
     />
 
     <MessageSpace
+      :user-id="userId"
       :anchor-message-id="anchorMessageId"
       :is-found-by-search="isFoundBySearch"
       :has-more-top="hasMoreTop"

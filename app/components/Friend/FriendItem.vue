@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue';
 import type { IFriend } from '~/shared/types';
-import Avatar from '../common/Avatar/Avatar.vue';
+import Avatar from '../ui/Avatar/Avatar.vue';
 import Icon from '../ui/Icon.vue';
+import { getStatus } from '#imports';
 
 const props = defineProps<{
   friend: IFriend;
 }>();
 
-const userStatus = computed(() =>
-  props.friend.isOnline ? 'Онлайн' : 'Был недавно',
-);
+const status = getStatus(() => props.friend.isOnline);
 </script>
 
 <template>
@@ -26,7 +24,7 @@ const userStatus = computed(() =>
         {{ friend.displayName }}
       </div>
       <div class="text-sm text-[var(--text-secondary)] truncate">
-        {{ userStatus }}
+        {{ status }}
       </div>
     </div>
 

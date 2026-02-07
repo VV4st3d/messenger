@@ -2,10 +2,10 @@
 import { computed, formatLastMessageDate } from '#imports';
 import { useCompanion } from '~/composables/useCompanion';
 import type { IChat, ITyping } from '~/shared/types';
-import TypingIndicator from '../common/Typing/TypingIndicator.vue';
-import Avatar from '../common/Avatar/Avatar.vue';
+import TypingIndicator from '../ui/TypingIndicator.vue';
+import Avatar from '../ui/Avatar/Avatar.vue';
 
-const props = defineProps<{ chat: IChat; typing: ITyping | undefined }>();
+const props = defineProps<{ chat: IChat; typing: ITyping | null }>();
 
 const companion = useCompanion(() => props.chat);
 

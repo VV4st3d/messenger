@@ -25,7 +25,7 @@ export const useAuthStore = defineStore('auth', () => {
       token.value = accessToken;
       setUser(data);
     } catch (error) {
-      console.error(error);
+      console.error('login error: ', error);
       throw error;
     }
   };
@@ -38,7 +38,7 @@ export const useAuthStore = defineStore('auth', () => {
       setUser(data);
       token.value = accessToken;
     } catch (error) {
-      console.error(error);
+      console.error('register error: ', error);
     }
   };
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useThrottling } from '#imports';
 import Icon from '../ui/Icon.vue';
-import { TYPING_MESSAGE_DELAY } from './const';
+import { TYPING_MESSAGE_DELAY_MS } from './const';
 
 const messageText = defineModel<string>();
 interface IProps {
@@ -12,12 +12,8 @@ const props = defineProps<IProps>();
 
 const startTyping = useThrottling(
   props.handleStartTyping,
-  TYPING_MESSAGE_DELAY,
+  TYPING_MESSAGE_DELAY_MS,
 );
-
-const onTypeMessage = () => {
-  startTyping();
-};
 </script>
 <template>
   <footer class="chat-input-container">
@@ -30,7 +26,7 @@ const onTypeMessage = () => {
       placeholder="Напишите сообщение..."
       rows="1"
       class="flex-1 resize-none bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-[var(--radius)] px-4 py-3 focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30 transition"
-      @input="onTypeMessage"
+      @input="startTyping"
       @keydown.enter.exact.prevent="handleSendMessage"
     />
 

@@ -2,32 +2,16 @@
 import { ref, onMounted } from 'vue';
 import Icon from '~/components/ui/Icon.vue';
 import { useAuth } from '~/composables/useAuth';
-import { LOCALSTORAGE_THEME_KEY, Themes } from '~/shared/const';
+import { useTheme } from '~/composables/useTheme';
 
 const { isAuthenticated } = useAuth();
 
 const showSidebar = ref(false);
-const isDark = ref(true);
 
-const toggleTheme = () => {
-  isDark.value = !isDark.value;
-  document.documentElement.classList.toggle(Themes.LIGHT_THEME, !isDark.value);
-  localStorage.setItem(
-    LOCALSTORAGE_THEME_KEY,
-    isDark.value ? Themes.DARK_THEME : Themes.LIGHT_THEME,
-  );
-};
+const { restoreTheme, toggleTheme, isDark } = useTheme();
 
 const toggleSidebar = () => {
   showSidebar.value = !showSidebar.value;
-};
-
-const restoreTheme = () => {
-  const savedTheme = localStorage.getItem(LOCALSTORAGE_THEME_KEY);
-  if (savedTheme === Themes.LIGHT_THEME) {
-    isDark.value = false;
-    document.documentElement.classList.add(Themes.LIGHT_THEME);
-  }
 };
 
 onMounted(() => {

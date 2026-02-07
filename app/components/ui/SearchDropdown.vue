@@ -1,63 +1,26 @@
 <script setup lang="ts">
-import { ref, useDebounce } from '#imports';
 import type { IMessage } from '~/shared/types';
-import Avatar from '../Avatar/Avatar.vue';
-import Icon from '~/components/ui/Icon.vue';
-import { SEARCH_MESSAGE_DELAY } from '../../../shared/const/delay';
+import Avatar from './Avatar/Avatar.vue';
+import { ROUTES } from '~/shared/const';
 
 interface IProps {
-  handleFindMessage?: (
-    chatId: string,
-    query: { query: string },
-  ) => Promise<void>;
   foundMessages: IMessage[];
-  chatId?: string;
-  noInput?: boolean;
   onMessageClick: (chatId: string) => Promise<void>;
 }
 const props = defineProps<IProps>();
-
-const queryInput = ref<string>('');
-const handleFindMessagesDebounced = props.handleFindMessage
-  ? useDebounce(props.handleFindMessage, SEARCH_MESSAGE_DELAY)
-  : null;
-
-const onSearch = () => {
-  if (!handleFindMessagesDebounced || !props.chatId) return;
-  handleFindMessagesDebounced(props.chatId, {
-    query: queryInput.value,
-  });
-};
 </script>
 
 <template>
   <div
     class="absolute top-full right-0 w-full bg-[var(--bg-primary)] border border-[var(--border)] shadow-lg overflow-hidden z-50"
+    @click.stop
   >
-    <div v-if="!noInput" class="p-3 border-b border-[var(--border)]">
-      <div
-        class="flex items-center gap-2 bg-[var(--bg-secondary)] rounded-lg px-3 py-2"
-      >
-        <Icon
-          name="magnifying-glass"
-          size="16"
-          class="text-[var(--text-secondary)]"
-        />
-        <input
-          v-model="queryInput"
-          type="text"
-          placeholder="Поиск..."
-          class="w-full bg-transparent outline-none text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]"
-          @input="onSearch"
-        >
-      </div>
-    </div>
-
+    <slot />
     <div v-if="foundMessages.length > 0" class="max-h-[320px] overflow-y-auto">
       <NuxtLink
         v-for="message in foundMessages"
         :key="message.id"
-        :to="`/chat/${message.chat.id}`"
+        :to="ROUTES.getRouteChat(message.chat.id)"
       >
         <div
           class="px-4 py-3 cursor-pointer hover:bg-[var(--bg-secondary)] transition flex gap-3"
