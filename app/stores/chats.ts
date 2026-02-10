@@ -12,9 +12,9 @@ export const useChatsStore = defineStore('chats', () => {
   const setGlobalFoundMessages = (payload: IMessage[]) =>
     (globalFoundMessage.value = payload);
 
-  const getChatsHandler = async (): Promise<void> => {
+  const fetchChats = async (): Promise<void> => {
     try {
-      const { data } = await $api.chats.getChats();
+      const { data = [] } = await $api.chats.getChats();
       setChats(data);
     } catch (error) {
       console.error('error during finding chats', error);
@@ -22,13 +22,14 @@ export const useChatsStore = defineStore('chats', () => {
     }
   };
 
-  const handleGetGlobalMessages = async (query: { query: string }) => {
+  const fetchGlobalMessages = async (query: { query: string }) => {
     if (!query.query.length) {
       globalFoundMessage.value = [];
       return;
     }
     try {
-      const { data } = await $api.chats.getGlobalChatsMessagesBySearch(query);
+      const { data = [] } =
+        await $api.chats.getGlobalChatsMessagesBySearch(query);
       setGlobalFoundMessages(data);
     } catch (error) {
       console.error('error during finding messages', error);
@@ -39,7 +40,7 @@ export const useChatsStore = defineStore('chats', () => {
     chats,
     globalFoundMessage,
     setChats,
-    getChatsHandler,
-    handleGetGlobalMessages,
+    fetchChats,
+    fetchGlobalMessages,
   };
 });

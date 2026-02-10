@@ -1,20 +1,24 @@
 <script setup lang="ts">
 import {
   getStatus,
+  navigateTo,
   storeToRefs,
+  useAsyncData,
   useAuthStore,
   useCurrentChatStore,
   useDebounce,
   useFriendsStore,
+  useNuxtApp,
 } from '#imports';
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import type { TSidebarTabs } from './types';
 import FriendList from '../Friend/FriendList.vue';
 import { useChatsStore } from '~/stores/chats';
 import Icon from '../ui/Icon.vue';
-import { SEARCH_MESSAGE_DELAY_MS } from '~/shared/const/delay';
-import SearchDropdown from '../ui/SearchDropdown.vue';
+import { SEARCH_DELAY_MS } from '~/shared/const/delay';
+import SearchDropdown from '../ui/SearchDropdown/SearchDropdown.vue';
 import Avatar from '../ui/Avatar/Avatar.vue';
+import { ROUTES } from '~/shared/const';
 
 const activeTab = ref<TSidebarTabs>('chats');
 const queryInput = ref<string>('');
@@ -24,6 +28,7 @@ const authStore = useAuthStore();
 const friendsStore = useFriendsStore();
 const chatStore = useChatsStore();
 const currentChatStore = useCurrentChatStore();
+const { $api } = useNuxtApp();
 
 const { user, isOnline } = storeToRefs(authStore);
 
@@ -31,61 +36,71 @@ const chats = computed(() => chatStore.chats);
 const friends = computed(() => friendsStore.friends);
 const typing = computed(() => currentChatStore.typing);
 const status = getStatus(() => isOnline.value);
-const foundGlobalMessages = computed(() => chatStore.globalFoundMessage);
+const globalFoundMessages = computed(() => chatStore.globalFoundMessage);
 
-const additionalClassses = (currentTab: TSidebarTabs) =>
+const getTabClasses = (currentTab: TSidebarTabs) =>
   activeTab.value === currentTab
     ? 'border-b-2 border-[var(--accent)] text-[var(--accent)]'
     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]';
 
-const handleGetFriends = async () => {
+const getOrCreateChatHandler = async (otherUserId: string): Promise<void> => {
   try {
-    await friendsStore.getFriendsHandler();
+    const { data } = await $api.chats.createOrGetPrivateChat({
+      otherUserId,
+    });
+    navigateTo(ROUTES.getRouteChat(data.id));
   } catch (error) {
-    console.log(error);
+    console.log('Ошибка при создании/поиске чата', error);
   }
 };
 
-const handleGetChats = async () => {
+const sendFriendRequestHandler = async (otherUserId: string): Promise<void> => {
   try {
-    await chatStore.getChatsHandler();
+    const data = await $api.friend.sendFriendRequest({ toUserId: otherUserId });
+    console.log(data);
   } catch (error) {
-    console.log(error);
+    console.log('Ошибка при отправке запроса', error);
   }
 };
 
 const handleSearchGlobalMessagesDebounced = useDebounce(
-  chatStore.handleGetGlobalMessages,
-  SEARCH_MESSAGE_DELAY_MS,
+  chatStore.fetchGlobalMessages,
+  SEARCH_DELAY_MS,
+);
+
+const handleSearchFriendsDebounced = useDebounce(
+  friendsStore.fetchUsers,
+  SEARCH_DELAY_MS,
 );
 
 const handleSearchGlobalMessages = () => {
   isSidebarDropdownOpen.value = true;
   handleSearchGlobalMessagesDebounced({ query: queryInput.value });
+  handleSearchFriendsDebounced({ q: queryInput.value });
 };
 
-const onClickFoundMessage = async (chatId: string): Promise<void> => {
-  await currentChatStore.handleMessagesById(chatId);
+const foundMessageHandler = async (chatId: string): Promise<void> => {
+  await currentChatStore.fetchMessagesById(chatId);
   isSidebarDropdownOpen.value = false;
 };
 
-watch(
-  activeTab,
-  (tab) => {
-    switch (tab) {
+await useAsyncData(
+  `tab-content-${activeTab.value}`,
+  async () => {
+    switch (activeTab.value) {
       case 'chats':
-        handleGetChats();
-        break;
+        await chatStore.fetchChats();
+        return true;
       case 'friends':
-        handleGetFriends();
-        break;
+        await friendsStore.fetchFriends();
+        return true;
       default: {
-        const _exhaustiveCheck: never = tab;
+        const _exhaustiveCheck: never = activeTab.value;
         return _exhaustiveCheck;
       }
     }
   },
-  { immediate: true },
+  { watch: [activeTab], immediate: true },
 );
 </script>
 
@@ -100,23 +115,26 @@ watch(
         @input="handleSearchGlobalMessages"
       >
       <SearchDropdown
-        v-if="foundGlobalMessages.length > 0 && isSidebarDropdownOpen"
-        :on-message-click="onClickFoundMessage"
-        :found-messages="foundGlobalMessages"
+        v-if="isSidebarDropdownOpen"
+        :messages="globalFoundMessages"
+        :found-users="friendsStore.foundUsers"
+        @message-click="foundMessageHandler"
+        @open-chat="getOrCreateChatHandler"
+        @add-friend="sendFriendRequestHandler"
       />
     </div>
 
     <div class="flex border-b border-[var(--border)]">
       <button
         class="flex-1 py-4 text-center font-medium text-sm transition-colors"
-        :class="additionalClassses('chats')"
+        :class="getTabClasses('chats')"
         @click="activeTab = 'chats'"
       >
         Чаты
       </button>
       <button
         class="flex-1 py-4 text-center font-medium text-sm transition-colors"
-        :class="additionalClassses('friends')"
+        :class="getTabClasses('friends')"
         @click="activeTab = 'friends'"
       >
         Друзья
@@ -135,7 +153,7 @@ watch(
         v-if="activeTab === 'friends'"
         class="p-4 text-[var(--text-secondary)]"
       >
-        <FriendList :friends="friends" />
+        <FriendList :friends="friends" @chat-open="getOrCreateChatHandler" />
       </div>
     </div>
 

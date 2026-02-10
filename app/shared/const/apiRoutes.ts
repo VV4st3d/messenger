@@ -14,6 +14,12 @@ export const API_ROUTES = {
   getRouteFriends() {
     return 'friends';
   },
+  getRouteSearchFriend() {
+    return 'friends/search';
+  },
+  getRouteFriendRequest() {
+    return 'friends/request';
+  },
   getRouteChats() {
     return 'chats';
   },
@@ -34,5 +40,8 @@ export const API_ROUTES = {
   },
   getRouteMessagesByMessageId(id: string) {
     return `messages/${id}/context`;
+  },
+  getRouteCreateOrGetChat() {
+    return `chats/private`;
   },
 };

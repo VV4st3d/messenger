@@ -6,6 +6,7 @@ import type {
   TChats,
   IGetMessageQuery,
   TMessagesListById,
+  TChatInfo,
 } from '~/shared/types';
 
 export function createChatsRepository(appFetch: typeof $fetch) {
@@ -51,6 +52,12 @@ export function createChatsRepository(appFetch: typeof $fetch) {
           method: 'GET',
         },
       );
+    },
+    createOrGetPrivateChat(body: { otherUserId: string }) {
+      return appFetch<TChatInfo>(API_ROUTES.getRouteCreateOrGetChat(), {
+        method: 'POST',
+        body,
+      });
     },
   };
 }

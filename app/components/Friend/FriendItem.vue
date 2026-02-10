@@ -9,6 +9,7 @@ const props = defineProps<{
 }>();
 
 const status = getStatus(() => props.friend.isOnline);
+const emit = defineEmits<{ chatOpen: [otherUserId: string] }>();
 </script>
 
 <template>
@@ -31,6 +32,7 @@ const status = getStatus(() => props.friend.isOnline);
     <div class="flex items-center gap-1">
       <button
         class="text-[var(--text-tertiary)] hover:text-[var(--accent)] transition p-1.5 rounded-full hover:bg-[rgba(var(--accent),0.1)] cursor-pointer"
+        @click="emit('chatOpen', friend.id)"
       >
         <Icon name="chat-bubble-left-right" size="20" />
       </button>

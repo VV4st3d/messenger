@@ -15,7 +15,7 @@ import { DIRECTION, MIN_MESSAGE_SIZE, REFS } from './const';
 
 import type MessageCard from './MessageCard.vue';
 
-const props = defineProps<{
+interface IProps {
   messages: IMessage[];
   chat: IChat | null;
   userId: string | undefined;
@@ -25,9 +25,16 @@ const props = defineProps<{
   hasMoreBottom: boolean;
   isFoundBySearch: boolean;
   anchorMessageId: string;
-  resetMessages: () => void;
-  getMesseges: (chatId: string, query?: IGetMessageQuery) => Promise<void>;
-}>();
+  onFetchMessages: (chatId: string, query?: IGetMessageQuery) => Promise<void>;
+}
+
+interface IEmits {
+  (e: 'unmount'): void;
+}
+
+const props = defineProps<IProps>();
+
+const emit = defineEmits<IEmits>();
 
 const scroller = useTemplateRef(REFS.REF_SCROLLER);
 const targetMessageTop = ref<InstanceType<typeof MessageCard> | null>(null);
@@ -61,6 +68,7 @@ const initRefs = async (createdAt: string, el: any, id: string) => {
 
   if (id === props.anchorMessageId && !hasScrolledToAnchor.value) {
     if (!el?.$el || !scroller.value) return;
+    await nextTick();
     await nextTick();
     scroller.value.scrollToItem(anchorIndex.value);
     hasScrolledToAnchor.value = true;
@@ -131,7 +139,7 @@ const onIntersect = async (
   if (direction === DIRECTION.BEFORE) saveScrollPosition();
 
   if (props.chat?.id) {
-    await props.getMesseges(props.chat.id, {
+    await props.onFetchMessages(props.chat.id, {
       direction,
       cursorCreatedAt: anchorMessageDate,
     });
@@ -150,7 +158,7 @@ const onIntersect = async (
 };
 
 onUnmounted(() => {
-  props.resetMessages();
+  emit('unmount');
 });
 
 watch(

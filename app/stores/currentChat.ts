@@ -21,7 +21,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   const hasMoreTop = ref(false);
   const hasMoreBottom = ref(false);
   const isFoundBySearch = ref(false);
-  const isFinding = ref(false);
+  const isSearching = ref(false);
   const setChat = (payload: IChat) => (chat.value = payload);
   const setTyping = (payload: ITyping) => (typing.value = payload);
   const pushMessage = (payload: IMessage) => messages.value.push(payload);
@@ -37,7 +37,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
         return;
       }
       isFoundBySearch.value = false;
-      if (chat.value?.id) await getMessagesHandler(chat.value?.id);
+      if (chat.value?.id) await fetchMessages(chat.value?.id);
     });
     $socket.on(SOCKET_ON_EVENTS.TYPING, setTyping);
     if (chat.value) {
@@ -50,15 +50,15 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     $socket.off(SOCKET_ON_EVENTS.TYPING);
   };
 
-  const handleStopTyping = () => {
+  const stopTyping = () => {
     if (chat.value) $socket.emit(SOCKET_EMIT_EVENTS.STOP_TYPING, chat.value.id);
   };
 
-  const handleStartTyping = () => {
+  const startTyping = () => {
     if (chat.value) $socket.emit(SOCKET_EMIT_EVENTS.TYPING, chat.value.id);
   };
 
-  const sendMessageHandler = (content: string) => {
+  const sendMessage = (content: string) => {
     if (chat.value?.id)
       $socket.emit(SOCKET_EMIT_EVENTS.SEND_MESSAGE, {
         chatId: chat.value?.id,
@@ -67,7 +67,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
       });
   };
 
-  const getChatInfoHandler = async (chatId: string): Promise<void> => {
+  const fetchChatInfo = async (chatId: string): Promise<void> => {
     try {
       const { data } = await $api.chats.getChat(chatId);
       setChat(data);
@@ -77,7 +77,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     }
   };
 
-  const getMessagesHandler = async (
+  const fetchMessages = async (
     chatId: string,
     query?: IGetMessageQuery,
   ): Promise<void> => {
@@ -108,7 +108,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     }
   };
 
-  const handleFindMessages = async (
+  const fetchMessagesByQuery = async (
     chatId: string,
     query: { query: string },
   ): Promise<void> => {
@@ -128,9 +128,9 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     }
   };
 
-  const handleMessagesById = async (chatId: string) => {
+  const fetchMessagesById = async (chatId: string) => {
     try {
-      isFinding.value = true;
+      isSearching.value = true;
       const { data } = await $api.chats.getMessagesListByMessageId(chatId);
       setMessages(data.messages);
 
@@ -146,12 +146,12 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     } catch (error) {
       console.log('error during finding messages by id: ', error);
     } finally {
-      isFinding.value = false;
+      isSearching.value = false;
     }
   };
 
   return {
-    isFinding,
+    isSearching,
     typing,
     hasMoreTop,
     hasMoreBottom,
@@ -163,14 +163,14 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     anchorMessageId,
     isFoundBySearch,
     setChat,
-    handleFindMessages,
-    handleStopTyping,
-    handleMessagesById,
+    fetchMessagesByQuery,
+    stopTyping,
+    fetchMessagesById,
     resetMessages,
-    handleStartTyping,
-    sendMessageHandler,
-    getChatInfoHandler,
-    getMessagesHandler,
+    startTyping,
+    sendMessage,
+    fetchChatInfo,
+    fetchMessages,
     unbindEvents,
     bindEvents,
   };

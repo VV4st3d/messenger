@@ -4,7 +4,7 @@ import { AVATAR_SIZE_CLASSES, STATUS_SIZE_CLASSES } from './consts';
 import Icon from '~/components/ui/Icon.vue';
 
 interface IProps {
-  src?: string;
+  src?: string | null;
   size?: 'sm' | 'md' | 'lg';
   online?: boolean | null;
 }

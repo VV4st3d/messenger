@@ -11,12 +11,12 @@ import {
 } from '#imports';
 import { useRoute } from 'vue-router';
 import ChatFooter from '~/components/Chat/ChatFooter.vue';
-import { SEARCH_MESSAGE_DELAY_MS } from '~/shared/const/delay';
+import { SEARCH_DELAY_MS } from '~/shared/const/delay';
 
 const { params } = useRoute();
 const chatId = params.id as string;
 const messageText = ref<string>('');
-const isSearching = ref(false);
+const isDropdownOpen = ref(false);
 const queryInput = ref('');
 
 const chatStore = useCurrentChatStore();
@@ -34,41 +34,42 @@ const {
   foundMessages,
   isFoundBySearch,
   anchorMessageId,
-  isFinding,
+  isSearching,
 } = storeToRefs(chatStore);
 const {
-  handleMessagesById,
-  getMessagesHandler,
-  sendMessageHandler,
+  fetchMessagesById,
+  fetchMessages,
+  sendMessage,
   bindEvents,
   unbindEvents,
-  getChatInfoHandler,
+  fetchChatInfo,
   resetMessages,
-  handleStartTyping,
-  handleFindMessages,
+  startTyping,
+  fetchMessagesByQuery,
 } = chatStore;
 
-const onToggleSearchingDropdown = () =>
-  (isSearching.value = !isSearching.value);
+const onToggleSearchingDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
 
-const handleFindMessagesDebounced = useDebounce(
-  handleFindMessages,
-  SEARCH_MESSAGE_DELAY_MS,
+const fetchMessagesByQueryDebounced = useDebounce(
+  fetchMessagesByQuery,
+  SEARCH_DELAY_MS,
 );
-const onSearch = () => {
-  handleFindMessagesDebounced(chatId, {
+const searchHandler = () => {
+  fetchMessagesByQueryDebounced(chatId, {
     query: queryInput.value,
   });
 };
 
-const onClickFoundMessage = async (chatId: string): Promise<void> => {
-  await handleMessagesById(chatId);
-  isSearching.value = false;
+const foundMessageClickHandler = async (messageId: string): Promise<void> => {
+  await fetchMessagesById(messageId);
+  isDropdownOpen.value = false;
 };
 
 const handleGetChatInfo = async () => {
   try {
-    await getChatInfoHandler(chatId);
+    await fetchChatInfo(chatId);
   } catch (error) {
     console.log(error);
   }
@@ -76,20 +77,20 @@ const handleGetChatInfo = async () => {
 
 const handleGetMessages = async () => {
   try {
-    await getMessagesHandler(chatId);
+    await fetchMessages(chatId);
   } catch (error) {
     console.log(error);
   }
 };
 
 const handleSendMessage = () => {
-  sendMessageHandler(messageText.value);
+  sendMessage(messageText.value);
   messageText.value = '';
 };
 
 onMounted(async () => {
   await handleGetChatInfo();
-  if (chatStore.messages.length === 0 && !isFinding.value)
+  if (chatStore.messages.length === 0 && !isSearching.value)
     await handleGetMessages();
   bindEvents();
 });
@@ -100,17 +101,17 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full" @click="isSearching = false">
+  <div class="flex flex-col h-full" @click="isDropdownOpen = false">
     <ChatHeader
       v-model="queryInput"
-      :on-message-click="onClickFoundMessage"
       :found-messages="foundMessages"
-      :is-searching="isSearching"
-      :on-search="onSearch"
-      :on-open-searching-dropdown="onToggleSearchingDropdown"
+      :is-searching="isDropdownOpen"
       :typing="typing"
       :chat="chat"
       :chat-id="chatId"
+      @message-click="foundMessageClickHandler"
+      @search="searchHandler"
+      @open-search-dropdown="onToggleSearchingDropdown"
     />
 
     <MessageSpace
@@ -119,18 +120,18 @@ onUnmounted(() => {
       :is-found-by-search="isFoundBySearch"
       :has-more-top="hasMoreTop"
       :has-more-bottom="hasMoreBottom"
-      :get-messeges="getMessagesHandler"
-      :reset-messages="resetMessages"
+      :on-fetch-messages="fetchMessages"
       :first-message-date-in-list="firstMessageDateInList"
       :last-message-date-in-list="lastMessageDateInList"
       :chat="chat"
       :messages="chatStore.messages"
+      @unmount="resetMessages"
     />
 
     <ChatFooter
       v-model="messageText"
-      :handle-start-typing="handleStartTyping"
-      :handle-send-message="handleSendMessage"
+      :on-start-typing="startTyping"
+      :on-send-message="handleSendMessage"
     />
   </div>
 </template>

@@ -13,7 +13,9 @@ export default defineNuxtPlugin({
     const authStore = useAuthStore();
 
     try {
-      const { data } = await useAsyncData('user-init', () => $api.auth.me());
+      const { data = [] } = await useAsyncData('user-init', () =>
+        $api.auth.me(),
+      );
 
       if (!data.value?.success) {
         authStore.setUser(null);

@@ -1,5 +1,9 @@
 import { API_ROUTES } from '~/shared/const';
-import type { TFriendsResponse } from '~/shared/types';
+import type {
+  IFriendRequest,
+  TFriendsResponse,
+  TSearchFriendsResponse,
+} from '~/shared/types';
 
 export function createFriendsRepository(appFetch: typeof $fetch) {
   return {
@@ -7,6 +11,21 @@ export function createFriendsRepository(appFetch: typeof $fetch) {
       return appFetch<TFriendsResponse>(API_ROUTES.getRouteFriends(), {
         method: 'GET',
       });
+    },
+    sendFriendRequest(body: { toUserId: string }) {
+      return appFetch<IFriendRequest>(API_ROUTES.getRouteFriendRequest(), {
+        method: 'POST',
+        body,
+      });
+    },
+    searchForFriends(query: { q: string }) {
+      return appFetch<TSearchFriendsResponse>(
+        API_ROUTES.getRouteSearchFriend(),
+        {
+          method: 'GET',
+          query,
+        },
+      );
     },
   };
 }

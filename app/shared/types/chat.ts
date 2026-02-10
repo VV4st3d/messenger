@@ -12,6 +12,9 @@ export type TMessengesResponse = TResponseBody<{
 export type TMessengesFindResponse = TResponseBody<IMessage[]>;
 export type TSendMessageResponse = TResponseBody<IMessage>;
 export type TMessagesListById = TResponseBody<IFoundMessageData>;
+export type TChatInfo = TResponseBody<
+  Omit<IChat, 'participants' | 'lastMessage'>
+>;
 
 export interface IChat {
   id: string;

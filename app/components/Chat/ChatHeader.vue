@@ -1,10 +1,17 @@
 <script setup lang="ts">
-import { computed, getStatus, useCompanion } from '#imports';
+import {
+  computed,
+  getStatus,
+  nextTick,
+  useCompanion,
+  useTemplateRef,
+  watch,
+} from '#imports';
 import type { IChat, IMessage, ITyping } from '~/shared/types';
 import TypingIndicator from '../ui/TypingIndicator.vue';
 import Avatar from '../ui/Avatar/Avatar.vue';
 import Icon from '../ui/Icon.vue';
-import SearchDropdown from '../ui/SearchDropdown.vue';
+import SearchDropdown from '../ui/SearchDropdown/SearchDropdown.vue';
 
 interface IProps {
   chat: IChat | null;
@@ -12,12 +19,19 @@ interface IProps {
   typing: ITyping | null;
   isSearching: boolean;
   foundMessages: IMessage[];
-  onSearch: () => void;
-  onOpenSearchingDropdown: () => void;
-  onMessageClick: (chatId: string) => Promise<void>;
 }
 
+interface IEmits {
+  (e: 'search' | 'open-search-dropdown'): void;
+  (e: 'message-click', chatId: string): void;
+}
+
+const SEARCH_INPUT = 'searchInputField' as const;
+const searchInputField = useTemplateRef<HTMLInputElement>(SEARCH_INPUT);
+
 const props = defineProps<IProps>();
+const emit = defineEmits<IEmits>();
+
 const queryInput = defineModel<string>();
 
 const companion = useCompanion(() => props.chat);
@@ -25,6 +39,16 @@ const companion = useCompanion(() => props.chat);
 const status = getStatus(() => companion.value?.isOnline);
 
 const isTyping = computed(() => props.typing?.isTyping);
+
+watch(
+  () => props.isSearching,
+  async (value) => {
+    if (value) {
+      await nextTick();
+      searchInputField.value?.focus();
+    }
+  },
+);
 </script>
 
 <template>
@@ -59,16 +83,17 @@ const isTyping = computed(() => props.typing?.isTyping);
       </button>
       <button
         class="text-[var(--text-secondary)] hover:text-[var(--accent)] transition"
-        @click.stop="onOpenSearchingDropdown"
+        @click.stop="emit('open-search-dropdown')"
       >
         <Icon name="magnifying-glass" size="24" />
       </button>
       <SearchDropdown
         v-if="isSearching"
-        :on-message-click="onMessageClick"
         class="rounded-xl"
-        :found-messages="foundMessages"
-        ><div class="p-3 border-b border-[var(--border)]">
+        :messages="foundMessages"
+        @message-click="(chatId) => emit('message-click', chatId)"
+      >
+        <div class="p-3 border-b border-[var(--border)]">
           <div
             class="flex items-center gap-2 bg-[var(--bg-secondary)] rounded-lg px-3 py-2"
           >
@@ -78,14 +103,16 @@ const isTyping = computed(() => props.typing?.isTyping);
               class="text-[var(--text-secondary)]"
             />
             <input
+              :ref="SEARCH_INPUT"
               v-model="queryInput"
               type="text"
               placeholder="Поиск..."
               class="w-full bg-transparent outline-none text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)]"
-              @input="onSearch"
+              @input="emit('search')"
             >
-          </div></div
-      ></SearchDropdown>
+          </div>
+        </div>
+      </SearchDropdown>
     </div>
   </header>
 </template>

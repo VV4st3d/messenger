@@ -1,12 +1,22 @@
 <script setup lang="ts">
 import type { IFriend } from '~/shared/types';
 import Icon from '../ui/Icon.vue';
+import FriendItem from './FriendItem.vue';
 
-defineProps<{ friends: IFriend[] }>();
+interface IProps {
+  friends: IFriend[];
+}
+defineProps<IProps>();
+const emit = defineEmits<{ chatOpen: [otherUserId: string] }>();
 </script>
 <template>
   <div class="divide-y divide-[var(--border-subtle)]">
-    <FriendItem v-for="friend in friends" :key="friend.id" :friend="friend" />
+    <FriendItem
+      v-for="friend in friends"
+      :key="friend.id"
+      :friend="friend"
+      @chat-open="(id) => emit('chatOpen', id)"
+    />
     <div
       v-if="friends.length === 0"
       class="flex flex-col items-center justify-center h-full py-12 text-[var(--text-tertiary)]"
