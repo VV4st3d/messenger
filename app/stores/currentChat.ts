@@ -15,6 +15,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   const messages = ref<IMessage[]>([]);
   const typing = ref<ITyping | null>(null);
   const foundMessages = ref<IMessage[]>([]);
+  const pinnedMessages = ref<IMessage[]>([]);
   const anchorMessageId = ref('');
   const firstMessageDateInList = ref('');
   const lastMessageDateInList = ref('');
@@ -29,6 +30,8 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   const setMessages = (payload: IMessage[]) => (messages.value = payload);
   const setFoundMessages = (payload: IMessage[]) =>
     (foundMessages.value = payload);
+  const setPinnedMessages = (payload: IMessage[]) =>
+    (pinnedMessages.value = payload);
 
   const bindEvents = () => {
     $socket.on(SOCKET_ON_EVENTS.NEW_MESSAGE, async (payload) => {
@@ -150,6 +153,43 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     }
   };
 
+  const fetchPinnedMessages = async (id: string) => {
+    try {
+      const { data = [] } = await $api.chats.getPinnedMessages(id);
+      setPinnedMessages(data.reverse());
+    } catch (error) {
+      console.error('error during finding pinned messages: ', error);
+    }
+  };
+
+  const pinMessage = async (messageId: string, chatId: string) => {
+    try {
+      const { data } = await $api.chats.pinMessage(
+        { chatId: chatId },
+        messageId,
+      );
+      pinnedMessages.value.unshift(data);
+    } catch (error) {
+      console.error('error during pin message: ', error);
+    }
+  };
+
+  const unpinMessage = async (messageId: string, chatId: string) => {
+    try {
+      const { data } = await $api.chats.unpinMessage(
+        { chatId: chatId },
+        messageId,
+      );
+      if (data) {
+        pinnedMessages.value = pinnedMessages.value.filter(
+          (msg) => msg.id !== data.id,
+        );
+      }
+    } catch (error) {
+      console.error('error during pin message: ', error);
+    }
+  };
+
   return {
     isSearching,
     typing,
@@ -158,6 +198,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     chat,
     messages,
     foundMessages,
+    pinnedMessages,
     firstMessageDateInList,
     lastMessageDateInList,
     anchorMessageId,
@@ -173,5 +214,8 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     fetchMessages,
     unbindEvents,
     bindEvents,
+    fetchPinnedMessages,
+    pinMessage,
+    unpinMessage,
   };
 });

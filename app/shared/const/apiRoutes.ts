@@ -62,4 +62,13 @@ export const API_ROUTES = {
   getRouteMessagesByMessageId(id: string) {
     return `messages/${id}/context`;
   },
+  getRoutePinnedMessages(chatId: string) {
+    return `messages/${chatId}/pinned`;
+  },
+  getRoutePinMessage(messageId: string) {
+    return `messages/${messageId}/pin`;
+  },
+  getRouteUnpinMessage(messageId: string) {
+    return `messages/${messageId}/unpin`;
+  },
 };

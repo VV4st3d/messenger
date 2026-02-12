@@ -1,12 +1,14 @@
 import { API_ROUTES } from '~/shared/const';
 import type {
-  TMessengesResponse,
+  TMessegesResponse,
   TMessengesFindResponse,
   TChat,
   TChats,
   IGetMessageQuery,
   TMessagesListById,
   TChatInfo,
+  TPinMessageActions,
+  TPinnedMessagesResponse,
 } from '~/shared/types';
 
 export function createChatsRepository(appFetch: typeof $fetch) {
@@ -20,7 +22,7 @@ export function createChatsRepository(appFetch: typeof $fetch) {
       });
     },
     getMessages(id: string, query?: IGetMessageQuery) {
-      return appFetch<TMessengesResponse>(API_ROUTES.getRouteMessages(id), {
+      return appFetch<TMessegesResponse>(API_ROUTES.getRouteMessages(id), {
         method: 'GET',
         query: {
           ...query,
@@ -58,6 +60,32 @@ export function createChatsRepository(appFetch: typeof $fetch) {
         method: 'POST',
         body,
       });
+    },
+    pinMessage(body: { chatId: string }, messageId: string) {
+      return appFetch<TPinMessageActions>(
+        API_ROUTES.getRoutePinMessage(messageId),
+        {
+          method: 'POST',
+          body,
+        },
+      );
+    },
+    unpinMessage(body: { chatId: string }, messageId: string) {
+      return appFetch<TPinMessageActions>(
+        API_ROUTES.getRouteUnpinMessage(messageId),
+        {
+          method: 'POST',
+          body,
+        },
+      );
+    },
+    getPinnedMessages(chatId: string) {
+      return appFetch<TPinnedMessagesResponse>(
+        API_ROUTES.getRoutePinnedMessages(chatId),
+        {
+          method: 'GET',
+        },
+      );
     },
   };
 }

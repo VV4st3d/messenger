@@ -15,6 +15,14 @@ const formattedTime = computed(() =>
 );
 
 const isOwn = computed(() => props.message.sender?.id === props.userId);
+
+const emit = defineEmits<{
+  (e: 'context', payload: { event: MouseEvent; message: IMessage }): void;
+}>();
+
+const onRightClick = (event: MouseEvent) => {
+  emit('context', { event, message: props.message });
+};
 </script>
 
 <template>
@@ -22,7 +30,11 @@ const isOwn = computed(() => props.message.sender?.id === props.userId);
     class="flex flex-col message-card"
     :class="{ 'highlight-active': isAnchor }"
   >
-    <div v-if="!isOwn" class="flex items-end gap-2 max-w-[85%] sm:max-w-[70%]">
+    <div
+      v-if="!isOwn"
+      class="flex items-end gap-2 max-w-[85%] sm:max-w-[70%]"
+      @contextmenu.prevent="onRightClick"
+    >
       <div class="flex flex-col">
         <div
           class="message-other relative p-3 rounded-2xl rounded-bl-none shadow-sm bg-[var(--message-other)] border border-[var(--border-color)] transition-all duration-300"
@@ -47,6 +59,7 @@ const isOwn = computed(() => props.message.sender?.id === props.userId);
     <div
       v-else
       class="flex items-end justify-end gap-2 max-w-[85%] sm:max-w-[70%] ml-auto"
+      @contextmenu.prevent="onRightClick"
     >
       <div class="flex flex-col items-end">
         <div

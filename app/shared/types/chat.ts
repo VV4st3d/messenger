@@ -1,16 +1,18 @@
-import type { IUser } from './auth';
 import type { TResponseBody } from './base-body';
 
 export type TChats = TResponseBody<IChat[]>;
 export type TChat = TResponseBody<Omit<IChat, 'lastMessage'>>;
-export type TMessengesResponse = TResponseBody<{
+export type TMessegesResponse = TResponseBody<{
   messages: IMessage[];
   hasMoreTop: boolean;
   hasMoreBottom: boolean;
-  total: number;
+  direction: 'initial';
 }>;
 export type TMessengesFindResponse = TResponseBody<IMessage[]>;
-export type TSendMessageResponse = TResponseBody<IMessage>;
+
+export type TPinnedMessagesResponse = TResponseBody<IMessage[]>;
+export type TPinMessageActions = TResponseBody<IMessage>;
+
 export type TMessagesListById = TResponseBody<IFoundMessageData>;
 export type TChatInfo = TResponseBody<
   Omit<IChat, 'participants' | 'lastMessage'>
@@ -49,12 +51,13 @@ export interface IParticipant {
 
 export interface IMessage {
   id: string;
-  sender: IUser;
-  chat: IMessageChat;
   content: string;
   type: 'text';
   isRead: boolean;
   createdAt: string;
+  isPinned: boolean;
+  sender: IParticipant;
+  chat: IMessageChat;
 }
 
 type TCHatType = 'private' | 'group';
@@ -76,4 +79,11 @@ export interface IFoundMessageData {
   anchorMessageId: string;
   hasMoreTop: boolean;
   hasMoreBottom: boolean;
+}
+
+export interface IContextMenu {
+  isVisible: boolean;
+  x: number;
+  y: number;
+  message: IMessage | null;
 }

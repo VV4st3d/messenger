@@ -61,7 +61,7 @@ export const useFriendsStore = defineStore('friends', () => {
       setIncoming(incomingData.data);
       setOutgoing(outgoingData.data);
     } catch (error) {
-      console.error('error during finding friends requests', error);
+      console.error('error during finding friends requests: ', error);
     }
   };
 

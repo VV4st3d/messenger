@@ -8,15 +8,24 @@ import {
   ref,
   useTemplateRef,
   watch,
-  type Ref,
 } from 'vue';
-import type { IChat, IGetMessageQuery, IMessage } from '~/shared/types';
+import type {
+  IChat,
+  IContextMenu,
+  IGetMessageQuery,
+  IMessage,
+} from '~/shared/types';
 import { DIRECTION, MIN_MESSAGE_SIZE, REFS } from './const';
 
 import type MessageCard from './MessageCard.vue';
+import Pinned from './Pinned.vue';
+import Dropdown from '../ui/Dropdown.vue';
 
 interface IProps {
   messages: IMessage[];
+  pinnedMessages: IMessage[];
+  contextMenu: IContextMenu;
+  contextEvents: { label: string; callback: () => void }[];
   chat: IChat | null;
   userId: string | undefined;
   firstMessageDateInList: string;
@@ -29,7 +38,12 @@ interface IProps {
 }
 
 interface IEmits {
-  (e: 'unmount'): void;
+  (e: 'unmount' | 'copy-message'): void;
+  (e: 'click-pinned' | 'unpin-message', id: string): void;
+  (
+    e: 'open-context-menu',
+    payload: { event: MouseEvent; message: IMessage },
+  ): void;
 }
 
 const props = defineProps<IProps>();
@@ -92,7 +106,7 @@ const saveScrollPosition = () => {
 };
 
 const createIntersectionObserver = (
-  target: Ref<InstanceType<typeof MessageCard> | null>,
+  target: any,
   direction: DIRECTION,
   hasMore: () => boolean,
   getAnchorDate: () => string | undefined,
@@ -174,6 +188,11 @@ watch(
 </script>
 
 <template>
+  <Pinned
+    :pinned-messages="pinnedMessages"
+    @unpin-message="(id) => emit('unpin-message', id)"
+    @click-pinned="(id) => emit('click-pinned', id)"
+  />
   <div class="flex-1 p-6 bg-[var(--bg-primary)] relative overflow-hidden">
     <div v-if="messages.length > 0" class="h-full">
       <DynamicScroller
@@ -198,6 +217,10 @@ watch(
                 :is-anchor="
                   item.id === props.anchorMessageId && props.isFoundBySearch
                 "
+                @context="
+                  ({ event, message }) =>
+                    emit('open-context-menu', { event, message })
+                "
               />
             </div>
           </DynamicScrollerItem>
@@ -205,6 +228,12 @@ watch(
       </DynamicScroller>
     </div>
     <MessageEmptySpace v-else />
+    <Dropdown
+      :is-visible="contextMenu.isVisible"
+      :position-x="contextMenu.x"
+      :position-y="contextMenu.y"
+      :events="contextEvents"
+    />
   </div>
 </template>
 

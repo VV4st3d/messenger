@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
   computed,
+  copyText,
   onMounted,
   onUnmounted,
   ref,
@@ -14,6 +15,7 @@ import { useRoute } from 'vue-router';
 import ChatFooter from '~/components/Chat/ChatFooter.vue';
 import { TYPING_MESSAGE_DELAY_MS } from '~/components/Chat/const';
 import { SEARCH_DELAY_MS } from '~/shared/const/delay';
+import type { IContextMenu, IMessage } from '~/shared/types';
 
 const { params } = useRoute();
 const chatId = params.id as string;
@@ -37,6 +39,7 @@ const {
   isFoundBySearch,
   anchorMessageId,
   isSearching,
+  pinnedMessages,
 } = storeToRefs(chatStore);
 const {
   fetchMessagesById,
@@ -48,7 +51,53 @@ const {
   resetMessages,
   startTyping,
   fetchMessagesByQuery,
+  fetchPinnedMessages,
+  pinMessage,
+  unpinMessage,
 } = chatStore;
+
+const contextMenu = ref<IContextMenu>({
+  isVisible: false,
+  x: 0,
+  y: 0,
+  message: null,
+});
+
+const openContextMenuHandler = ({
+  event,
+  message,
+}: {
+  event: MouseEvent;
+  message: IMessage;
+}) => {
+  contextMenu.value = {
+    isVisible: true,
+    x: event.clientX,
+    y: event.clientY,
+    message,
+  };
+};
+
+const contextEvents = computed(() => {
+  if (!contextMenu.value.message) return [];
+
+  const msg = contextMenu.value.message;
+
+  return [
+    {
+      label: 'Закрепить',
+      callback: () => pinMessage(msg.id, chatId),
+    },
+    {
+      label: 'Копировать',
+      callback: () => copyText(msg.content, closeContextMenu),
+    },
+  ];
+});
+
+const closeContextMenu = () => {
+  contextMenu.value.isVisible = false;
+};
 
 const onToggleSearchingDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
@@ -70,24 +119,15 @@ const searchHandler = () => {
   });
 };
 
-const foundMessageClickHandler = async (messageId: string): Promise<void> => {
-  await fetchMessagesById(messageId);
-  isDropdownOpen.value = false;
-};
-
-const handleGetChatInfo = async () => {
+const foundOrPinnedMessageClickHandler = async (
+  messageId: string,
+): Promise<void> => {
   try {
-    await fetchChatInfo(chatId);
+    await fetchMessagesById(messageId);
   } catch (error) {
-    console.log(error);
-  }
-};
-
-const handleGetMessages = async () => {
-  try {
-    await fetchMessages(chatId);
-  } catch (error) {
-    console.log(error);
+    console.log('Ошибка поиска сообщений');
+  } finally {
+    isDropdownOpen.value = false;
   }
 };
 
@@ -96,20 +136,37 @@ const sendMessageHandler = () => {
   messageText.value = '';
 };
 
+const unpinMessageHandler = async (messageId: string) => {
+  try {
+    await unpinMessage(messageId, chatId);
+  } catch (error) {
+    console.log('Ошибка при удалении сообщения из закрепленных');
+  }
+};
+
+const closeAllPopups = () => {
+  isDropdownOpen.value = false;
+  closeContextMenu();
+};
+
 onMounted(async () => {
-  await handleGetChatInfo();
+  window.addEventListener('click', closeAllPopups);
+
+  await Promise.all([fetchChatInfo(chatId), fetchPinnedMessages(chatId)]);
+
   if (chatStore.messages.length === 0 && !isSearching.value)
-    await handleGetMessages();
+    await fetchMessages(chatId);
   bindEvents();
 });
 
 onUnmounted(() => {
+  window.removeEventListener('click', closeAllPopups);
   unbindEvents();
 });
 </script>
 
 <template>
-  <div class="flex flex-col h-full" @click="isDropdownOpen = false">
+  <div class="flex flex-col h-full">
     <ChatHeader
       v-model="queryInput"
       :found-messages="foundMessages"
@@ -117,12 +174,15 @@ onUnmounted(() => {
       :typing="typing"
       :chat="chat"
       :chat-id="chatId"
-      @message-click="foundMessageClickHandler"
+      @message-click="foundOrPinnedMessageClickHandler"
       @search="searchHandler"
       @open-search-dropdown="onToggleSearchingDropdown"
     />
 
     <MessageSpace
+      :context-events="contextEvents"
+      :context-menu="contextMenu"
+      :pinned-messages="pinnedMessages"
       :user-id="userId"
       :anchor-message-id="anchorMessageId"
       :is-found-by-search="isFoundBySearch"
@@ -134,6 +194,9 @@ onUnmounted(() => {
       :chat="chat"
       :messages="chatStore.messages"
       @unmount="resetMessages"
+      @click-pinned="foundOrPinnedMessageClickHandler"
+      @open-context-menu="openContextMenuHandler"
+      @unpin-message="unpinMessageHandler"
     />
 
     <ChatFooter

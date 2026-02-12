@@ -12,6 +12,9 @@ export default defineNuxtConfig({
       socketUrl: '',
     },
   },
+  icon: {
+    serverBundle: 'remote',
+  },
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxt/icon',
