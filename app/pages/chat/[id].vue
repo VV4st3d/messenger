@@ -8,9 +8,11 @@ import {
   useAuthStore,
   useCurrentChatStore,
   useDebounce,
+  useThrottling,
 } from '#imports';
 import { useRoute } from 'vue-router';
 import ChatFooter from '~/components/Chat/ChatFooter.vue';
+import { TYPING_MESSAGE_DELAY_MS } from '~/components/Chat/const';
 import { SEARCH_DELAY_MS } from '~/shared/const/delay';
 
 const { params } = useRoute();
@@ -56,6 +58,12 @@ const fetchMessagesByQueryDebounced = useDebounce(
   fetchMessagesByQuery,
   SEARCH_DELAY_MS,
 );
+
+const startTypingThrottled = useThrottling(
+  startTyping,
+  TYPING_MESSAGE_DELAY_MS,
+);
+
 const searchHandler = () => {
   fetchMessagesByQueryDebounced(chatId, {
     query: queryInput.value,
@@ -83,7 +91,7 @@ const handleGetMessages = async () => {
   }
 };
 
-const handleSendMessage = () => {
+const sendMessageHandler = () => {
   sendMessage(messageText.value);
   messageText.value = '';
 };
@@ -130,8 +138,8 @@ onUnmounted(() => {
 
     <ChatFooter
       v-model="messageText"
-      :on-start-typing="startTyping"
-      :on-send-message="handleSendMessage"
+      @start-typing="startTypingThrottled"
+      @send-message="sendMessageHandler"
     />
   </div>
 </template>

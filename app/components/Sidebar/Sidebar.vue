@@ -31,9 +31,10 @@ const currentChatStore = useCurrentChatStore();
 const { $api } = useNuxtApp();
 
 const { user, isOnline } = storeToRefs(authStore);
+const { friends, incomingRequests, outgoingRequests } =
+  storeToRefs(friendsStore);
 
 const chats = computed(() => chatStore.chats);
-const friends = computed(() => friendsStore.friends);
 const typing = computed(() => currentChatStore.typing);
 const status = getStatus(() => isOnline.value);
 const globalFoundMessages = computed(() => chatStore.globalFoundMessage);
@@ -51,15 +52,6 @@ const getOrCreateChatHandler = async (otherUserId: string): Promise<void> => {
     navigateTo(ROUTES.getRouteChat(data.id));
   } catch (error) {
     console.log('Ошибка при создании/поиске чата', error);
-  }
-};
-
-const sendFriendRequestHandler = async (otherUserId: string): Promise<void> => {
-  try {
-    const data = await $api.friend.sendFriendRequest({ toUserId: otherUserId });
-    console.log(data);
-  } catch (error) {
-    console.log('Ошибка при отправке запроса', error);
   }
 };
 
@@ -92,7 +84,10 @@ await useAsyncData(
         await chatStore.fetchChats();
         return true;
       case 'friends':
-        await friendsStore.fetchFriends();
+        await Promise.all([
+          friendsStore.fetchFriends(),
+          friendsStore.fetchFriendsRequests(),
+        ]);
         return true;
       default: {
         const _exhaustiveCheck: never = activeTab.value;
@@ -120,7 +115,7 @@ await useAsyncData(
         :found-users="friendsStore.foundUsers"
         @message-click="foundMessageHandler"
         @open-chat="getOrCreateChatHandler"
-        @add-friend="sendFriendRequestHandler"
+        @add-friend="friendsStore.sendRequest"
       />
     </div>
 
@@ -153,7 +148,16 @@ await useAsyncData(
         v-if="activeTab === 'friends'"
         class="p-4 text-[var(--text-secondary)]"
       >
-        <FriendList :friends="friends" @chat-open="getOrCreateChatHandler" />
+        <FriendList
+          :incoming-requests="incomingRequests"
+          :outgoing-requests="outgoingRequests"
+          :friends="friends"
+          @open-chat="getOrCreateChatHandler"
+          @accept="friendsStore.acceptRequest"
+          @reject="friendsStore.rejectRequest"
+          @cancel="friendsStore.cancelRequest"
+          @remove-friend="friendsStore.removeFriend"
+        />
       </div>
     </div>
 

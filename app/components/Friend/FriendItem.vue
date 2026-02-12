@@ -8,8 +8,12 @@ const props = defineProps<{
   friend: IFriend;
 }>();
 
+interface IEmits {
+  (e: 'open-chat' | 'remove-friend', id: string): void;
+}
+
 const status = getStatus(() => props.friend.isOnline);
-const emit = defineEmits<{ chatOpen: [otherUserId: string] }>();
+const emit = defineEmits<IEmits>();
 </script>
 
 <template>
@@ -32,12 +36,13 @@ const emit = defineEmits<{ chatOpen: [otherUserId: string] }>();
     <div class="flex items-center gap-1">
       <button
         class="text-[var(--text-tertiary)] hover:text-[var(--accent)] transition p-1.5 rounded-full hover:bg-[rgba(var(--accent),0.1)] cursor-pointer"
-        @click="emit('chatOpen', friend.id)"
+        @click="emit('open-chat', friend.id)"
       >
         <Icon name="chat-bubble-left-right" size="20" />
       </button>
       <button
         class="text-[var(--text-tertiary)] hover:text-[var(--danger)] transition p-1.5 rounded-full hover:bg-[rgba(var(--danger),0.1)] cursor-pointer"
+        @click="emit('remove-friend', friend.id)"
       >
         <Icon name="trash" size="20" />
       </button>

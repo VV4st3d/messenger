@@ -20,11 +20,32 @@ export const API_ROUTES = {
   getRouteFriendRequest() {
     return 'friends/request';
   },
+  getRouteIncomingFriendRequests() {
+    return 'friends/incoming';
+  },
+  getRouteOutgoingFriendRequests() {
+    return 'friends/outgoing';
+  },
+  getRouteAcceptFriendRequest(id: string) {
+    return `friends/accept/${id}`;
+  },
+  getRouteRejectFriendRequest(id: string) {
+    return `friends/reject/${id}`;
+  },
+  getRouteCancelFriendRequest(id: string) {
+    return `friends/request/${id}`;
+  },
+  getRouteRemoveFriend(id: string) {
+    return `friends/delete/${id}`;
+  },
   getRouteChats() {
     return 'chats';
   },
   getRouteChatInfo(id: string) {
     return `chats/${id}`;
+  },
+  getRouteCreateOrGetChat() {
+    return 'chats/private';
   },
   getRouteMessages(id: string) {
     return `messages/${id}`;
@@ -40,8 +61,5 @@ export const API_ROUTES = {
   },
   getRouteMessagesByMessageId(id: string) {
     return `messages/${id}/context`;
-  },
-  getRouteCreateOrGetChat() {
-    return `chats/private`;
   },
 };
