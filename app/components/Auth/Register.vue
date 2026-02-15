@@ -24,7 +24,7 @@ const props = defineProps<IProps>();
 const handleRegister = async () => {
   props.setLoading(true);
   try {
-    await props.authStore.registerHandler({
+    await props.authStore.rigester({
       email: props.email,
       password: password.value,
       username: username.value,

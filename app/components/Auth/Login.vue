@@ -23,7 +23,7 @@ const props = defineProps<IProps>();
 const handleLogin = async () => {
   props.setLoading(true);
   try {
-    await props.authStore.loginHandler({
+    await props.authStore.login({
       email: props.email,
       password: password.value,
     });

@@ -10,7 +10,7 @@ import {
   useFriendsStore,
   useNuxtApp,
 } from '#imports';
-import { computed, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import type { TSidebarTabs } from './types';
 import FriendList from '../Friend/FriendList.vue';
 import { useChatsStore } from '~/stores/chats';
@@ -19,10 +19,21 @@ import { SEARCH_DELAY_MS } from '~/shared/const/delay';
 import SearchDropdown from '../SearchDropdown/SearchDropdown.vue';
 import Avatar from '../ui/Avatar/Avatar.vue';
 import { ROUTES } from '~/shared/const';
+import Dropdown from '../ui/Dropdown.vue';
+import { contextEvents } from './const';
 
 const activeTab = ref<TSidebarTabs>('chats');
-const queryInput = ref<string>('');
-const isSidebarDropdownOpen = ref<boolean>(false);
+const queryInput = ref('');
+const isSidebarDropdownOpen = ref(false);
+const userContextMenu = ref<{
+  isVisible: boolean;
+  x: number;
+  y: number;
+}>({
+  isVisible: false,
+  x: 0,
+  y: 0,
+});
 
 const authStore = useAuthStore();
 const friendsStore = useFriendsStore();
@@ -76,6 +87,19 @@ const foundMessageHandler = async (chatId: string): Promise<void> => {
   isSidebarDropdownOpen.value = false;
 };
 
+const onCloseEvents = () => {
+  isSidebarDropdownOpen.value = false;
+  userContextMenu.value.isVisible = false;
+};
+
+const handleOpenPopup = (e: MouseEvent) => {
+  userContextMenu.value = {
+    x: e.clientX,
+    y: e.clientY,
+    isVisible: true,
+  };
+};
+
 await useAsyncData(
   `tab-content-${activeTab.value}`,
   async () => {
@@ -97,10 +121,18 @@ await useAsyncData(
   },
   { watch: [activeTab], immediate: true },
 );
+
+onMounted(() => {
+  window.addEventListener('click', onCloseEvents);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('click', onCloseEvents);
+});
 </script>
 
 <template>
-  <div class="flex flex-col h-full" @click="isSidebarDropdownOpen = false">
+  <div class="flex flex-col h-full">
     <div class="relative p-4 border-b border-[var(--border)]">
       <input
         v-model="queryInput"
@@ -175,9 +207,18 @@ await useAsyncData(
       </div>
       <button
         class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition cursor-pointer"
+        @click.stop="handleOpenPopup"
       >
         <Icon name="ellipsis-horizontal" size="24" />
       </button>
+      <Dropdown
+        :is-visible="userContextMenu.isVisible"
+        :position-x="userContextMenu.x"
+        :position-y="userContextMenu.y"
+        :events="contextEvents"
+        vertical-side="top"
+        side="left"
+      />
     </div>
   </div>
 </template>
