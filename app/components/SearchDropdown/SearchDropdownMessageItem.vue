@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Avatar from '../Avatar/Avatar.vue';
+import Avatar from '../ui/Avatar/Avatar.vue';
 
 interface IProps {
   imgSrc: string | undefined;

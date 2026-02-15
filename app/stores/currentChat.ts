@@ -23,6 +23,9 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   const hasMoreBottom = ref(false);
   const isFoundBySearch = ref(false);
   const isSearching = ref(false);
+  const isGeneraringSummary = ref<{ isGenerating: boolean; id: string | null }>(
+    { isGenerating: false, id: null },
+  );
   const setChat = (payload: IChat) => (chat.value = payload);
   const setTyping = (payload: ITyping) => (typing.value = payload);
   const pushMessage = (payload: IMessage) => messages.value.push(payload);
@@ -190,8 +193,28 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     }
   };
 
+  const generateMessageSummary = async (messageId: string): Promise<void> => {
+    try {
+      isGeneraringSummary.value = { isGenerating: true, id: messageId };
+      const { data } = await $api.chats.generateSummaryMessage(messageId);
+      messages.value = messages.value.reduce((acc: IMessage[], value) => {
+        if (value.id !== messageId) {
+          acc.push(value);
+          return acc;
+        }
+        acc.push({ ...value, content: data.summary });
+        return acc;
+      }, []);
+    } catch (error) {
+      console.error('error then trying to generate summary: ', error);
+    } finally {
+      isGeneraringSummary.value = { isGenerating: false, id: null };
+    }
+  };
+
   return {
     isSearching,
+    isGeneraringSummary,
     typing,
     hasMoreTop,
     hasMoreBottom,
@@ -217,5 +240,6 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     fetchPinnedMessages,
     pinMessage,
     unpinMessage,
+    generateMessageSummary,
   };
 });

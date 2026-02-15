@@ -33,6 +33,7 @@ interface IProps {
   hasMoreTop: boolean;
   hasMoreBottom: boolean;
   isFoundBySearch: boolean;
+  isGeneratingSummary?: { isGenerating: boolean; id: string | null };
   anchorMessageId: string;
   onFetchMessages: (chatId: string, query?: IGetMessageQuery) => Promise<void>;
 }
@@ -212,6 +213,7 @@ watch(
             <div class="pb-6">
               <MessageCard
                 :ref="(el) => initRefs(item.createdAt, el, item.id)"
+                :is-generating-summary="isGeneratingSummary"
                 :user-id="userId"
                 :message="item"
                 :is-anchor="
@@ -229,6 +231,7 @@ watch(
     </div>
     <MessageEmptySpace v-else />
     <Dropdown
+      :side="'left'"
       :is-visible="contextMenu.isVisible"
       :position-x="contextMenu.x"
       :position-y="contextMenu.y"

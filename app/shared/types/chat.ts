@@ -13,10 +13,18 @@ export type TMessengesFindResponse = TResponseBody<IMessage[]>;
 export type TPinnedMessagesResponse = TResponseBody<IMessage[]>;
 export type TPinMessageActions = TResponseBody<IMessage>;
 
+export type TSummaryMessage = TResponseBody<ISummaryMessage>;
+
 export type TMessagesListById = TResponseBody<IFoundMessageData>;
 export type TChatInfo = TResponseBody<
   Omit<IChat, 'participants' | 'lastMessage'>
 >;
+
+export interface ISummaryMessage {
+  summary: string;
+  originalMessageId: string;
+  originalLength: string;
+}
 
 export interface IChat {
   id: string;

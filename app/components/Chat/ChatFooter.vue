@@ -25,7 +25,7 @@ const emit = defineEmits<IEmits>();
 
     <button
       :disabled="!messageText?.length"
-      class="disabled:opacity-50"
+      class="disabled:opacity-50 disabled:cursor-not-allowed"
       @click="emit('send-message')"
     >
       <Icon name="paper-airplane" size="24" />

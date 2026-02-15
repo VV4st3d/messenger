@@ -71,4 +71,7 @@ export const API_ROUTES = {
   getRouteUnpinMessage(messageId: string) {
     return `messages/${messageId}/unpin`;
   },
+  getRouteAISummary(messageId: string) {
+    return `ai/${messageId}/summary`;
+  },
 };

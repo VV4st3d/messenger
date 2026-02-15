@@ -11,7 +11,7 @@ import type { IChat, IMessage, ITyping } from '~/shared/types';
 import TypingIndicator from '../ui/TypingIndicator.vue';
 import Avatar from '../ui/Avatar/Avatar.vue';
 import Icon from '../ui/Icon.vue';
-import SearchDropdown from '../ui/SearchDropdown/SearchDropdown.vue';
+import SearchDropdown from '../SearchDropdown/SearchDropdown.vue';
 
 interface IProps {
   chat: IChat | null;

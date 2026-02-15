@@ -40,6 +40,7 @@ const {
   anchorMessageId,
   isSearching,
   pinnedMessages,
+  isGeneraringSummary,
 } = storeToRefs(chatStore);
 const {
   fetchMessagesById,
@@ -54,6 +55,7 @@ const {
   fetchPinnedMessages,
   pinMessage,
   unpinMessage,
+  generateMessageSummary,
 } = chatStore;
 
 const contextMenu = ref<IContextMenu>({
@@ -91,6 +93,11 @@ const contextEvents = computed(() => {
     {
       label: 'Копировать',
       callback: () => copyText(msg.content, closeContextMenu),
+    },
+    {
+      label: 'Сгенерировать кратко',
+      callback: () => generateMessageSummary(msg.id),
+      icon: { name: 'ri:ai-generate-2', color: 'var(--accent)' },
     },
   ];
 });
@@ -180,6 +187,7 @@ onUnmounted(() => {
     />
 
     <MessageSpace
+      :is-generating-summary="isGeneraringSummary"
       :context-events="contextEvents"
       :context-menu="contextMenu"
       :pinned-messages="pinnedMessages"
@@ -206,10 +214,3 @@ onUnmounted(() => {
     />
   </div>
 </template>
-
-<style scoped>
-button:disabled {
-  cursor: not-allowed;
-  background-color: var(--text-secondary);
-}
-</style>

@@ -8,6 +8,7 @@ const props = defineProps<{
   message: IMessage;
   isAnchor?: boolean;
   userId: string | undefined;
+  isGeneratingSummary?: { isGenerating: boolean; id: string | null };
 }>();
 
 const formattedTime = computed(() =>
@@ -23,6 +24,12 @@ const emit = defineEmits<{
 const onRightClick = (event: MouseEvent) => {
   emit('context', { event, message: props.message });
 };
+
+const isGenerating = computed(
+  () =>
+    props.isGeneratingSummary?.isGenerating &&
+    props.isGeneratingSummary.id === props.message.id,
+);
 </script>
 
 <template>
@@ -38,6 +45,7 @@ const onRightClick = (event: MouseEvent) => {
       <div class="flex flex-col">
         <div
           class="message-other relative p-3 rounded-2xl rounded-bl-none shadow-sm bg-[var(--message-other)] border border-[var(--border-color)] transition-all duration-300"
+          :class="{ 'generating-summary': isGenerating }"
         >
           <p
             class="text-[var(--text-primary)] leading-relaxed break-words whitespace-pre-wrap overflow-hidden"
@@ -64,6 +72,7 @@ const onRightClick = (event: MouseEvent) => {
       <div class="flex flex-col items-end">
         <div
           class="message-own relative p-3 rounded-2xl rounded-br-none shadow-md bg-[var(--message-own)] text-white transition-all duration-300"
+          :class="{ 'generating-summary': isGenerating }"
         >
           <p
             class="leading-relaxed break-words whitespace-pre-wrap overflow-hidden"
@@ -104,6 +113,18 @@ const onRightClick = (event: MouseEvent) => {
   z-index: 1;
 }
 
+.generating-summary {
+  background: linear-gradient(
+    270deg,
+    var(--accent),
+    var(--accent-hover),
+    #8b5cf6,
+    var(--accent)
+  );
+  background-size: 300% 300%;
+  animation: accentGradient 6s ease infinite;
+}
+
 @keyframes highlightSubtle {
   0% {
     filter: brightness(1);
@@ -116,6 +137,18 @@ const onRightClick = (event: MouseEvent) => {
   100% {
     filter: brightness(1);
     box-shadow: 0 0 0 rgba(99, 102, 241, 0);
+  }
+}
+
+@keyframes accentGradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
   }
 }
 </style>

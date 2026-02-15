@@ -16,7 +16,7 @@ import FriendList from '../Friend/FriendList.vue';
 import { useChatsStore } from '~/stores/chats';
 import Icon from '../ui/Icon.vue';
 import { SEARCH_DELAY_MS } from '~/shared/const/delay';
-import SearchDropdown from '../ui/SearchDropdown/SearchDropdown.vue';
+import SearchDropdown from '../SearchDropdown/SearchDropdown.vue';
 import Avatar from '../ui/Avatar/Avatar.vue';
 import { ROUTES } from '~/shared/const';
 

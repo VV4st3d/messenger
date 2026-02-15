@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { IFoundUser } from '~/shared/types';
-import Avatar from '../Avatar/Avatar.vue';
-import Icon from '../Icon.vue';
+import Avatar from '../ui/Avatar/Avatar.vue';
+import Icon from '../ui/Icon.vue';
 
 interface IProps {
   foundUsers: IFoundUser[];

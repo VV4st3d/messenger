@@ -9,6 +9,7 @@ import type {
   TChatInfo,
   TPinMessageActions,
   TPinnedMessagesResponse,
+  TSummaryMessage,
 } from '~/shared/types';
 
 export function createChatsRepository(appFetch: typeof $fetch) {
@@ -82,6 +83,14 @@ export function createChatsRepository(appFetch: typeof $fetch) {
     getPinnedMessages(chatId: string) {
       return appFetch<TPinnedMessagesResponse>(
         API_ROUTES.getRoutePinnedMessages(chatId),
+        {
+          method: 'GET',
+        },
+      );
+    },
+    generateSummaryMessage(messageId: string) {
+      return appFetch<TSummaryMessage>(
+        API_ROUTES.getRouteAISummary(messageId),
         {
           method: 'GET',
         },
