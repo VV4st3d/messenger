@@ -11,7 +11,7 @@ export type TMessegesResponse = TResponseBody<{
 export type TMessengesFindResponse = TResponseBody<IMessage[]>;
 
 export type TPinnedMessagesResponse = TResponseBody<IMessage[]>;
-export type TPinMessageActions = TResponseBody<IMessage>;
+export type TMessageResponse = TResponseBody<IMessage>;
 
 export type TSummaryMessage = TResponseBody<ISummaryMessage>;
 
@@ -66,6 +66,9 @@ export interface IMessage {
   isPinned: boolean;
   sender: IParticipant;
   chat: IMessageChat;
+  filePath: string | null;
+  fileType: string | null;
+  fileSize: null | number;
 }
 
 type TCHatType = 'private' | 'group';
@@ -94,4 +97,10 @@ export interface IContextMenu {
   x: number;
   y: number;
   message: IMessage | null;
+}
+
+export interface IMessageWithFileBody {
+  content: string;
+  chatId: string;
+  file: File;
 }

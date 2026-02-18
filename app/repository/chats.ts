@@ -7,7 +7,7 @@ import type {
   IGetMessageQuery,
   TMessagesListById,
   TChatInfo,
-  TPinMessageActions,
+  TMessageResponse,
   TPinnedMessagesResponse,
   TSummaryMessage,
 } from '~/shared/types';
@@ -63,7 +63,7 @@ export function createChatsRepository(appFetch: typeof $fetch) {
       });
     },
     pinMessage(body: { chatId: string }, messageId: string) {
-      return appFetch<TPinMessageActions>(
+      return appFetch<TMessageResponse>(
         API_ROUTES.getRoutePinMessage(messageId),
         {
           method: 'POST',
@@ -72,7 +72,7 @@ export function createChatsRepository(appFetch: typeof $fetch) {
       );
     },
     unpinMessage(body: { chatId: string }, messageId: string) {
-      return appFetch<TPinMessageActions>(
+      return appFetch<TMessageResponse>(
         API_ROUTES.getRouteUnpinMessage(messageId),
         {
           method: 'POST',
@@ -95,6 +95,12 @@ export function createChatsRepository(appFetch: typeof $fetch) {
           method: 'GET',
         },
       );
+    },
+    uploadFile(body: FormData) {
+      return appFetch<TMessageResponse>(API_ROUTES.getRouteUploadFile(), {
+        method: 'POST',
+        body,
+      });
     },
   };
 }

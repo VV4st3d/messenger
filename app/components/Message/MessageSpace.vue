@@ -20,6 +20,7 @@ import { DIRECTION, MIN_MESSAGE_SIZE, REFS } from './const';
 import type MessageCard from './MessageCard.vue';
 import Pinned from './Pinned.vue';
 import Dropdown from '../ui/Dropdown.vue';
+import EmptyChat from './EmptyChat.vue';
 
 interface IProps {
   messages: IMessage[];
@@ -229,7 +230,7 @@ watch(
         </template>
       </DynamicScroller>
     </div>
-    <MessageEmptySpace v-else />
+    <EmptyChat v-else />
     <Dropdown
       :side="'left'"
       :is-visible="contextMenu.isVisible"

@@ -6,6 +6,7 @@ import type {
   IChat,
   IGetMessageQuery,
   IMessage,
+  IMessageWithFileBody,
   ITyping,
 } from '~/shared/types';
 
@@ -197,18 +198,29 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     try {
       isGeneraringSummary.value = { isGenerating: true, id: messageId };
       const { data } = await $api.chats.generateSummaryMessage(messageId);
-      messages.value = messages.value.reduce((acc: IMessage[], value) => {
-        if (value.id !== messageId) {
-          acc.push(value);
-          return acc;
+      messages.value = messages.value.map((msg) => {
+        if (msg.id !== messageId) {
+          return msg;
         }
-        acc.push({ ...value, content: data.summary });
-        return acc;
-      }, []);
+        return { ...msg, content: data.summary };
+      });
     } catch (error) {
       console.error('error then trying to generate summary: ', error);
     } finally {
       isGeneraringSummary.value = { isGenerating: false, id: null };
+    }
+  };
+
+  const uploadAttachedToMessageFile = async (body: IMessageWithFileBody) => {
+    const formData = new FormData();
+    formData.append('file', body.file);
+    formData.append('chatId', body.chatId);
+    formData.append('content', body.content || '');
+    try {
+      const data = await $api.chats.uploadFile(formData);
+      console.log(data);
+    } catch (error) {
+      console.error('error during uploading file: ', error);
     }
   };
 
@@ -241,5 +253,6 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     pinMessage,
     unpinMessage,
     generateMessageSummary,
+    uploadAttachedToMessageFile,
   };
 });

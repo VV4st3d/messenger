@@ -1,3 +1,4 @@
+
 export const API_ROUTES = {
   getRouteCheckEmail() {
     return 'auth/check-email';
@@ -73,5 +74,8 @@ export const API_ROUTES = {
   },
   getRouteAISummary(messageId: string) {
     return `ai/${messageId}/summary`;
+  },
+  getRouteUploadFile() {
+    return 'messages/upload';
   },
 };

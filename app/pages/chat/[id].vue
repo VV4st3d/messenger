@@ -56,6 +56,7 @@ const {
   pinMessage,
   unpinMessage,
   generateMessageSummary,
+  uploadAttachedToMessageFile,
 } = chatStore;
 
 const contextMenu = ref<IContextMenu>({
@@ -138,6 +139,18 @@ const foundOrPinnedMessageClickHandler = async (
   }
 };
 
+const uploadFileHandler = async (file: File) => {
+  try {
+    await uploadAttachedToMessageFile({
+      chatId,
+      content: messageText.value,
+      file,
+    });
+  } catch (error) {
+    console.log('Ошибка при отправке файла');
+  }
+};
+
 const sendMessageHandler = () => {
   sendMessage(messageText.value);
   messageText.value = '';
@@ -211,6 +224,7 @@ onUnmounted(() => {
       v-model="messageText"
       @start-typing="startTypingThrottled"
       @send-message="sendMessageHandler"
+      @upload-file="uploadFileHandler"
     />
   </div>
 </template>
