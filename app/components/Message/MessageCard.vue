@@ -4,12 +4,14 @@ import { formatLastMessageDate } from '#imports';
 import type { IMessage } from '~/shared/types';
 import Icon from '../ui/Icon.vue';
 
-const props = defineProps<{
+interface IProps {
   message: IMessage;
   isAnchor?: boolean;
   userId: string | undefined;
   isGeneratingSummary?: { isGenerating: boolean; id: string | null };
-}>();
+}
+
+const props = defineProps<IProps>();
 
 const formattedTime = computed(() =>
   formatLastMessageDate(props.message.createdAt),
@@ -39,38 +41,39 @@ const isGenerating = computed(
   >
     <div
       v-if="!isOwn"
-      class="flex items-end gap-2 max-w-[85%] sm:max-w-[72%] pr-1"
+      class="flex items-end gap-2 max-w-[86%] sm:max-w-[74%] pr-2"
       @contextmenu.prevent="onRightClick"
     >
       <div
-        class="message-other flex flex-col gap-1.5 rounded-2xl px-3.5 py-2.5 bg-gray-100 dark:bg-gray-800 transition-all duration-200"
+        class="message-other flex flex-col rounded-2xl bg-gray-100 dark:bg-gray-800 transition-all duration-200 min-h-[44px]"
         :class="{
-          'has-image px-1.5 py-1.5 rounded-xl': message.filePath,
+          'has-image rounded-xl bg-transparent': message.filePath,
           'generating-summary': isGenerating,
         }"
       >
+        <div
+          v-if="message.filePath"
+          class="message-image h-[380px] overflow-hidden rounded-[0.75rem_0.75rem_0.4rem_0.4rem] w-full max-w-[320px] aspect-[4/5] sm:aspect-[5/6] bg-gray-200 dark:bg-gray-700"
+        >
+          <img
+            :src="`http://localhost:8080/uploads${message.filePath}`"
+            alt="attachment"
+            class="w-full h-full object-cover block"
+          >
+        </div>
+
         <p
           v-if="message.content"
-          class="message-text text-[15px] leading-5 whitespace-pre-wrap break-words"
+          class="message-text px-3.5 py-2.5 text-[15px] leading-5 whitespace-pre-wrap break-words"
+          :class="{ 'pt-2': message.filePath }"
         >
           {{ message.content }}
         </p>
 
         <div
-          v-if="message.filePath"
-          class="message-image mt-1 mb-1 overflow-hidden rounded-xl max-w-[320px]"
+          class="message-meta flex items-center gap-1.5 px-3.5 pb-2 text-xs text-gray-500 dark:text-gray-400"
         >
-          <img
-            :src="`http://localhost:8080/uploads${message.filePath}`"
-            alt="attachment"
-            class="w-full h-auto object-cover block"
-          >
-        </div>
-
-        <div
-          class="message-meta flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-0.5"
-        >
-          <span class="time min-w-[36px] text-right opacity-85">{{
+          <span class="time min-w-[38px] text-right opacity-90 font-medium">{{
             formattedTime
           }}</span>
         </div>
@@ -79,51 +82,52 @@ const isGenerating = computed(
 
     <div
       v-else
-      class="flex items-end justify-end max-w-[85%] sm:max-w-[72%] ml-auto pl-1"
+      class="flex items-end justify-end max-w-[86%] sm:max-w-[74%] ml-auto pl-2"
       @contextmenu.prevent="onRightClick"
     >
       <div
-        class="message-own flex flex-col gap-1.5 rounded-2xl px-3.5 py-2.5 bg-blue-100 dark:bg-blue-900/40 transition-all duration-200"
+        class="message-own flex flex-col rounded-2xl bg-blue-100 dark:bg-blue-900/40 transition-all duration-200 min-h-[44px]"
         :class="{
-          'has-image px-1.5 py-1.5 rounded-xl': message.filePath,
+          'has-image rounded-xl bg-transparent': message.filePath,
           'generating-summary': isGenerating,
         }"
       >
+        <div
+          v-if="message.filePath"
+          class="message-image h-[380px] overflow-hidden rounded-[0.75rem_0.75rem_0.4rem_0.4rem] w-full max-w-[320px] aspect-[4/5] sm:aspect-[5/6] bg-gray-200 dark:bg-gray-700"
+        >
+          <img
+            :src="`http://localhost:8080/uploads${message.filePath}`"
+            alt="attachment"
+            class="w-full h-full object-cover block"
+          >
+        </div>
+
         <p
           v-if="message.content"
-          class="message-text text-[15px] leading-5 whitespace-pre-wrap break-words"
+          class="message-text px-3.5 py-2.5 text-[15px] leading-5 whitespace-pre-wrap break-words"
+          :class="{ 'pt-2': message.filePath }"
         >
           {{ message.content }}
         </p>
 
         <div
-          v-if="message.filePath"
-          class="message-image mt-1 mb-1 overflow-hidden rounded-xl max-w-[320px]"
+          class="message-meta flex items-center justify-end gap-1.5 px-3.5 pb-2 text-xs text-gray-500 dark:text-gray-300"
         >
-          <img
-            :src="`http://localhost:8080/uploads${message.filePath}`"
-            alt="attachment"
-            class="w-full h-auto object-cover block"
-          >
-        </div>
-
-        <div
-          class="message-meta flex items-center justify-end gap-1.5 text-xs text-gray-500 dark:text-gray-400 mt-0.5"
-        >
-          <span class="time min-w-[36px] text-right opacity-85">{{
+          <span class="time min-w-[38px] text-right opacity-90 font-medium">{{
             formattedTime
           }}</span>
           <Icon
             v-if="message.isRead"
             is-not-default
             name="solar:check-read-linear"
-            class="status text-blue-600 dark:text-blue-400 opacity-100 w-4 h-4"
+            class="status text-blue-600 dark:text-blue-400 w-4 h-4 opacity-100"
           />
           <Icon
             v-else
             is-not-default
             name="lineicons:check"
-            class="status opacity-70 w-4 h-4"
+            class="status w-4 h-4 opacity-75"
           />
         </div>
       </div>
@@ -139,7 +143,7 @@ const isGenerating = computed(
     var(--accent-hover),
     #8b5cf6,
     var(--accent)
-  );
+  ) !important;
   background-size: 300% 300%;
   animation: accentGradient 6s ease infinite;
 }
@@ -175,17 +179,5 @@ const isGenerating = computed(
   100% {
     background-position: 0% 50%;
   }
-}
-
-.has-image .message-meta {
-  position: absolute;
-  bottom: 38px;
-  right: 12px;
-  background: rgba(0, 0, 0, 0.55);
-  color: white;
-  padding: 2px 6px;
-  border-radius: 8px;
-  font-size: 11px;
-  backdrop-filter: blur(1.5px);
 }
 </style>

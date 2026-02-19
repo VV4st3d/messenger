@@ -146,6 +146,7 @@ const uploadFileHandler = async (file: File) => {
       content: messageText.value,
       file,
     });
+    messageText.value = '';
   } catch (error) {
     console.log('Ошибка при отправке файла');
   }

@@ -105,7 +105,11 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
           break;
         default:
           firstMessageDateInList.value = data.messages[0]?.createdAt ?? '';
-          messages.value = data.messages;
+          messages.value = data.messages.map((m) => {
+            if (!m.filePath) return m;
+            return { ...m, loaded: false };
+          });
+
           hasMoreTop.value = data.hasMoreTop;
           break;
       }
@@ -151,7 +155,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
 
       isFoundBySearch.value = true;
     } catch (error) {
-      console.log('error during finding messages by id: ', error);
+      console.error('error during finding messages by id: ', error);
     } finally {
       isSearching.value = false;
     }
@@ -217,8 +221,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     formData.append('chatId', body.chatId);
     formData.append('content', body.content || '');
     try {
-      const data = await $api.chats.uploadFile(formData);
-      console.log(data);
+      await $api.chats.uploadFile(formData);
     } catch (error) {
       console.error('error during uploading file: ', error);
     }
