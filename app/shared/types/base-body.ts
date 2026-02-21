@@ -1,4 +1,4 @@
-export type TResponseBody<T> = {
+export interface IResponseBody<T> {
   success: boolean;
   data: T;
-};
+}

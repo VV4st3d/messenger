@@ -56,7 +56,7 @@ export function createChatsRepository(appFetch: typeof $fetch) {
         },
       );
     },
-    createOrGetPrivateChat(body: { otherUserId: string }) {
+    createOrGetPrivateChat(body: { companionId: string }) {
       return appFetch<TChatInfo>(API_ROUTES.getRouteCreateOrGetChat(), {
         method: 'POST',
         body,
@@ -96,11 +96,14 @@ export function createChatsRepository(appFetch: typeof $fetch) {
         },
       );
     },
-    uploadFile(body: FormData) {
-      return appFetch<TMessageResponse>(API_ROUTES.getRouteUploadFile(), {
-        method: 'POST',
-        body,
-      });
+    uploadFileWithMessageText(body: FormData) {
+      return appFetch<TMessageResponse>(
+        API_ROUTES.getRouteuploadFileWithMessageText(),
+        {
+          method: 'POST',
+          body,
+        },
+      );
     },
   };
 }

@@ -1,4 +1,4 @@
-import type { TResponseBody } from './base-body';
+import type { IResponseBody } from './base-body';
 
 export interface IFriend {
   id: string;
@@ -14,11 +14,12 @@ export interface IFriend {
   updatedAt: string;
 }
 
-export type TSearchFriendsResponse = TResponseBody<IFoundUser[]>;
-export type TFriendRequestResponse = TResponseBody<IFriendResponse>;
-export type TRequestsOutgoingResponse = TResponseBody<IFriendOutgoing[]>;
-export type TRequestsIncomingResponse = TResponseBody<IFriendIncoming[]>;
-export type TFriendRequestActionResponse = TResponseBody<IActionResponse>;
+export type TSearchFriendsResponse = IResponseBody<IFoundUser[]>;
+export type TFriendRequestResponse = IResponseBody<IFriendResponse>;
+export type TRequestsOutgoingResponse = IResponseBody<IFriendOutgoing[]>;
+export type TRequestsIncomingResponse = IResponseBody<IFriendIncoming[]>;
+export type TFriendRequestActionResponse = IResponseBody<IActionResponse>;
+export type TFriendsResponse = IResponseBody<IFriend[]>;
 
 export interface ICancelRequestResponse {
   success: boolean;
@@ -40,19 +41,18 @@ export interface IActionResponse {
   fromUser: IFriend;
 }
 
-export interface IFriendOutgoing {
+interface IFriendUnionBody {
   id: string;
   status: TRequestStatus;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface IFriendOutgoing extends IFriendUnionBody {
   toUser: IFriend;
 }
 
-export interface IFriendIncoming {
-  id: string;
-  status: TRequestStatus;
-  createdAt: string;
-  updatedAt: string;
+export interface IFriendIncoming extends IFriendUnionBody {
   fromUser: IFriend;
 }
 
@@ -76,5 +76,3 @@ export interface IFoundUser {
 }
 
 type TRequestStatus = 'pending' | 'accepted' | 'rejected';
-
-export type TFriendsResponse = TResponseBody<IFriend[]>;

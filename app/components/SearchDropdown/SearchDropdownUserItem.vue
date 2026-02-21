@@ -7,7 +7,7 @@ interface IProps {
   foundUsers: IFoundUser[];
 }
 interface IEmits {
-  (e: 'open-chat' | 'add-friend', otherUserId: string): void;
+  (e: 'open-chat' | 'add-friend', companionId: string): void;
 }
 defineProps<IProps>();
 const emit = defineEmits<IEmits>();

@@ -3,12 +3,13 @@ import { computed } from 'vue';
 import { formatLastMessageDate } from '#imports';
 import type { IMessage } from '~/shared/types';
 import Icon from '../ui/Icon.vue';
+import type { IGeneratedSummary } from './type';
 
 interface IProps {
   message: IMessage;
   isAnchor?: boolean;
   userId: string | undefined;
-  isGeneratingSummary?: { isGenerating: boolean; id: string | null };
+  generatedSummary?: IGeneratedSummary;
 }
 
 const props = defineProps<IProps>();
@@ -29,8 +30,8 @@ const onRightClick = (event: MouseEvent) => {
 
 const isGenerating = computed(
   () =>
-    props.isGeneratingSummary?.isGenerating &&
-    props.isGeneratingSummary.id === props.message.id,
+    props.generatedSummary?.isGenerating &&
+    props.generatedSummary.id === props.message.id,
 );
 </script>
 

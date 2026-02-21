@@ -59,7 +59,7 @@ const {
   uploadAttachedToMessageFile,
 } = chatStore;
 
-const contextMenu = ref<IContextMenu>({
+const contextMenu = ref<IContextMenu & { message: IMessage | null }>({
   isVisible: false,
   x: 0,
   y: 0,
@@ -139,7 +139,7 @@ const foundOrPinnedMessageClickHandler = async (
   }
 };
 
-const uploadFileHandler = async (file: File) => {
+const uploadFileWithMessageTextHandler = async (file: File) => {
   try {
     await uploadAttachedToMessageFile({
       chatId,
@@ -201,7 +201,7 @@ onUnmounted(() => {
     />
 
     <MessageSpace
-      :is-generating-summary="isGeneraringSummary"
+      :generated-summary="isGeneraringSummary"
       :context-events="contextEvents"
       :context-menu="contextMenu"
       :pinned-messages="pinnedMessages"
@@ -225,7 +225,7 @@ onUnmounted(() => {
       v-model="messageText"
       @start-typing="startTypingThrottled"
       @send-message="sendMessageHandler"
-      @upload-file="uploadFileHandler"
+      @upload-file="uploadFileWithMessageTextHandler"
     />
   </div>
 </template>

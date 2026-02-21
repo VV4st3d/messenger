@@ -4,8 +4,8 @@ import { ref } from 'vue';
 import type { IChat, IMessage } from '~/shared/types';
 
 export const useChatsStore = defineStore('chats', () => {
-  const chats = ref<IChat[]>([]);
   const { $api } = useNuxtApp();
+  const chats = ref<IChat[]>([]);
   const globalFoundMessage = ref<IMessage[]>([]);
 
   const setChats = (payload: IChat[]) => (chats.value = payload);
@@ -39,7 +39,6 @@ export const useChatsStore = defineStore('chats', () => {
   return {
     chats,
     globalFoundMessage,
-    setChats,
     fetchChats,
     fetchGlobalMessages,
   };

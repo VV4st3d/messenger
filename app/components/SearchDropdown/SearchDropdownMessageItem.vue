@@ -2,9 +2,9 @@
 import Avatar from '../ui/Avatar/Avatar.vue';
 
 interface IProps {
-  imgSrc: string | undefined;
-  name: string | undefined;
-  content?: string | undefined;
+  imgSrc?: string;
+  name?: string;
+  content?: string;
 }
 defineProps<IProps>();
 </script>

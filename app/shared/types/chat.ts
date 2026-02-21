@@ -1,22 +1,22 @@
-import type { TResponseBody } from './base-body';
+import type { IResponseBody } from './base-body';
 
-export type TChats = TResponseBody<IChat[]>;
-export type TChat = TResponseBody<Omit<IChat, 'lastMessage'>>;
-export type TMessegesResponse = TResponseBody<{
+export type TChats = IResponseBody<IChat[]>;
+export type TChat = IResponseBody<Omit<IChat, 'lastMessage'>>;
+export type TMessegesResponse = IResponseBody<{
   messages: IMessage[];
   hasMoreTop: boolean;
   hasMoreBottom: boolean;
   direction: 'initial';
 }>;
-export type TMessengesFindResponse = TResponseBody<IMessage[]>;
+export type TMessengesFindResponse = IResponseBody<IMessage[]>;
 
-export type TPinnedMessagesResponse = TResponseBody<IMessage[]>;
-export type TMessageResponse = TResponseBody<IMessage>;
+export type TPinnedMessagesResponse = IResponseBody<IMessage[]>;
+export type TMessageResponse = IResponseBody<IMessage>;
 
-export type TSummaryMessage = TResponseBody<ISummaryMessage>;
+export type TSummaryMessage = IResponseBody<ISummaryMessage>;
 
-export type TMessagesListById = TResponseBody<IFoundMessageData>;
-export type TChatInfo = TResponseBody<
+export type TMessagesListById = IResponseBody<IFoundMessageData>;
+export type TChatInfo = IResponseBody<
   Omit<IChat, 'participants' | 'lastMessage'>
 >;
 
@@ -96,7 +96,6 @@ export interface IContextMenu {
   isVisible: boolean;
   x: number;
   y: number;
-  message: IMessage | null;
 }
 
 export interface IMessageWithFileBody {

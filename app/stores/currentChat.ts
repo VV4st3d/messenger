@@ -58,11 +58,12 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   };
 
   const stopTyping = () => {
-    if (chat.value) $socket.emit(SOCKET_EMIT_EVENTS.STOP_TYPING, chat.value.id);
+    if (chat.value?.id)
+      $socket.emit(SOCKET_EMIT_EVENTS.STOP_TYPING, chat.value.id);
   };
 
   const startTyping = () => {
-    if (chat.value) $socket.emit(SOCKET_EMIT_EVENTS.TYPING, chat.value.id);
+    if (chat.value?.id) $socket.emit(SOCKET_EMIT_EVENTS.TYPING, chat.value.id);
   };
 
   const sendMessage = (content: string) => {
@@ -221,7 +222,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     formData.append('chatId', body.chatId);
     formData.append('content', body.content || '');
     try {
-      await $api.chats.uploadFile(formData);
+      await $api.chats.uploadFileWithMessageText(formData);
     } catch (error) {
       console.error('error during uploading file: ', error);
     }

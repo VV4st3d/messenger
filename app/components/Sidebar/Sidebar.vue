@@ -21,15 +21,12 @@ import Avatar from '../ui/Avatar/Avatar.vue';
 import { ROUTES } from '~/shared/const';
 import Dropdown from '../ui/Dropdown.vue';
 import { contextEvents } from './const';
+import type { IContextMenu } from '~/shared/types';
 
 const activeTab = ref<TSidebarTabs>('chats');
 const queryInput = ref('');
 const isSidebarDropdownOpen = ref(false);
-const userContextMenu = ref<{
-  isVisible: boolean;
-  x: number;
-  y: number;
-}>({
+const userContextMenu = ref<IContextMenu>({
   isVisible: false,
   x: 0,
   y: 0,
@@ -46,7 +43,7 @@ const { friends, incomingRequests, outgoingRequests } =
   storeToRefs(friendsStore);
 
 const chats = computed(() => chatStore.chats);
-const typing = computed(() => currentChatStore.typing);
+const isTyping = computed(() => currentChatStore.typing);
 const status = getStatus(() => isOnline.value);
 const globalFoundMessages = computed(() => chatStore.globalFoundMessage);
 
@@ -55,10 +52,10 @@ const getTabClasses = (currentTab: TSidebarTabs) =>
     ? 'border-b-2 border-[var(--accent)] text-[var(--accent)]'
     : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]';
 
-const getOrCreateChatHandler = async (otherUserId: string): Promise<void> => {
+const getOrCreateChatHandler = async (companionId: string): Promise<void> => {
   try {
     const { data } = await $api.chats.createOrGetPrivateChat({
-      otherUserId,
+      companionId,
     });
     navigateTo(ROUTES.getRouteChat(data.id));
   } catch (error) {
@@ -173,7 +170,7 @@ onUnmounted(() => {
         v-if="activeTab === 'chats'"
         class="divide-y divide-[var(--border-subtle)]"
       >
-        <Chats :typing="typing" :chats="chats" />
+        <Chats :is-typing="isTyping" :chats="chats" />
       </div>
 
       <div

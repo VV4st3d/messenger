@@ -1,4 +1,4 @@
-import type { TResponseBody } from './base-body';
+import type { IResponseBody } from './base-body';
 
 export interface IUser {
   id: string;
@@ -8,7 +8,7 @@ export interface IUser {
   avatarUrl?: string;
 }
 
-export type TCheckExist = TResponseBody<{ exists: boolean }>;
+export type TCheckExist = IResponseBody<{ exists: boolean }>;
 
 export interface TCheckExistBody {
   email: string;
@@ -23,6 +23,6 @@ export interface IRegisterBody extends ILoginBody {
   username: string;
 }
 
-export type TUserInitRes = TResponseBody<IUser>;
+export type TUserInitRes = IResponseBody<IUser>;
 
-export type TAuthenticationRes = TResponseBody<IUser> & { token: string };
+export type TAuthenticationRes = IResponseBody<IUser> & { token: string };

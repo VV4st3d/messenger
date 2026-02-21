@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { useIntersectionObserver } from '#imports';
 import {
   computed,
@@ -8,6 +8,8 @@ import {
   ref,
   useTemplateRef,
   watch,
+  type MaybeRefOrGetter,
+  type Ref,
 } from 'vue';
 import type {
   IChat,
@@ -15,12 +17,13 @@ import type {
   IGetMessageQuery,
   IMessage,
 } from '~/shared/types';
-import { DIRECTION, MIN_MESSAGE_SIZE, REFS } from './const';
-
+import { DIRECTION, MIN_MESSAGE_SIZE } from './const';
 import type MessageCard from './MessageCard.vue';
 import Pinned from './Pinned.vue';
 import Dropdown from '../ui/Dropdown.vue';
 import EmptyChat from './EmptyChat.vue';
+import type { DynamicScroller } from 'vue-virtual-scroller';
+import type { IGeneratedSummary } from './type';
 
 interface IProps {
   messages: IMessage[];
@@ -34,7 +37,7 @@ interface IProps {
   hasMoreTop: boolean;
   hasMoreBottom: boolean;
   isFoundBySearch: boolean;
-  isGeneratingSummary?: { isGenerating: boolean; id: string | null };
+  generatedSummary?: IGeneratedSummary;
   anchorMessageId: string;
   onFetchMessages: (chatId: string, query?: IGetMessageQuery) => Promise<void>;
 }
@@ -48,11 +51,28 @@ interface IEmits {
   ): void;
 }
 
+interface IRefPayload {
+  createdAt: string;
+  el: InstanceType<typeof MessageCard>;
+  id: string;
+}
+
+interface IObserverPayload {
+  target: Ref<InstanceType<typeof MessageCard> | null>;
+  direction: DIRECTION;
+  hasMore: () => boolean;
+  getAnchorDate: () => string | undefined;
+}
+
+const REF_SCROLLER = 'scroller';
+const MESSAGE_KEY: keyof IMessage = 'id';
+
 const props = defineProps<IProps>();
 
 const emit = defineEmits<IEmits>();
 
-const scroller = useTemplateRef(REFS.REF_SCROLLER);
+const scroller =
+  useTemplateRef<InstanceType<typeof DynamicScroller>>(REF_SCROLLER);
 const targetMessageTop = ref<InstanceType<typeof MessageCard> | null>(null);
 const targetMessageBottom = ref<InstanceType<typeof MessageCard> | null>(null);
 
@@ -60,7 +80,6 @@ const isInitialScroll = ref(true);
 const isPrepending = ref(false);
 const prevScrollHeight = ref(0);
 const prevScrollTop = ref(0);
-const isReadyToScroll = ref(false);
 
 const hasScrolledToAnchor = ref(false);
 
@@ -69,21 +88,21 @@ const anchorIndex = computed(() => {
   return props.messages.findIndex((m) => m.id === props.anchorMessageId);
 });
 
-const initRefs = async (createdAt: string, el: any, id: string) => {
-  if (createdAt === props.firstMessageDateInList) {
-    targetMessageTop.value = el;
-  } else if (targetMessageTop.value === el) {
+const initRefs = async (payload: IRefPayload) => {
+  if (payload.createdAt === props.firstMessageDateInList) {
+    targetMessageTop.value = payload.el;
+  } else if (targetMessageTop.value === payload.el) {
     targetMessageTop.value = null;
   }
 
-  if (createdAt === props.lastMessageDateInList) {
-    targetMessageBottom.value = el;
-  } else if (targetMessageBottom.value === el) {
+  if (payload.createdAt === props.lastMessageDateInList) {
+    targetMessageBottom.value = payload.el;
+  } else if (targetMessageBottom.value === payload.el) {
     targetMessageBottom.value = null;
   }
 
-  if (id === props.anchorMessageId && !hasScrolledToAnchor.value) {
-    if (!el?.$el || !scroller.value) return;
+  if (payload.id === props.anchorMessageId && !hasScrolledToAnchor.value) {
+    if (!payload.el?.$el || !scroller.value) return;
     await nextTick();
     await nextTick();
     scroller.value.scrollToItem(anchorIndex.value);
@@ -94,55 +113,57 @@ const initRefs = async (createdAt: string, el: any, id: string) => {
 const scrollToBottom = async (smooth: boolean) => {
   await nextTick();
   if (!scroller.value) return;
-  const el = scroller.value.$el || scroller.value;
+  const el = scroller.value.$el || (scroller.value as HTMLElement);
 
   el.style.scrollBehavior = smooth ? 'smooth' : 'auto';
   scroller.value.scrollToBottom();
 };
 
 const saveScrollPosition = () => {
-  const el = scroller.value?.$el;
+  const el = scroller.value?.$el as HTMLElement;
   if (!el) return;
   prevScrollHeight.value = el.scrollHeight;
   prevScrollTop.value = el.scrollTop;
 };
 
-const createIntersectionObserver = (
-  target: any,
-  direction: DIRECTION,
-  hasMore: () => boolean,
-  getAnchorDate: () => string | undefined,
-) => {
-  const observer = useIntersectionObserver([target], async ([entry]) => {
-    if (
-      !entry?.isIntersecting ||
-      !scroller.value?.$el ||
-      !target.value ||
-      !hasMore()
-    )
-      return;
+const createIntersectionObserver = (payload: IObserverPayload) => {
+  const observer = useIntersectionObserver(
+    [payload.target] as MaybeRefOrGetter,
+    async ([entry]) => {
+      if (
+        !entry?.isIntersecting ||
+        !scroller.value?.$el ||
+        !payload.target.value ||
+        !payload.hasMore()
+      )
+        return;
+      const anchorDate = payload.getAnchorDate();
+      if (!anchorDate) return;
 
-    const anchorDate = getAnchorDate();
-    if (!anchorDate) return;
-
-    await onIntersect(observer.pause, observer.resume, direction, anchorDate);
-  });
+      await onIntersect(
+        observer.pause,
+        observer.resume,
+        payload.direction,
+        anchorDate,
+      );
+    },
+  );
   return observer;
 };
 
-createIntersectionObserver(
-  targetMessageTop,
-  DIRECTION.BEFORE,
-  () => props.hasMoreTop,
-  () => props.firstMessageDateInList,
-);
+createIntersectionObserver({
+  target: targetMessageTop,
+  direction: DIRECTION.BEFORE,
+  hasMore: () => props.hasMoreTop,
+  getAnchorDate: () => props.firstMessageDateInList,
+});
 
-createIntersectionObserver(
-  targetMessageBottom,
-  DIRECTION.AFTER,
-  () => props.hasMoreBottom,
-  () => props.lastMessageDateInList,
-);
+createIntersectionObserver({
+  target: targetMessageBottom,
+  direction: DIRECTION.AFTER,
+  hasMore: () => props.hasMoreBottom,
+  getAnchorDate: () => props.lastMessageDateInList,
+});
 
 const onIntersect = async (
   pause: () => void,
@@ -180,9 +201,9 @@ onUnmounted(() => {
 watch(
   () => props.messages.length,
   (value) => {
-    isReadyToScroll.value =
+    const isReadyToScroll =
       value !== 0 && !isPrepending.value && !props.isFoundBySearch;
-    if (!isReadyToScroll.value) return;
+    if (!isReadyToScroll) return;
     scrollToBottom(!isInitialScroll.value);
     isInitialScroll.value = false;
   },
@@ -198,41 +219,57 @@ watch(
   <div class="flex-1 p-6 bg-[var(--bg-primary)] relative overflow-hidden">
     <div v-if="messages.length > 0" class="h-full">
       <DynamicScroller
-        :ref="REFS.REF_SCROLLER"
+        :ref="REF_SCROLLER"
         :items="messages"
         :min-item-size="MIN_MESSAGE_SIZE"
         class="scroller"
-        key-field="id"
+        :key-field="MESSAGE_KEY"
       >
-        <template #default="{ item, index, active }">
+        <template
+          #default="{
+            item,
+            index,
+            active,
+          }: {
+            item: IMessage;
+            index: number;
+            active: boolean;
+          }"
+        >
           <DynamicScrollerItem
             :size-dependencies="[item.content]"
             :item="item"
             :active="active"
             :data-index="index"
           >
-            <div class="pb-6">
-              <MessageCard
-                :ref="(el) => initRefs(item.createdAt, el, item.id)"
-                :is-generating-summary="isGeneratingSummary"
-                :user-id="userId"
-                :message="item"
-                :is-anchor="
-                  item.id === props.anchorMessageId && props.isFoundBySearch
-                "
-                @context="
-                  ({ event, message }) =>
-                    emit('open-context-menu', { event, message })
-                "
-              />
-            </div>
+            <MessageCard
+              :ref="
+                (el) =>
+                  initRefs({
+                    createdAt: item.createdAt,
+                    el,
+                    id: item.id,
+                  } as IRefPayload)
+              "
+              :is-generating-summary="generatedSummary"
+              :user-id="userId"
+              :message="item"
+              :is-anchor="
+                item.id === props.anchorMessageId && props.isFoundBySearch
+              "
+              class="pb-6"
+              @context="
+                ({ event, message }) =>
+                  emit('open-context-menu', { event, message })
+              "
+            />
           </DynamicScrollerItem>
         </template>
       </DynamicScroller>
     </div>
     <EmptyChat v-else />
     <Dropdown
-      :side="'left'"
+      side="left"
       :is-visible="contextMenu.isVisible"
       :position-x="contextMenu.x"
       :position-y="contextMenu.y"

@@ -65,9 +65,9 @@ export const useFriendsStore = defineStore('friends', () => {
     }
   };
 
-  const sendRequest = async (otherUserId: string): Promise<void> => {
+  const sendRequest = async (companionId: string): Promise<void> => {
     try {
-      await $api.friend.sendFriendRequest({ toUserId: otherUserId });
+      await $api.friend.sendFriendRequest({ toUserId: companionId });
       const { data = [] } = await $api.friend.searchOutgoingRequests();
       setOutgoing(data);
     } catch (error) {

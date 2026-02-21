@@ -22,5 +22,10 @@ export default defineNuxtConfig({
     '@pinia/nuxt',
     '@nuxt/eslint',
     '@vueuse/nuxt',
+    'nuxt-lottie',
   ],
+  lottie: {
+    componentName: 'Lottie',
+    lottieFolder: '/assets/lottie',
+  },
 });
