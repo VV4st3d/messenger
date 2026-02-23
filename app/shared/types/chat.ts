@@ -60,7 +60,7 @@ export interface IParticipant {
 export interface IMessage {
   id: string;
   content: string;
-  type: 'text';
+  type: TMessageType;
   isRead: boolean;
   createdAt: string;
   isPinned: boolean;
@@ -72,11 +72,12 @@ export interface IMessage {
 }
 
 type TCHatType = 'private' | 'group';
+export type TMessageType = 'text' | 'file' | 'sticker';
 
 export interface IMessageBody {
   chatId: string;
   content: string;
-  type: 'text';
+  type: TMessageType;
 }
 
 export interface IGetMessageQuery {

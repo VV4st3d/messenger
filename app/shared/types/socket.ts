@@ -1,6 +1,4 @@
-import type { SOCKET_EMIT_EVENTS, SOCKET_ON_EVENTS } from '../const';
-import type { IMessage } from './chat';
-import type { valueOf } from './helpers';
+import type { IMessage, TMessageType } from './chat';
 
 export interface UserStatus {
   userId: string;
@@ -13,7 +11,7 @@ export type TSocketOnPayload<T extends keyof IOnEvents> = IOnEvents[T];
 
 interface IEmitEvents {
   joinChat: string;
-  sendMessage: { chatId: string; content: string; type: 'text' | 'file' };
+  sendMessage: { chatId: string; content: string; type: TMessageType };
   typing: string;
   stopTyping: string;
 }
@@ -26,8 +24,8 @@ interface IOnEvents {
   typing: ITyping;
 }
 
-export type TSocketEmitEvents = valueOf<typeof SOCKET_EMIT_EVENTS>;
-export type TSocketOnEvents = valueOf<typeof SOCKET_ON_EVENTS>;
+export type TSocketEmitEvents = keyof IEmitEvents;
+export type TSocketOnEvents = keyof IOnEvents;
 
 export interface ITyping {
   userId: string;

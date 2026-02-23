@@ -1,5 +1,4 @@
 <script setup lang="ts">
- 
 import { useIntersectionObserver } from '#imports';
 import {
   computed,
@@ -20,7 +19,7 @@ import type {
 import { DIRECTION, MIN_MESSAGE_SIZE } from './const';
 import type MessageCard from './MessageCard.vue';
 import Pinned from './Pinned.vue';
-import Dropdown from '../ui/Dropdown.vue';
+import ContextMenu from '../ui/ContextMenu.vue';
 import EmptyChat from './EmptyChat.vue';
 import type { DynamicScroller } from 'vue-virtual-scroller';
 import type { IGeneratedSummary } from './type';
@@ -251,7 +250,7 @@ watch(
                     id: item.id,
                   } as IRefPayload)
               "
-              :is-generating-summary="generatedSummary"
+              :generated-summary="generatedSummary"
               :user-id="userId"
               :message="item"
               :is-anchor="
@@ -268,7 +267,7 @@ watch(
       </DynamicScroller>
     </div>
     <EmptyChat v-else />
-    <Dropdown
+    <ContextMenu
       side="left"
       :is-visible="contextMenu.isVisible"
       :position-x="contextMenu.x"

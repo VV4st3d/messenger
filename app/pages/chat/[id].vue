@@ -15,7 +15,7 @@ import { useRoute } from 'vue-router';
 import ChatFooter from '~/components/Chat/ChatFooter.vue';
 import { TYPING_MESSAGE_DELAY_MS } from '~/components/Chat/const';
 import { SEARCH_DELAY_MS } from '~/shared/const/delay';
-import type { IContextMenu, IMessage } from '~/shared/types';
+import type { IContextMenu, IMessage, TMessageType } from '~/shared/types';
 
 const { params } = useRoute();
 const chatId = params.id as string;
@@ -40,7 +40,7 @@ const {
   anchorMessageId,
   isSearching,
   pinnedMessages,
-  isGeneraringSummary,
+  isGeneratingSummary,
 } = storeToRefs(chatStore);
 const {
   fetchMessagesById,
@@ -152,7 +152,11 @@ const uploadFileWithMessageTextHandler = async (file: File) => {
   }
 };
 
-const sendMessageHandler = () => {
+const sendMessageHandler = (stickerName: string, type?: TMessageType) => {
+  if (stickerName) {
+    sendMessage(stickerName, type);
+    return;
+  }
   sendMessage(messageText.value);
   messageText.value = '';
 };
@@ -201,7 +205,7 @@ onUnmounted(() => {
     />
 
     <MessageSpace
-      :generated-summary="isGeneraringSummary"
+      :generated-summary="isGeneratingSummary"
       :context-events="contextEvents"
       :context-menu="contextMenu"
       :pinned-messages="pinnedMessages"
@@ -224,7 +228,9 @@ onUnmounted(() => {
     <ChatFooter
       v-model="messageText"
       @start-typing="startTypingThrottled"
-      @send-message="sendMessageHandler"
+      @send-message="
+        (stickerName, type) => sendMessageHandler(stickerName as string, type)
+      "
       @upload-file="uploadFileWithMessageTextHandler"
     />
   </div>

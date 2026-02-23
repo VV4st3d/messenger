@@ -19,7 +19,7 @@ import { SEARCH_DELAY_MS } from '~/shared/const/delay';
 import SearchDropdown from '../SearchDropdown/SearchDropdown.vue';
 import Avatar from '../ui/Avatar/Avatar.vue';
 import { ROUTES } from '~/shared/const';
-import Dropdown from '../ui/Dropdown.vue';
+import ContextMenu from '../ui/ContextMenu.vue';
 import { contextEvents } from './const';
 import type { IContextMenu } from '~/shared/types';
 
@@ -111,8 +111,8 @@ await useAsyncData(
         ]);
         return true;
       default: {
-        const _exhaustiveCheck: never = activeTab.value;
-        return _exhaustiveCheck;
+        const exhaustiveCheck: never = activeTab.value;
+        return exhaustiveCheck;
       }
     }
   },
@@ -208,7 +208,7 @@ onUnmounted(() => {
       >
         <Icon name="ellipsis-horizontal" size="24" />
       </button>
-      <Dropdown
+      <ContextMenu
         :is-visible="userContextMenu.isVisible"
         :position-x="userContextMenu.x"
         :position-y="userContextMenu.y"

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from 'vue';
 import Icon from '../ui/Icon.vue';
+import Popover from '../ui/Popover.vue';
+import type { TMessageType } from '~/shared/types';
 
 const messageText = defineModel<string>();
 const FILE_INPUT = 'file-input';
@@ -11,8 +13,9 @@ const imageUrl = ref<string | null>(null);
 const attachedFile = ref<File | null>(null);
 
 const emit = defineEmits<{
-  (e: 'send-message' | 'start-typing'): void;
+  (e: 'start-typing'): void;
   (e: 'upload-file', file: File): void;
+  (e: 'send-message', content?: string, type?: TMessageType): void;
 }>();
 
 const handleOpenFileUploader = () => {
@@ -83,15 +86,35 @@ const sendMessage = () => {
         class="hidden"
         @change="handleSetFile"
       >
-
-      <textarea
-        v-model="messageText"
-        placeholder="Напишите сообщение..."
-        rows="1"
-        class="flex-1 resize-none bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-[var(--radius)] px-4 py-3 focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30 transition"
-        @input="emit('start-typing')"
-        @keydown.enter.exact.prevent="sendMessage"
-      />
+      <div class="relative flex-1 resize-none flex items-center">
+        <textarea
+          v-model="messageText"
+          placeholder="Напишите сообщение..."
+          rows="1"
+          class="w-full bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-[var(--radius)] px-4 py-3 focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30 transition"
+          @input="emit('start-typing')"
+          @keydown.enter.exact.prevent="sendMessage"
+        />
+        <Popover placement="top" align="right" class="absolute right-3">
+          <template #button>
+            <button class="open-emoji-panel">
+              <Icon
+                is-not-default
+                name="iconoir:emoji"
+                size="20"
+                class="hover:text-[var(--accent)]"
+              />
+            </button>
+          </template>
+          <template #content>
+            <StickerPanel
+              @send-sticker="
+                (stickerName) => emit('send-message', stickerName, 'sticker')
+              "
+            />
+          </template>
+        </Popover>
+      </div>
 
       <button
         :disabled="!messageText?.trim() && !attachedFile"

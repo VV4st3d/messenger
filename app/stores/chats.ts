@@ -22,14 +22,14 @@ export const useChatsStore = defineStore('chats', () => {
     }
   };
 
-  const fetchGlobalMessages = async (query: { query: string }) => {
-    if (!query.query.length) {
+  const fetchGlobalMessages = async (payload: { query: string }) => {
+    if (!payload.query.length) {
       globalFoundMessage.value = [];
       return;
     }
     try {
       const { data = [] } =
-        await $api.chats.getGlobalChatsMessagesBySearch(query);
+        await $api.chats.getGlobalChatsMessagesBySearch(payload);
       setGlobalFoundMessages(data);
     } catch (error) {
       console.error('error during finding messages', error);

@@ -8,6 +8,7 @@ import type {
   IMessage,
   IMessageWithFileBody,
   ITyping,
+  TMessageType,
 } from '~/shared/types';
 
 export const useCurrentChatStore = defineStore('currentChat', () => {
@@ -24,7 +25,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   const hasMoreBottom = ref(false);
   const isFoundBySearch = ref(false);
   const isSearching = ref(false);
-  const isGeneraringSummary = ref<{ isGenerating: boolean; id: string | null }>(
+  const isGeneratingSummary = ref<{ isGenerating: boolean; id: string | null }>(
     { isGenerating: false, id: null },
   );
   const setChat = (payload: IChat) => (chat.value = payload);
@@ -36,6 +37,12 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     (foundMessages.value = payload);
   const setPinnedMessages = (payload: IMessage[]) =>
     (pinnedMessages.value = payload);
+  const setGeneratingSummary = (messageId: string | null) => {
+    isGeneratingSummary.value = {
+      isGenerating: Boolean(messageId),
+      id: messageId,
+    };
+  };
 
   const bindEvents = () => {
     $socket.on(SOCKET_ON_EVENTS.NEW_MESSAGE, async (payload) => {
@@ -66,12 +73,12 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     if (chat.value?.id) $socket.emit(SOCKET_EMIT_EVENTS.TYPING, chat.value.id);
   };
 
-  const sendMessage = (content: string) => {
+  const sendMessage = (content: string, type: TMessageType = 'text') => {
     if (chat.value?.id)
       $socket.emit(SOCKET_EMIT_EVENTS.SEND_MESSAGE, {
         chatId: chat.value?.id,
         content,
-        type: 'text',
+        type,
       });
   };
 
@@ -106,11 +113,12 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
           break;
         default:
           firstMessageDateInList.value = data.messages[0]?.createdAt ?? '';
-          messages.value = data.messages.map((m) => {
-            if (!m.filePath) return m;
-            return { ...m, loaded: false };
-          });
-
+          setMessages(
+            data.messages.map((m) => {
+              if (!m.filePath) return m;
+              return { ...m, loaded: false };
+            }),
+          );
           hasMoreTop.value = data.hasMoreTop;
           break;
       }
@@ -122,16 +130,16 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
 
   const fetchMessagesByQuery = async (
     chatId: string,
-    query: { query: string },
+    payload: { query: string },
   ): Promise<void> => {
-    if (!query.query.length) {
-      foundMessages.value = [];
+    if (!payload.query.length) {
+      setFoundMessages([]);
       return;
     }
     try {
       const { data = [] } = await $api.chats.getChatMessagesBySearch(
         chatId,
-        query,
+        payload,
       );
       setFoundMessages(data);
     } catch (error) {
@@ -201,18 +209,20 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
 
   const generateMessageSummary = async (messageId: string): Promise<void> => {
     try {
-      isGeneraringSummary.value = { isGenerating: true, id: messageId };
+      setGeneratingSummary(messageId);
       const { data } = await $api.chats.generateSummaryMessage(messageId);
-      messages.value = messages.value.map((msg) => {
-        if (msg.id !== messageId) {
-          return msg;
-        }
-        return { ...msg, content: data.summary };
-      });
+      setMessages(
+        messages.value.map((msg) => {
+          if (msg.id !== messageId) {
+            return msg;
+          }
+          return { ...msg, content: data.summary };
+        }),
+      );
     } catch (error) {
       console.error('error then trying to generate summary: ', error);
     } finally {
-      isGeneraringSummary.value = { isGenerating: false, id: null };
+      setGeneratingSummary(null);
     }
   };
 
@@ -230,7 +240,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
 
   return {
     isSearching,
-    isGeneraringSummary,
+    isGeneratingSummary,
     typing,
     hasMoreTop,
     hasMoreBottom,

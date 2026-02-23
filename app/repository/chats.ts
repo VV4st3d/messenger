@@ -30,21 +30,21 @@ export function createChatsRepository(appFetch: typeof $fetch) {
         },
       });
     },
-    getChatMessagesBySearch(id: string, query: { query: string }) {
+    getChatMessagesBySearch(id: string, payload: { query: string }) {
       return appFetch<TMessengesFindResponse>(
         API_ROUTES.getRouteSearchMessages(id),
         {
           method: 'GET',
-          query,
+          query: payload,
         },
       );
     },
-    getGlobalChatsMessagesBySearch(query: { query: string }) {
+    getGlobalChatsMessagesBySearch(payload: { query: string }) {
       return appFetch<TMessengesFindResponse>(
         API_ROUTES.getRouteGlobalSearchMessages(),
         {
           method: 'GET',
-          query,
+          query: payload,
         },
       );
     },
@@ -59,7 +59,7 @@ export function createChatsRepository(appFetch: typeof $fetch) {
     createOrGetPrivateChat(body: { companionId: string }) {
       return appFetch<TChatInfo>(API_ROUTES.getRouteCreateOrGetChat(), {
         method: 'POST',
-        body,
+        body: { otherUserId: body.companionId },
       });
     },
     pinMessage(body: { chatId: string }, messageId: string) {
