@@ -18,11 +18,11 @@ import type {
 } from '~/shared/types';
 import { DIRECTION, MIN_MESSAGE_SIZE } from './const';
 import type MessageCard from './MessageCard.vue';
-import Pinned from './Pinned.vue';
 import ContextMenu from '../ui/ContextMenu.vue';
 import EmptyChat from './EmptyChat.vue';
 import type { DynamicScroller } from 'vue-virtual-scroller';
 import type { IGeneratedSummary } from './type';
+import PinnedMessages from '../PinnedMessages/PinnedMessages.vue';
 
 interface IProps {
   messages: IMessage[];
@@ -210,7 +210,7 @@ watch(
 </script>
 
 <template>
-  <Pinned
+  <PinnedMessages
     :pinned-messages="pinnedMessages"
     @unpin-message="(id) => emit('unpin-message', id)"
     @click-pinned="(id) => emit('click-pinned', id)"

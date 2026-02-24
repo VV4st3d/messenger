@@ -26,6 +26,6 @@ export default defineNuxtConfig({
   ],
   lottie: {
     componentName: 'Lottie',
-    lottieFolder: '/assets/lottie',
+    autoFolderCreation: false,
   },
 });

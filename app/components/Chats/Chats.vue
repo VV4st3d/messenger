@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ROUTES } from '~/shared/const';
 import type { IChat, ITyping } from '~/shared/types';
+import ChatCard from './ChatCard.vue';
 
 defineProps<{ chats: IChat[]; isTyping: ITyping | null }>();
 </script>
@@ -16,7 +17,7 @@ defineProps<{ chats: IChat[]; isTyping: ITyping | null }>();
       class="w-full"
       :to="ROUTES.getRouteChat(chat.id)"
     >
-      <ChatsChatCard
+      <ChatCard
         :typing="isTyping"
         :class="isActive ? 'active_link' : null"
         class="p-4"

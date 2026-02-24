@@ -38,7 +38,7 @@ const handleCheckEmail = async () => {
   error.value = '';
 
   try {
-    const { data = [] } = await $api.auth.checkExist({ email: email.value });
+    const { data } = await $api.auth.checkExist({ email: email.value });
     step.value = data.exists ? AUTH_STEP.LOGIN : AUTH_STEP.REGISTER;
   } catch (err: any) {
     error.value = err.data.message || 'Непредвиденная ошибка';

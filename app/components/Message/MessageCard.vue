@@ -14,7 +14,7 @@ interface IProps {
 }
 const LOTTIE = 'lottieElement';
 const lottieElement = ref<Lottie | null>(null);
-const playingAnimationMap = ref<Record<string, boolean>>({});
+const isAnimatingSticker = ref(false);
 
 const props = defineProps<IProps>();
 
@@ -38,24 +38,25 @@ const onRightClick = (event: MouseEvent) => {
   emit('context', { event, message: props.message });
 };
 
-const additionalClasses = computed(() => {
-  let result = '';
-  if (props.message.filePath) {
-    result += 'has-image rounded-xl bg-transparent';
-  }
-  if (isGenerating.value) {
-    result += 'generating-summary';
-  }
-  if (props.message.type === 'sticker') {
-    result += 'isSticker';
-  }
-  return result;
-});
+const wrapperClasses = computed(() => ({
+  'flex items-end gap-2 max-w-[86%] sm:max-w-[74%]': true,
+  'ml-auto pl-2 justify-end': isOwn.value,
+  'pr-2': !isOwn.value,
+}));
 
-const playStickerAnimation = (messageId: string) => {
-  if (lottieElement.value && !playingAnimationMap.value[messageId]) {
+const bubbleClasses = computed(() => ({
+  'flex flex-col rounded-2xl transition-all duration-200 min-h-[44px]': true,
+  'bg-blue-100 message-own': isOwn.value,
+  'bg-gray-100 message-other': !isOwn.value,
+  'has-image rounded-xl bg-transparent': !!props.message.filePath,
+  'generating-summary': isGenerating.value,
+  isSticker: props.message.type === 'sticker',
+}));
+
+const playStickerAnimation = () => {
+  if (lottieElement.value && !isAnimatingSticker.value) {
     lottieElement.value.goToAndPlay(0);
-    playingAnimationMap.value[messageId] = true;
+    isAnimatingSticker.value = true;
   }
 };
 </script>
@@ -65,67 +66,19 @@ const playStickerAnimation = (messageId: string) => {
     class="flex flex-col message-card"
     :class="{ 'highlight-active': isAnchor }"
   >
-    <div
-      v-if="!isOwn"
-      class="flex items-end gap-2 max-w-[86%] sm:max-w-[74%] pr-2"
-      @contextmenu.prevent="onRightClick"
-    >
-      <div v-if="message.type === 'sticker'">
-        <Lottie :ref="LOTTIE" :loop="1" :height="200" :name="message.content" />
-      </div>
-      <div
-        class="message-other flex flex-col rounded-2xl bg-gray-100 transition-all duration-200 min-h-[44px]"
-        :class="additionalClasses"
-      >
-        <div
-          v-if="message.filePath"
-          class="message-image h-[380px] overflow-hidden rounded-[0.75rem_0.75rem_0.4rem_0.4rem] w-full max-w-[320px] aspect-[4/5] sm:aspect-[5/6] bg-gray-200 dark:bg-gray-700"
-        >
-          <img
-            loading="lazy"
-            :src="`http://localhost:8080/uploads${message.filePath}`"
-            alt="attachment"
-            class="w-full h-full object-cover block"
-          >
-        </div>
-
-        <p
-          v-if="message.content && message.type !== 'sticker'"
-          class="message-text px-3.5 py-2.5 text-[15px] leading-5 whitespace-pre-wrap break-words"
-          :class="{ 'pt-2': message.filePath }"
-        >
-          {{ message.content }}
-        </p>
-
-        <div
-          class="message-meta flex items-center gap-1.5 px-3.5 pb-2 text-xs text-gray-500 dark:text-gray-400"
-        >
-          <span class="time min-w-[38px] text-right opacity-90 font-medium">{{
-            formattedTime
-          }}</span>
-        </div>
-      </div>
-    </div>
-
-    <div
-      v-else
-      class="flex items-end justify-end max-w-[86%] sm:max-w-[74%] ml-auto pl-2"
-      @contextmenu.prevent="onRightClick"
-    >
-      <div
-        class="message-own flex flex-col rounded-2xl bg-blue-100 transition-all duration-200 min-h-[44px]"
-        :class="additionalClasses"
-      >
-        <div v-if="message.type === 'sticker'">
-          <Lottie
+    <div :class="wrapperClasses" @contextmenu.prevent="onRightClick">
+      <div :class="bubbleClasses">
+        <div v-if="message.type === 'sticker'" class="h-[200px]">
+          <LazyLottie
             :ref="LOTTIE"
             :height="200"
-            :name="message.content"
+            :link="`/stickers/${message.content}.json`"
             :loop="1"
-            @click="playStickerAnimation(message.id)"
-            @on-complete="playingAnimationMap[message.id] = false"
+            @click="playStickerAnimation"
+            @on-complete="isAnimatingSticker = false"
           />
         </div>
+
         <div
           v-if="message.filePath"
           class="message-image h-[380px] overflow-hidden rounded-[0.75rem_0.75rem_0.4rem_0.4rem] w-full max-w-[320px] aspect-[4/5] sm:aspect-[5/6] bg-gray-200 dark:bg-gray-700"
@@ -147,23 +100,31 @@ const playStickerAnimation = (messageId: string) => {
         </p>
 
         <div
-          class="message-meta flex items-center justify-end gap-1.5 px-3.5 pb-2 text-xs text-gray-500 dark:text-gray-300"
+          class="message-meta flex items-center gap-1.5 px-3.5 pb-2 text-xs"
+          :class="
+            isOwn
+              ? 'justify-end text-gray-500 dark:text-gray-300'
+              : 'text-gray-500 dark:text-gray-400'
+          "
         >
-          <span class="time min-w-[38px] text-right opacity-90 font-medium">{{
-            formattedTime
-          }}</span>
-          <Icon
-            v-if="message.isRead"
-            is-not-default
-            name="solar:check-read-linear"
-            class="status text-blue-600 dark:text-blue-400 w-4 h-4 opacity-100"
-          />
-          <Icon
-            v-else
-            is-not-default
-            name="lineicons:check"
-            class="status w-4 h-4 opacity-75"
-          />
+          <span class="time min-w-[38px] text-right opacity-90 font-medium">
+            {{ formattedTime }}
+          </span>
+
+          <template v-if="isOwn">
+            <Icon
+              v-if="message.isRead"
+              is-not-default
+              name="solar:check-read-linear"
+              class="status text-blue-600 dark:text-blue-400 w-4 h-4 opacity-100"
+            />
+            <Icon
+              v-else
+              is-not-default
+              name="lineicons:check"
+              class="status w-4 h-4 opacity-75"
+            />
+          </template>
         </div>
       </div>
     </div>
