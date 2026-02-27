@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Icon from '../ui/Icon.vue';
-import { stickers } from './const';
+import { stickers } from '../../shared/const/emoji';
 
 const emit = defineEmits<{
   (e: 'send-sticker', sticker: string): void;
@@ -21,7 +21,7 @@ const emit = defineEmits<{
         v-for="(sticker, index) in stickers"
         :key="index"
         class="sticker-item"
-        @click="emit('send-sticker', sticker.lottieName)"
+        @click="emit('send-sticker', sticker.emoji)"
       >
         <span class="sticker-emoji">{{ sticker.emoji }}</span>
       </button>

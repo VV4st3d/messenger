@@ -87,6 +87,14 @@ body {
   flex-direction: column;
 }
 
+*::-webkit-scrollbar {
+  width: 6px;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--bg-tertiary);
+  border-radius: 10px;
+}
+
 .app-container {
   flex: 1;
   display: grid;

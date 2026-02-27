@@ -13,4 +13,7 @@ export const ROUTES = {
   getRouteChat(id: string) {
     return `/chat/${id}`;
   },
+  getRouteProfile(id: string) {
+    return `/profile/${id}`;
+  },
 };

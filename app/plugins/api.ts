@@ -3,6 +3,7 @@ import { useAuthStore } from '#imports';
 import { createAuthRepository } from '~/repository/auth';
 import { createChatsRepository } from '~/repository/chats';
 import { createFriendsRepository } from '~/repository/friends';
+import { createProfileRepository } from '~/repository/profile';
 
 export default defineNuxtPlugin({
   name: 'fetch',
@@ -28,6 +29,7 @@ export default defineNuxtPlugin({
       auth: createAuthRepository(appFetch),
       friend: createFriendsRepository(appFetch),
       chats: createChatsRepository(appFetch),
+      profile: createProfileRepository(appFetch),
     };
 
     return {

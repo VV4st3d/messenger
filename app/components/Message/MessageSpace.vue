@@ -281,12 +281,4 @@ watch(
 .scroller {
   height: 100%;
 }
-
-.scroller::-webkit-scrollbar {
-  width: 6px;
-}
-.scroller::-webkit-scrollbar-thumb {
-  background-color: var(--bg-tertiary);
-  border-radius: 10px;
-}
 </style>

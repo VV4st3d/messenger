@@ -5,7 +5,7 @@ import Icon from '~/components/ui/Icon.vue';
 
 interface IProps {
   src?: string | null;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'profile';
   online?: boolean | null;
 }
 

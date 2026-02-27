@@ -74,7 +74,10 @@ export const API_ROUTES = {
   getRouteAISummary(messageId: string) {
     return `ai/${messageId}/summary`;
   },
-  getRouteuploadFileWithMessageText() {
+  getRouteUploadFileWithMessageText() {
     return 'messages/upload';
+  },
+  getRouteProfile(id: string) {
+    return `users/${id}`;
   },
 };

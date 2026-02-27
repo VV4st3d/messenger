@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import type { IFriend, IFriendIncoming, IFriendOutgoing } from '~/shared/types';
+import type { IUser, IFriendIncoming, IFriendOutgoing } from '~/shared/types';
 import FriendItem from './FriendItem.vue';
 import Icon from '../ui/Icon.vue';
+import { ROUTES } from '~/shared/const';
 
 interface IProps {
-  friends: IFriend[];
+  friends: IUser[];
   incomingRequests: IFriendIncoming[];
   outgoingRequests: IFriendOutgoing[];
 }
@@ -123,13 +124,17 @@ const emit = defineEmits<IEmits>();
       </div>
 
       <div v-else class="space-y-1">
-        <FriendItem
+        <NuxtLink
           v-for="friend in friends"
           :key="friend.id"
-          :friend="friend"
-          @open-chat="(id) => emit('open-chat', id)"
-          @remove-friend="(id) => emit('remove-friend', id)"
-        />
+          :to="`${ROUTES.getRouteProfile(friend.id)}`"
+        >
+          <FriendItem
+            :friend="friend"
+            @open-chat="(id) => emit('open-chat', id)"
+            @remove-friend="(id) => emit('remove-friend', id)"
+          />
+        </NuxtLink>
       </div>
     </div>
   </div>

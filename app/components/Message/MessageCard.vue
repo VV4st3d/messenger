@@ -5,6 +5,7 @@ import type { IMessage } from '~/shared/types';
 import Icon from '../ui/Icon.vue';
 import type { IGeneratedSummary } from './type';
 import type { Lottie } from 'nuxt-lottie';
+import { emojiMap, mapStickerToLottieName } from '~/shared/const/emoji';
 
 interface IProps {
   message: IMessage;
@@ -72,7 +73,7 @@ const playStickerAnimation = () => {
           <LazyLottie
             :ref="LOTTIE"
             :height="200"
-            :link="`/stickers/${message.content}.json`"
+            :link="`/stickers/${mapStickerToLottieName(message.content as keyof typeof emojiMap)}.json`"
             :loop="1"
             @click="playStickerAnimation"
             @on-complete="isAnimatingSticker = false"

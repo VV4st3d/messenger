@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { IFriend } from '~/shared/types';
+import type { IUser } from '~/shared/types';
 import Avatar from '../ui/Avatar/Avatar.vue';
 import Icon from '../ui/Icon.vue';
 import { getStatus } from '#imports';
 
 const props = defineProps<{
-  friend: IFriend;
+  friend: IUser;
 }>();
 
 interface IEmits {

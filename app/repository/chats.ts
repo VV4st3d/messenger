@@ -98,7 +98,7 @@ export function createChatsRepository(appFetch: typeof $fetch) {
     },
     uploadFileWithMessageText(body: FormData) {
       return appFetch<TMessageResponse>(
-        API_ROUTES.getRouteuploadFileWithMessageText(),
+        API_ROUTES.getRouteUploadFileWithMessageText(),
         {
           method: 'POST',
           body,

@@ -1,5 +1,12 @@
 import type { IResponseBody } from './base-body';
 
+export type TSearchFriendsResponse = IResponseBody<IFoundUser[]>;
+export type TFriendRequestResponse = IResponseBody<IFriendResponse>;
+export type TRequestsOutgoingResponse = IResponseBody<IFriendOutgoing[]>;
+export type TRequestsIncomingResponse = IResponseBody<IFriendIncoming[]>;
+export type TFriendRequestActionResponse = IResponseBody<IActionResponse>;
+export type TFriendsResponse = IResponseBody<IFriend[]>;
+
 export interface IFriend {
   id: string;
   username: string;
@@ -13,13 +20,6 @@ export interface IFriend {
   createdAt: string;
   updatedAt: string;
 }
-
-export type TSearchFriendsResponse = IResponseBody<IFoundUser[]>;
-export type TFriendRequestResponse = IResponseBody<IFriendResponse>;
-export type TRequestsOutgoingResponse = IResponseBody<IFriendOutgoing[]>;
-export type TRequestsIncomingResponse = IResponseBody<IFriendIncoming[]>;
-export type TFriendRequestActionResponse = IResponseBody<IActionResponse>;
-export type TFriendsResponse = IResponseBody<IFriend[]>;
 
 export interface ICancelRequestResponse {
   success: boolean;

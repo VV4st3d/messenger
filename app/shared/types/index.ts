@@ -3,4 +3,4 @@ export * from './auth';
 export * from './socket';
 export * from './chat';
 
-export type { valueOf } from './helpers';
+export type { valueOf, getTypeOfArrayElements } from './helpers';
