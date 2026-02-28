@@ -1,4 +1,5 @@
 import { useNuxtApp } from '#app';
+import { useProfileStore } from '#imports';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type {
@@ -14,6 +15,7 @@ export const useFriendsStore = defineStore('friends', () => {
   const incomingRequests = ref<IFriendIncoming[]>([]);
   const outgoingRequests = ref<IFriendOutgoing[]>([]);
   const { $api } = useNuxtApp();
+  const profileStore = useProfileStore();
 
   const setFriends = (payload: IUser[]) => (friends.value = payload);
   const setFoundUsers = (payload: IFoundUser[]) => (foundUsers.value = payload);
@@ -47,6 +49,7 @@ export const useFriendsStore = defineStore('friends', () => {
         friends.value = friends.value.filter(
           (friend) => friend.id !== removedFriendId,
         );
+      profileStore.setFriendRequestStatus('none');
     } catch (error) {
       console.error('error during removing friend: ', error);
     }
@@ -67,9 +70,13 @@ export const useFriendsStore = defineStore('friends', () => {
 
   const sendRequest = async (companionId: string): Promise<void> => {
     try {
-      await $api.friend.sendFriendRequest({ toUserId: companionId });
+      const { data: requestData } = await $api.friend.sendFriendRequest({
+        toUserId: companionId,
+      });
       const { data = [] } = await $api.friend.searchOutgoingRequests();
       setOutgoing(data);
+      profileStore.setFriendRequestStatus('sent');
+      profileStore.setFriendRequestId(requestData.id);
     } catch (error) {
       console.error('error during sendind request: ', error);
     }
@@ -82,6 +89,7 @@ export const useFriendsStore = defineStore('friends', () => {
       incomingRequests.value = incomingRequests.value.filter(
         (request) => request.id !== data.id,
       );
+      profileStore.setFriendRequestStatus('friends');
     } catch (error) {
       console.error('error during accepting friend request: ', error);
     }
@@ -93,6 +101,7 @@ export const useFriendsStore = defineStore('friends', () => {
       incomingRequests.value = incomingRequests.value.filter(
         (request) => request.id !== id,
       );
+      profileStore.setFriendRequestStatus('none');
     } catch (error) {
       console.error('error during rejecting friend request: ', error);
     }
@@ -105,6 +114,7 @@ export const useFriendsStore = defineStore('friends', () => {
         outgoingRequests.value = outgoingRequests.value.filter(
           (request) => request.id !== id,
         );
+      profileStore.setFriendRequestStatus('none');
     } catch (error) {
       console.error('error during canceling friend request: ', error);
     }

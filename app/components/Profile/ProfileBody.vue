@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Gallery from '../ui/Gallery.vue';
 
-defineProps<{ bio: string | undefined | null }>();
+defineProps<{ bio: string | null }>();
 const photos: string[] = [];
 </script>
 

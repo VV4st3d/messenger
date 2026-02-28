@@ -2,13 +2,21 @@ import { useNuxtApp } from '#app';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-
-import type { IProfile } from '~/shared/types/profile';
+import type { IProfile, TFriendRequestStatus } from '~/shared/types/profile';
 
 export const useProfileStore = defineStore('profile', () => {
   const profile = ref<IProfile | null>(null);
-  const setProfile = (payload: IProfile) => (profile.value = payload);
   const { $api } = useNuxtApp();
+
+  const setProfile = (payload: IProfile) => (profile.value = payload);
+  const setFriendRequestStatus = (payload: TFriendRequestStatus) => {
+    if (profile.value?.friendRequestStatus) {
+      profile.value.friendRequestStatus = payload;
+    }
+  };
+  const setFriendRequestId = (id: string) => {
+    if (profile.value) profile.value.friendRequestId = id;
+  };
 
   const fetchProfile = async (id: string): Promise<void> => {
     try {
@@ -22,5 +30,7 @@ export const useProfileStore = defineStore('profile', () => {
   return {
     profile,
     fetchProfile,
+    setFriendRequestStatus,
+    setFriendRequestId,
   };
 });

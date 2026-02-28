@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { IProfile } from '~/shared/types/profile';
 import Avatar from '../ui/Avatar/Avatar.vue';
+import type { TEvents } from './type';
 
-defineProps<{ profile: IProfile | null; status: string }>();
+defineProps<{ profile: IProfile; status: string }>();
+const emit = defineEmits<{ (e: TEvents, id: string): void }>();
 </script>
 
 <template>
@@ -15,8 +17,8 @@ defineProps<{ profile: IProfile | null; status: string }>();
     <div class="relative z-10 flex flex-col items-center pt-24 sm:pt-32 px-4">
       <div class="relative mb-5 group">
         <Avatar
-          :src="profile?.avatarUrl"
-          :online="profile?.isOnline"
+          :src="profile.avatarUrl"
+          :online="profile.isOnline"
           size="profile"
         />
       </div>
@@ -24,18 +26,26 @@ defineProps<{ profile: IProfile | null; status: string }>();
       <h1
         class="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]"
       >
-        {{ profile?.displayName }}
+        {{ profile.displayName }}
       </h1>
 
       <p class="mt-1 text-lg text-[var(--text-secondary)]">
-        @{{ profile?.username }}
+        @{{ profile.username }}
       </p>
 
       <div class="mt-3 flex items-center gap-3 text-sm">
         <span class="font-medium text-[var(--online)]"> {{ status }} </span>
       </div>
 
-      <ProfileActions :is-own-profile="Boolean(profile?.isOwnProfile)" />
+      <ProfileActions
+        :user-profile="profile"
+        @accept-request="(id) => emit('accept-request', id)"
+        @chat-open="(id) => emit('chat-open', id)"
+        @delete-friend="(id) => emit('delete-friend', id)"
+        @cancel-request="(id) => emit('cancel-request', id)"
+        @send-request="(id) => emit('send-request', id)"
+        @reject-request="(id) => emit('reject-request', id)"
+      />
     </div>
   </div>
 </template>

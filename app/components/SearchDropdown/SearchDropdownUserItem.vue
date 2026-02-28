@@ -2,6 +2,7 @@
 import type { IFoundUser } from '~/shared/types';
 import Avatar from '../ui/Avatar/Avatar.vue';
 import Icon from '../ui/Icon.vue';
+import { ROUTES } from '~/shared/const';
 
 interface IProps {
   foundUsers: IFoundUser[];
@@ -15,9 +16,10 @@ const emit = defineEmits<IEmits>();
 
 <template>
   <div class="max-h-[200px] overflow-y-auto">
-    <div
+    <NuxtLink
       v-for="user in foundUsers"
       :key="user.id"
+      :to="ROUTES.getRouteProfile(user.id)"
       class="flex items-center justify-between gap-3 px-4 py-2 hover:bg-[var(--bg-secondary)] transition"
     >
       <div class="flex items-center gap-3 overflow-hidden">
@@ -31,7 +33,7 @@ const emit = defineEmits<IEmits>();
         <button
           v-if="!user.isFriend"
           class="text-[var(--text-tertiary)] hover:text-[var(--accent)] transition p-1.5 rounded-full hover:bg-[rgba(var(--accent),0.1)] cursor-pointer"
-          @click="emit('add-friend', user.id)"
+          @click.stop="emit('add-friend', user.id)"
         >
           <Icon name="user-plus" size="20" />
         </button>
@@ -39,11 +41,11 @@ const emit = defineEmits<IEmits>();
         <button
           v-else
           class="text-[var(--text-tertiary)] hover:text-[var(--accent)] transition p-1.5 rounded-full hover:bg-[rgba(var(--accent),0.1)] cursor-pointer"
-          @click="emit('open-chat', user.id)"
+          @click.stop="emit('open-chat', user.id)"
         >
           <Icon name="chat-bubble-left-right" size="20" />
         </button>
       </div>
-    </div>
+    </NuxtLink>
   </div>
 </template>
