@@ -1,5 +1,8 @@
 import { API_ROUTES } from '~/shared/const';
-import type { TProfile } from '~/shared/types/profile';
+import type {
+  TProfile,
+  TUpdateProfileResponse,
+} from '~/shared/types/profile';
 
 export function createProfileRepository(appFetch: typeof $fetch) {
   return {
@@ -7,6 +10,15 @@ export function createProfileRepository(appFetch: typeof $fetch) {
       return appFetch<TProfile>(API_ROUTES.getRouteProfile(id), {
         method: 'GET',
       });
+    },
+    editProfile(body: FormData) {
+      return appFetch<TUpdateProfileResponse>(
+        API_ROUTES.getRouteEditProfile(),
+        {
+          method: 'PATCH',
+          body,
+        },
+      );
     },
   };
 }

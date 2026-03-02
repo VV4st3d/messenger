@@ -34,13 +34,13 @@ export const useAuthStore = defineStore('auth', () => {
     }
   };
 
-  const rigester = async (payload: IRegisterBody): Promise<void> => {
+  const register = async (payload: IRegisterBody): Promise<void> => {
     const { $api } = useNuxtApp();
     try {
       const { data, token: accessToken } =
         await $api.auth.registration(payload);
-      setUser(data);
       token.value = accessToken;
+      setUser(data);
     } catch (error) {
       console.error('register error: ', error);
     }
@@ -59,7 +59,7 @@ export const useAuthStore = defineStore('auth', () => {
     setOnline,
     isOnline,
     login,
-    rigester,
+    register,
     logout,
   };
 });

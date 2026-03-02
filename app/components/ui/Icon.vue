@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-type TSizeValues = '14' | '16' | '20' | '24';
+type TSizeValues = '14' | '16' | '20' | '24' | '64';
 
 const props = defineProps<{
   name: string;

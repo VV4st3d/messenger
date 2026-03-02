@@ -24,7 +24,7 @@ const emit = defineEmits<{ (e: TEvents, id: string): void }>();
       </div>
 
       <h1
-        class="text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]"
+        class="text-center text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]"
       >
         {{ profile.displayName }}
       </h1>

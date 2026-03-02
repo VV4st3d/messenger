@@ -28,7 +28,7 @@ const hasError = ref(false);
     >
       <img
         v-if="src && !hasError"
-        :src="src"
+        :src="`http://localhost:8080${src}`"
         alt="Avatar"
         class="w-full h-full object-cover"
         @error="hasError = true"

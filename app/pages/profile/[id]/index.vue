@@ -7,9 +7,8 @@ import {
   useFriendsStore,
   useNuxtApp,
   useProfileStore,
+  useRoute,
 } from '#imports';
-import { useRoute } from 'vue-router';
-import ProfileHeader from '~/components/Profile/ProfileHeader.vue';
 import { ROUTES } from '~/shared/const';
 
 const { params } = useRoute();
@@ -46,7 +45,7 @@ onMounted(() => {
 <template>
   <div
     v-if="profile"
-    class="overflow-auto profile min-h-screen bg-[var(--bg-primary)] font-[var(--font-primary)]"
+    class="overflow-auto min-h-screen bg-[var(--bg-primary)] font-[var(--font-primary)]"
   >
     <ProfileHeader
       :profile="profile"

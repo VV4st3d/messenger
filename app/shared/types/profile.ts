@@ -7,7 +7,7 @@ export interface IProfile {
   passwordHash: string;
   displayName: string;
   lastActive: string;
-  avatarUrl: string;
+  avatarUrl: string | null;
   status: string;
   isOnline: boolean;
   createdAt: string;
@@ -21,3 +21,13 @@ export interface IProfile {
 export type TFriendRequestStatus = 'sent' | 'received' | 'none' | 'friends';
 
 export type TProfile = IResponseBody<IProfile>;
+export type TUpdateProfileResponse = IResponseBody<IProfile> & {
+  message: string;
+};
+
+export interface IEditProfileBody {
+  bio?: string;
+  username?: string;
+  displayName?: string;
+  avatarUrl?: File | null;
+}

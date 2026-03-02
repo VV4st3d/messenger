@@ -19,12 +19,13 @@ interface IProps {
   setError: (error: string) => void;
   setLoading: (value: boolean) => void;
 }
+
 const props = defineProps<IProps>();
 
 const handleRegister = async () => {
   props.setLoading(true);
   try {
-    await props.authStore.rigester({
+    await props.authStore.register({
       email: props.email,
       password: password.value,
       username: username.value,

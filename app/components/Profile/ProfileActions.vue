@@ -4,6 +4,8 @@ import Icon from '../ui/Icon.vue';
 import { actionButtonsMap } from './const';
 import type { TEvents } from './type';
 import { computed } from 'vue';
+import { navigateTo } from '#app';
+import { ROUTES } from '~/shared/const';
 
 interface IEmits {
   (e: TEvents, id: string): void;
@@ -61,6 +63,7 @@ const eventPayload = computed(() => {
   <div v-else class="mt-7 flex flex-wrap gap-3 justify-center">
     <button
       class="flex items-center gap-2 px-6 py-2.5 rounded-[var(--radius)] font-medium text-white bg-gradient-to-br bg-[var(--accent)] transition-all duration-200 hover:-translate-y-0.5"
+      @click="navigateTo(ROUTES.getRouteEditProfile(userProfile.id))"
     >
       <Icon is-not-default name="boxicons:edit-filled" size="20" />
       Редактировать профиль

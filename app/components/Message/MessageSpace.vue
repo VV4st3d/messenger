@@ -223,6 +223,7 @@ watch(
         :min-item-size="MIN_MESSAGE_SIZE"
         class="scroller"
         :key-field="MESSAGE_KEY"
+        skip-hover
       >
         <template
           #default="{

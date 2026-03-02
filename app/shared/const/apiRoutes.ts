@@ -80,4 +80,7 @@ export const API_ROUTES = {
   getRouteProfile(id: string) {
     return `users/${id}`;
   },
+  getRouteEditProfile() {
+    return 'users/profile';
+  },
 };

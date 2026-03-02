@@ -2,7 +2,7 @@ export const AVATAR_SIZE_CLASSES = {
   sm: 'w-8 h-8',
   md: 'w-10 h-10',
   lg: 'w-12 h-12',
-  profile: 'w-36, h-36',
+  profile: 'w-32 h-32',
 };
 
 export const STATUS_SIZE_CLASSES = {

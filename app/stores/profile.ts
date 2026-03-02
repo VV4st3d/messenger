@@ -2,7 +2,11 @@ import { useNuxtApp } from '#app';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
-import type { IProfile, TFriendRequestStatus } from '~/shared/types/profile';
+import type {
+  IEditProfileBody,
+  IProfile,
+  TFriendRequestStatus,
+} from '~/shared/types/profile';
 
 export const useProfileStore = defineStore('profile', () => {
   const profile = ref<IProfile | null>(null);
@@ -27,10 +31,25 @@ export const useProfileStore = defineStore('profile', () => {
     }
   };
 
+  const updateProfile = async (payload: IEditProfileBody): Promise<void> => {
+    try {
+      const formData = new FormData();
+      if (payload.bio) formData.append('bio', payload.bio);
+      if (payload.username) formData.append('username', payload.username);
+      if (payload.displayName)
+        formData.append('displayName', payload.displayName);
+      if (payload.avatarUrl) formData.append('avatar', payload.avatarUrl);
+      await $api.profile.editProfile(formData);
+    } catch (error) {
+      console.log('error during updating profile: ', error);
+    }
+  };
+
   return {
     profile,
     fetchProfile,
     setFriendRequestStatus,
     setFriendRequestId,
+    updateProfile,
   };
 });

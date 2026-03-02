@@ -62,7 +62,11 @@ watch(
         <Icon name="arrow-left" size="24" />
       </button>
       <div class="relative">
-        <Avatar size="md" :online="companion?.isOnline" />
+        <Avatar
+          :src="companion?.avatarUrl"
+          size="md"
+          :online="companion?.isOnline"
+        />
       </div>
       <div>
         <h2 class="font-semibold text-lg truncate max-w-[200px]">

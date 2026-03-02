@@ -16,4 +16,7 @@ export const ROUTES = {
   getRouteProfile(id: string) {
     return `/profile/${id}`;
   },
+  getRouteEditProfile(id: string) {
+    return `/profile/${id}/edit`;
+  },
 };
