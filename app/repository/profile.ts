@@ -2,6 +2,7 @@ import { API_ROUTES } from '~/shared/const';
 import type {
   TProfile,
   TUpdateProfileResponse,
+  TUploadPhotoResponse,
 } from '~/shared/types/profile';
 
 export function createProfileRepository(appFetch: typeof $fetch) {
@@ -16,6 +17,15 @@ export function createProfileRepository(appFetch: typeof $fetch) {
         API_ROUTES.getRouteEditProfile(),
         {
           method: 'PATCH',
+          body,
+        },
+      );
+    },
+    uploadPhoto(body: FormData) {
+      return appFetch<TUploadPhotoResponse>(
+        API_ROUTES.getRouteUploadProfilePhotos(),
+        {
+          method: 'POST',
           body,
         },
       );

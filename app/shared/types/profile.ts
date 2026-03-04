@@ -10,6 +10,7 @@ export interface IProfile {
   avatarUrl: string | null;
   status: string;
   isOnline: boolean;
+  photos: string[];
   createdAt: string;
   updatedAt: string;
   isOwnProfile: boolean;
@@ -24,6 +25,7 @@ export type TProfile = IResponseBody<IProfile>;
 export type TUpdateProfileResponse = IResponseBody<IProfile> & {
   message: string;
 };
+export type TUploadPhotoResponse = IResponseBody<{ photoUrl: string }>;
 
 export interface IEditProfileBody {
   bio?: string;

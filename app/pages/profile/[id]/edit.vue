@@ -4,6 +4,7 @@ import Icon from '~/components/ui/Icon.vue';
 import { navigateTo, useAsyncData, useProfileStore } from '#imports';
 import { useRoute } from 'vue-router';
 import { ROUTES } from '~/shared/const';
+import { getUploadsRoute } from '~/shared/const/apiRoutes';
 
 const { params } = useRoute();
 const profileId = params.id as string;
@@ -19,7 +20,12 @@ const avatarUrl = ref<string | null>(profile.value?.avatarUrl || null);
 const previewAvatar = ref(avatarUrl.value || '');
 const inputAvatar = ref<File | null>(null);
 
-const fileInput = ref<HTMLInputElement | null>(null);
+const getAvatarUrl = computed(() => {
+  if (previewAvatar.value?.startsWith('/uploads')) {
+    return getUploadsRoute(previewAvatar.value);
+  }
+  return previewAvatar.value;
+});
 
 const handleAvatarChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
@@ -65,37 +71,44 @@ await useAsyncData(`profile-${profileId}`, async () => {
         class="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-[var(--radius-lg)] shadow-[var(--shadow-lg)] overflow-hidden"
       >
         <div class="p-8 border-b border-[var(--border-subtle)] text-center">
-          <div class="relative inline-block mb-4">
-            <div
-              v-if="previewAvatar"
-              class="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 border-[var(--bg-primary)] shadow-[var(--shadow)]"
-            >
-              <img
-                :src="`http://localhost:8080${avatarUrl}`"
-                alt="Аватар"
-                class="w-full h-full object-cover rounded-full"
+          <ClientOnly>
+            <div class="relative inline-block mb-4">
+              <div
+                v-if="previewAvatar"
+                class="w-32 h-32 sm:w-40 sm:h-40 rounded-full overflow-hidden border-4 border-[var(--bg-primary)] shadow-[var(--shadow)]"
               >
-            </div>
-            <div
-              v-else
-              class="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-[var(--bg-tertiary)] border-4 border-[var(--border)] flex items-center justify-center shadow-[var(--shadow)]"
-            >
-              <Icon name="user" size="64" class="text-[var(--text-tertiary)]" />
-            </div>
+                <img
+                  :src="getAvatarUrl"
+                  alt="Аватар"
+                  class="w-full h-full object-cover rounded-full"
+                >
+              </div>
+              <div
+                v-else
+                class="w-32 h-32 sm:w-40 sm:h-40 rounded-full bg-[var(--bg-tertiary)] border-4 border-[var(--border)] flex items-center justify-center shadow-[var(--shadow)]"
+              >
+                <Icon
+                  name="user"
+                  size="64"
+                  class="text-[var(--text-tertiary)]"
+                />
+              </div>
 
-            <label
-              class="absolute bottom-0 right-0 p-2 bg-[var(--accent)] rounded-full cursor-pointer hover:bg-[var(--accent-hover)] transition shadow-[var(--shadow-sm)]"
-            >
-              <Icon name="camera" size="20" class="text-white" />
-              <input
-                ref="fileInput"
-                type="file"
-                accept="image/*"
-                class="hidden"
-                @change="handleAvatarChange"
+              <label
+                class="absolute bottom-0 right-0 p-2 bg-[var(--accent)] rounded-full cursor-pointer hover:bg-[var(--accent-hover)] transition shadow-[var(--shadow-sm)]"
               >
-            </label>
-          </div>
+                <Icon name="camera" size="20" class="text-white" />
+                <input
+                  ref="fileInput"
+                  type="file"
+                  accept="image/*"
+                  class="hidden"
+                  @change="handleAvatarChange"
+                >
+              </label>
+            </div>
+          </ClientOnly>
+
           <p class="text-sm text-[var(--text-tertiary)]">
             Нажмите на камеру, чтобы изменить фото
           </p>

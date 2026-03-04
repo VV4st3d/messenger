@@ -1,8 +1,13 @@
 <script setup lang="ts">
 import Gallery from '../ui/Gallery.vue';
 
-defineProps<{ bio: string | null }>();
-const photos: string[] = [];
+interface IProps {
+  bio: string | null;
+  photos: string[];
+}
+
+defineProps<IProps>();
+const emit = defineEmits<{ (e: 'upload', file: File): void }>();
 </script>
 
 <template>
@@ -29,7 +34,7 @@ const photos: string[] = [];
         </div>
       </div>
 
-      <Gallery :photos="photos" />
+      <Gallery :photos="photos" @upload="(file) => $emit('upload', file)" />
     </div>
   </div>
 </template>

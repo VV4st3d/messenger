@@ -83,4 +83,10 @@ export const API_ROUTES = {
   getRouteEditProfile() {
     return 'users/profile';
   },
+  getRouteUploadProfilePhotos() {
+    return 'users/profile/photo';
+  },
 };
+
+export const getUploadsRoute = (payload: string) =>
+  `http://localhost:8080${payload}`;

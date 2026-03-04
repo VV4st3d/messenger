@@ -2,6 +2,7 @@
 import { ref } from 'vue';
 import { AVATAR_SIZE_CLASSES, STATUS_SIZE_CLASSES } from './consts';
 import Icon from '~/components/ui/Icon.vue';
+import { getUploadsRoute } from '~/shared/const/apiRoutes';
 
 interface IProps {
   src?: string | null;
@@ -28,7 +29,7 @@ const hasError = ref(false);
     >
       <img
         v-if="src && !hasError"
-        :src="`http://localhost:8080${src}`"
+        :src="getUploadsRoute(src)"
         alt="Avatar"
         class="w-full h-full object-cover"
         @error="hasError = true"

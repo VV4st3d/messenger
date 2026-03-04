@@ -6,6 +6,7 @@ import Icon from '../ui/Icon.vue';
 import type { IGeneratedSummary } from './type';
 import type { Lottie } from 'nuxt-lottie';
 import { emojiMap, mapStickerToLottieName } from '~/shared/const/emoji';
+import { getUploadsRoute } from '~/shared/const/apiRoutes';
 
 interface IProps {
   message: IMessage;
@@ -86,7 +87,7 @@ const playStickerAnimation = () => {
         >
           <img
             loading="lazy"
-            :src="`http://localhost:8080/uploads${message.filePath}`"
+            :src="getUploadsRoute(`/uploads${message.filePath}`)"
             alt="attachment"
             class="w-full h-full object-cover block"
           >

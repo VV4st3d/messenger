@@ -13,6 +13,7 @@ export const useProfileStore = defineStore('profile', () => {
   const { $api } = useNuxtApp();
 
   const setProfile = (payload: IProfile) => (profile.value = payload);
+  const addPhoto = (url: string) => profile.value?.photos.push(url);
   const setFriendRequestStatus = (payload: TFriendRequestStatus) => {
     if (profile.value?.friendRequestStatus) {
       profile.value.friendRequestStatus = payload;
@@ -45,11 +46,23 @@ export const useProfileStore = defineStore('profile', () => {
     }
   };
 
+  const uploadPhoto = async (file: File): Promise<void> => {
+    try {
+      const formData = new FormData();
+      formData.append('photo', file);
+      const { success, data } = await $api.profile.uploadPhoto(formData);
+      if (success) addPhoto(data.photoUrl);
+    } catch (error) {
+      console.log('error during uploading photo', error);
+    }
+  };
+
   return {
     profile,
     fetchProfile,
     setFriendRequestStatus,
     setFriendRequestId,
     updateProfile,
+    uploadPhoto,
   };
 });

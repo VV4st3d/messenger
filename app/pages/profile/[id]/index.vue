@@ -58,6 +58,10 @@ onMounted(() => {
       @reject-request="rejectRequest"
     />
 
-    <ProfileBody :bio="profile.bio" />
+    <ProfileBody
+      :photos="profile.photos"
+      :bio="profile.bio"
+      @upload="profileStore.uploadPhoto"
+    />
   </div>
 </template>
