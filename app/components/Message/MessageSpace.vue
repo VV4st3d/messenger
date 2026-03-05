@@ -38,11 +38,13 @@ interface IProps {
   isFoundBySearch: boolean;
   generatedSummary?: IGeneratedSummary;
   anchorMessageId: string;
+  hasScrolledToAnchorId: boolean;
   onFetchMessages: (chatId: string, query?: IGetMessageQuery) => Promise<void>;
 }
 
 interface IEmits {
   (e: 'unmount' | 'copy-message'): void;
+  (e: 'set-scrolled-to-anchor', value: boolean): void;
   (e: 'click-pinned' | 'unpin-message', id: string): void;
   (
     e: 'open-context-menu',
@@ -80,8 +82,6 @@ const isPrepending = ref(false);
 const prevScrollHeight = ref(0);
 const prevScrollTop = ref(0);
 
-const hasScrolledToAnchor = ref(false);
-
 const anchorIndex = computed(() => {
   if (!props.anchorMessageId) return -1;
   return props.messages.findIndex((m) => m.id === props.anchorMessageId);
@@ -98,14 +98,6 @@ const initRefs = async (payload: IRefPayload) => {
     targetMessageBottom.value = payload.el;
   } else if (targetMessageBottom.value === payload.el) {
     targetMessageBottom.value = null;
-  }
-
-  if (payload.id === props.anchorMessageId && !hasScrolledToAnchor.value) {
-    if (!payload.el?.$el || !scroller.value) return;
-    await nextTick();
-    await nextTick();
-    scroller.value.scrollToItem(anchorIndex.value);
-    hasScrolledToAnchor.value = true;
   }
 };
 
@@ -207,6 +199,19 @@ watch(
     isInitialScroll.value = false;
   },
 );
+
+watch(
+  () => props.messages,
+  async () => {
+    if (!scroller.value) return;
+    if (anchorIndex.value !== -1) {
+      await nextTick();
+
+      scroller.value.scrollToItem(anchorIndex.value);
+      emit('set-scrolled-to-anchor', true);
+    }
+  },
+);
 </script>
 
 <template>
@@ -219,6 +224,7 @@ watch(
     <div v-if="messages.length > 0" class="h-full">
       <DynamicScroller
         :ref="REF_SCROLLER"
+        :emit-update="true"
         :items="messages"
         :min-item-size="MIN_MESSAGE_SIZE"
         class="scroller"

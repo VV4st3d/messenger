@@ -41,6 +41,7 @@ const {
   isSearching,
   pinnedMessages,
   isGeneratingSummary,
+  isScrolledToAnchorId,
 } = storeToRefs(chatStore);
 const {
   fetchMessagesById,
@@ -57,6 +58,7 @@ const {
   unpinMessage,
   generateMessageSummary,
   uploadAttachedToMessageFile,
+  setIsScrolledToAnchorId,
 } = chatStore;
 
 const contextMenu = ref<IContextMenu & { message: IMessage | null }>({
@@ -219,10 +221,12 @@ onUnmounted(() => {
       :last-message-date-in-list="lastMessageDateInList"
       :chat="chat"
       :messages="chatStore.messages"
+      :has-scrolled-to-anchor-id="isScrolledToAnchorId"
       @unmount="resetMessages"
       @click-pinned="foundOrPinnedMessageClickHandler"
       @open-context-menu="openContextMenuHandler"
       @unpin-message="unpinMessageHandler"
+      @set-scrolled-to-anchor="setIsScrolledToAnchorId"
     />
 
     <ChatFooter

@@ -25,10 +25,13 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   const hasMoreBottom = ref(false);
   const isFoundBySearch = ref(false);
   const isSearching = ref(false);
+  const isScrolledToAnchorId = ref(false);
   const isGeneratingSummary = ref<{ isGenerating: boolean; id: string | null }>(
     { isGenerating: false, id: null },
   );
   const setChat = (payload: IChat) => (chat.value = payload);
+  const setIsScrolledToAnchorId = (payload: boolean) =>
+    (isScrolledToAnchorId.value = payload);
   const setTyping = (payload: ITyping) => (typing.value = payload);
   const pushMessage = (payload: IMessage) => messages.value.push(payload);
   const resetMessages = () => (messages.value = []);
@@ -163,6 +166,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
         data.messages[data.messages.length - 1]?.createdAt ?? '';
 
       isFoundBySearch.value = true;
+      setIsScrolledToAnchorId(false);
     } catch (error) {
       console.error('error during finding messages by id: ', error);
     } finally {
@@ -243,6 +247,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     isGeneratingSummary,
     typing,
     hasMoreTop,
+    isScrolledToAnchorId,
     hasMoreBottom,
     chat,
     messages,
@@ -268,5 +273,6 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
     unpinMessage,
     generateMessageSummary,
     uploadAttachedToMessageFile,
+    setIsScrolledToAnchorId,
   };
 });
