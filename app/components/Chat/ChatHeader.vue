@@ -14,7 +14,7 @@ import Icon from '../ui/Icon.vue';
 import SearchDropdown from '../SearchDropdown/SearchDropdown.vue';
 
 interface IProps {
-  chat: IChat | null;
+  chat: Omit<IChat, 'lastMessage'> | null;
   chatId: string;
   typing: ITyping | null;
   isSearching: boolean;

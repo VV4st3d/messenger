@@ -29,7 +29,7 @@ interface IProps {
   pinnedMessages: IMessage[];
   contextMenu: IContextMenu;
   contextEvents: { label: string; callback: () => void }[];
-  chat: IChat | null;
+  chat: Omit<IChat, 'lastMessage'> | null;
   userId: string | undefined;
   firstMessageDateInList: string;
   lastMessageDateInList: string;

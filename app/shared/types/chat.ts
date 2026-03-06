@@ -33,7 +33,7 @@ export interface IChat {
   createdAt: string;
   updatedAt: string;
   participants: IParticipant[];
-  lastMessage?: IMessage;
+  lastMessage: IMessage | null;
 }
 
 export interface IMessageChat {

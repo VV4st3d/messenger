@@ -11,10 +11,17 @@ export const useChatsStore = defineStore('chats', () => {
   const setChats = (payload: IChat[]) => (chats.value = payload);
   const setGlobalFoundMessages = (payload: IMessage[]) =>
     (globalFoundMessage.value = payload);
+  const setLastMessage = (payload: { message: IMessage; chatId: string }) => {
+    chats.value = chats.value.map((c) => {
+      if (c.id !== payload.chatId) return c;
+      return { ...c, lastMessage: payload.message };
+    });
+  };
 
   const fetchChats = async (): Promise<void> => {
     try {
       const { data = [] } = await $api.chats.getChats();
+
       setChats(data);
     } catch (error) {
       console.error('error during finding chats', error);
@@ -41,5 +48,6 @@ export const useChatsStore = defineStore('chats', () => {
     globalFoundMessage,
     fetchChats,
     fetchGlobalMessages,
+    setLastMessage,
   };
 });

@@ -1,4 +1,4 @@
-import { useNuxtApp } from '#imports';
+import { useChatsStore, useNuxtApp } from '#imports';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { SOCKET_EMIT_EVENTS, SOCKET_ON_EVENTS } from '~/shared/const';
@@ -13,6 +13,7 @@ import type {
 
 export const useCurrentChatStore = defineStore('currentChat', () => {
   const { $api, $socket } = useNuxtApp();
+  const chatsStore = useChatsStore();
   const chat = ref<Omit<IChat, 'lastMessage'> | null>(null);
   const messages = ref<IMessage[]>([]);
   const typing = ref<ITyping | null>(null);
@@ -29,7 +30,9 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   const isGeneratingSummary = ref<{ isGenerating: boolean; id: string | null }>(
     { isGenerating: false, id: null },
   );
-  const setChat = (payload: IChat) => (chat.value = payload);
+
+  const setChat = (payload: Omit<IChat, 'lastMessage'>) =>
+    (chat.value = payload);
   const setIsScrolledToAnchorId = (payload: boolean) =>
     (isScrolledToAnchorId.value = payload);
   const setTyping = (payload: ITyping) => (typing.value = payload);
@@ -49,12 +52,13 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
 
   const bindEvents = () => {
     $socket.on(SOCKET_ON_EVENTS.NEW_MESSAGE, async (payload) => {
-      if (!isFoundBySearch.value) {
+      if (!isFoundBySearch.value && chat.value?.id) {
         pushMessage(payload);
+        chatsStore.setLastMessage({ chatId: chat.value.id, message: payload });
         return;
       }
       isFoundBySearch.value = false;
-      if (chat.value?.id) await fetchMessages(chat.value?.id);
+      if (chat.value?.id) await fetchMessages(chat.value.id);
     });
     $socket.on(SOCKET_ON_EVENTS.TYPING, setTyping);
     if (chat.value) {
@@ -79,7 +83,7 @@ export const useCurrentChatStore = defineStore('currentChat', () => {
   const sendMessage = (content: string, type: TMessageType = 'text') => {
     if (chat.value?.id)
       $socket.emit(SOCKET_EMIT_EVENTS.SEND_MESSAGE, {
-        chatId: chat.value?.id,
+        chatId: chat.value.id,
         content,
         type,
       });
