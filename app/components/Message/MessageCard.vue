@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { formatLastMessageDate } from '#imports';
 import type { IMessage } from '~/shared/types';
-import Icon from '../ui/Icon.vue';
 import type { IGeneratedSummary } from './type';
-import type { Lottie } from 'nuxt-lottie';
-import { emojiMap, mapStickerToLottieName } from '~/shared/const/emoji';
-import { getUploadsRoute } from '~/shared/const/apiRoutes';
+import type { emojiMap} from '~/shared/const/emoji';
+import { mapStickerToLottieName } from '~/shared/const/emoji';
+import Sticker from './MessageCard/Message/Sticker.vue';
+import File from './MessageCard/Message/File.vue';
+import MessageMeta from './MessageCard/Message/MessageMeta.vue';
 
 interface IProps {
   message: IMessage;
@@ -14,9 +15,6 @@ interface IProps {
   userId: string | undefined;
   generatedSummary?: IGeneratedSummary;
 }
-const LOTTIE = 'lottieElement';
-const lottieElement = ref<Lottie | null>(null);
-const isAnimatingSticker = ref(false);
 
 const props = defineProps<IProps>();
 
@@ -55,12 +53,9 @@ const bubbleClasses = computed(() => ({
   isSticker: props.message.type === 'sticker',
 }));
 
-const playStickerAnimation = () => {
-  if (lottieElement.value && !isAnimatingSticker.value) {
-    lottieElement.value.goToAndPlay(0);
-    isAnimatingSticker.value = true;
-  }
-};
+const sticker = computed(() =>
+  mapStickerToLottieName(props.message.content as keyof typeof emojiMap),
+);
 </script>
 
 <template>
@@ -70,64 +65,29 @@ const playStickerAnimation = () => {
   >
     <div :class="wrapperClasses" @contextmenu.prevent="onRightClick">
       <div :class="bubbleClasses">
-        <div v-if="message.type === 'sticker'" class="h-[200px]">
-          <LazyLottie
-            :ref="LOTTIE"
-            :height="200"
-            :link="`/stickers/${mapStickerToLottieName(message.content as keyof typeof emojiMap)}.json`"
-            :loop="1"
-            @click="playStickerAnimation"
-            @on-complete="isAnimatingSticker = false"
-          />
+        <div v-if="message.type === 'sticker' && sticker" class="h-[200px]">
+          <Sticker :sticker-name="sticker" />
         </div>
 
         <div
           v-if="message.filePath"
           class="message-image h-[380px] overflow-hidden rounded-[0.75rem_0.75rem_0.4rem_0.4rem] w-full max-w-[320px] aspect-[4/5] sm:aspect-[5/6] bg-gray-200 dark:bg-gray-700"
         >
-          <img
-            loading="lazy"
-            :src="getUploadsRoute(`/uploads${message.filePath}`)"
-            alt="attachment"
-            class="w-full h-full object-cover block"
-          >
+          <File :file-path="message.filePath" />
         </div>
-
-        <p
-          v-if="message.content && message.type !== 'sticker'"
-          class="message-text px-3.5 py-2.5 text-[15px] leading-5 whitespace-pre-wrap break-words"
-          :class="{ 'pt-2': message.filePath }"
-        >
-          {{ message.content }}
-        </p>
 
         <div
-          class="message-meta flex items-center gap-1.5 px-3.5 pb-2 text-xs"
-          :class="
-            isOwn
-              ? 'justify-end text-gray-500 dark:text-gray-300'
-              : 'text-gray-500 dark:text-gray-400'
-          "
+          v-if="message.content && message.type !== 'sticker'"
+          class="message px-3.5 py-2.5 text-[15px] leading-5 whitespace-pre-wrap break-words"
         >
-          <span class="time min-w-[38px] text-right opacity-90 font-medium">
-            {{ formattedTime }}
-          </span>
-
-          <template v-if="isOwn">
-            <Icon
-              v-if="message.isRead"
-              is-not-default
-              name="solar:check-read-linear"
-              class="status text-blue-600 dark:text-blue-400 w-4 h-4 opacity-100"
-            />
-            <Icon
-              v-else
-              is-not-default
-              name="lineicons:check"
-              class="status w-4 h-4 opacity-75"
-            />
-          </template>
+          {{ message.content }}
         </div>
+
+        <MessageMeta
+          :is-own="isOwn"
+          :time="formattedTime"
+          :is-read="message.isRead"
+        />
       </div>
     </div>
   </div>

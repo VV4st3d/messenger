@@ -15,6 +15,7 @@ import { useRoute } from 'vue-router';
 import ChatFooter from '~/components/Chat/ChatFooter.vue';
 import { TYPING_MESSAGE_DELAY_MS } from '~/components/Chat/const';
 import { SEARCH_DELAY_MS } from '~/shared/const/delay';
+import { emojiMap } from '~/shared/const/emoji';
 import type { IContextMenu, IMessage, TMessageType } from '~/shared/types';
 
 const { params } = useRoute();
@@ -154,9 +155,13 @@ const uploadFileWithMessageTextHandler = async (file: File) => {
   }
 };
 
-const sendMessageHandler = (stickerName: string, type?: TMessageType) => {
+const sendMessageHandler = (stickerName?: string, type?: TMessageType) => {
   if (stickerName) {
     sendMessage(stickerName, type);
+    return;
+  }
+  if (emojiMap[messageText.value as keyof typeof emojiMap]) {
+    sendMessage(messageText.value, 'sticker');
     return;
   }
   sendMessage(messageText.value);

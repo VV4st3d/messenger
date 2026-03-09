@@ -107,8 +107,7 @@ body {
 }
 
 .message {
-  max-width: 72%;
-  margin-bottom: var(--spacing-md);
+  width: 100%;
   padding: var(--spacing-md) var(--spacing-lg);
   border-radius: var(--radius-lg);
   position: relative;

@@ -47,6 +47,10 @@ const isTyping = computed(() => currentChatStore.typing);
 const status = getStatus(() => isOnline.value);
 const globalFoundMessages = computed(() => chatStore.globalFoundMessage);
 
+const setTab = (tab: TSidebarTabs) => {
+  activeTab.value = tab;
+};
+
 const getTabClasses = (currentTab: TSidebarTabs) =>
   activeTab.value === currentTab
     ? 'border-b-2 border-[var(--accent)] text-[var(--accent)]'
@@ -58,6 +62,7 @@ const getOrCreateChatHandler = async (companionId: string): Promise<void> => {
       companionId,
     });
     navigateTo(ROUTES.getRouteChat(data.id));
+    setTab('chats');
   } catch (error) {
     console.log('Ошибка при создании/поиске чата', error);
   }
@@ -152,14 +157,14 @@ onUnmounted(() => {
       <button
         class="flex-1 py-4 text-center font-medium text-sm transition-colors"
         :class="getTabClasses('chats')"
-        @click="activeTab = 'chats'"
+        @click="setTab('chats')"
       >
         Чаты
       </button>
       <button
         class="flex-1 py-4 text-center font-medium text-sm transition-colors"
         :class="getTabClasses('friends')"
-        @click="activeTab = 'friends'"
+        @click="setTab('friends')"
       >
         Друзья
       </button>
