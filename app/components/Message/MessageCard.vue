@@ -3,7 +3,7 @@ import { computed } from 'vue';
 import { formatLastMessageDate } from '#imports';
 import type { IMessage } from '~/shared/types';
 import type { IGeneratedSummary } from './type';
-import type { emojiMap} from '~/shared/const/emoji';
+import type { emojiMap } from '~/shared/const/emoji';
 import { mapStickerToLottieName } from '~/shared/const/emoji';
 import Sticker from './MessageCard/Message/Sticker.vue';
 import File from './MessageCard/Message/File.vue';
@@ -17,6 +17,9 @@ interface IProps {
 }
 
 const props = defineProps<IProps>();
+const emit = defineEmits<{
+  (e: 'context', payload: { event: MouseEvent; message: IMessage }): void;
+}>();
 
 const formattedTime = computed(() =>
   formatLastMessageDate(props.message.createdAt),
@@ -29,10 +32,6 @@ const isGenerating = computed(
     props.generatedSummary?.isGenerating &&
     props.generatedSummary.id === props.message.id,
 );
-
-const emit = defineEmits<{
-  (e: 'context', payload: { event: MouseEvent; message: IMessage }): void;
-}>();
 
 const onRightClick = (event: MouseEvent) => {
   emit('context', { event, message: props.message });
@@ -71,9 +70,10 @@ const sticker = computed(() =>
 
         <div
           v-if="message.filePath"
-          class="message-image h-[380px] overflow-hidden rounded-[0.75rem_0.75rem_0.4rem_0.4rem] w-full max-w-[320px] aspect-[4/5] sm:aspect-[5/6] bg-gray-200 dark:bg-gray-700"
+          class="message-image overflow-hidden rounded-[0.75rem_0.75rem_0.4rem_0.4rem]"
+          :class="{ 'h-[380px]': message.type === 'image' }"
         >
-          <File :file-path="message.filePath" />
+          <File :file="message" />
         </div>
 
         <div

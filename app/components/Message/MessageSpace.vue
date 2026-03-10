@@ -69,7 +69,6 @@ const REF_SCROLLER = 'scroller';
 const MESSAGE_KEY: keyof IMessage = 'id';
 
 const props = defineProps<IProps>();
-
 const emit = defineEmits<IEmits>();
 
 const scroller =

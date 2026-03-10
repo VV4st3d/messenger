@@ -8,7 +8,7 @@ defineProps<{ stickerName: string }>();
 const LOTTIE = 'lottieElement';
 const LOTTIE_CONTAINER = 'container';
 
-const lottieElement = useTemplateRef<Lottie>(LOTTIE);
+const lottieElement = ref<Lottie | null>(null);
 const lottieContainer = useTemplateRef<HTMLDivElement>(LOTTIE_CONTAINER);
 const isAnimatingSticker = ref(false);
 const isVisible = ref(false);
@@ -19,9 +19,11 @@ const playStickerAnimation = () => {
     isAnimatingSticker.value = true;
   }
 };
-
-useIntersectionObserver(lottieContainer, ([entry]) => {
+useIntersectionObserver(lottieContainer, async ([entry]) => {
+  if (!entry) return;
   if (entry?.isIntersecting) {
+    console.log(entry);
+
     isVisible.value = true;
   }
 });

@@ -72,7 +72,7 @@ export interface IMessage {
 }
 
 type TCHatType = 'private' | 'group';
-export type TMessageType = 'text' | 'file' | 'sticker';
+export type TMessageType = 'text' | 'file' | 'sticker' | 'image';
 
 export interface IMessageBody {
   chatId: string;
