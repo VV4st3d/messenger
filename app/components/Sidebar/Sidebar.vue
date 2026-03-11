@@ -19,18 +19,12 @@ import { SEARCH_DELAY_MS } from '~/shared/const/delay';
 import SearchDropdown from '../SearchDropdown/SearchDropdown.vue';
 import Avatar from '../ui/Avatar/Avatar.vue';
 import { ROUTES } from '~/shared/const';
-import ContextMenu from '../ui/ContextMenu.vue';
-import { contextEvents } from './const';
-import type { IContextMenu } from '~/shared/types';
+import { dropdownItems } from './const';
+import Dropdown from '../ui/Dropdown.vue';
 
 const activeTab = ref<TSidebarTabs>('chats');
 const queryInput = ref('');
 const isSidebarDropdownOpen = ref(false);
-const userContextMenu = ref<IContextMenu>({
-  isVisible: false,
-  x: 0,
-  y: 0,
-});
 
 const authStore = useAuthStore();
 const friendsStore = useFriendsStore();
@@ -91,15 +85,6 @@ const foundMessageHandler = async (chatId: string): Promise<void> => {
 
 const onCloseEvents = () => {
   isSidebarDropdownOpen.value = false;
-  userContextMenu.value.isVisible = false;
-};
-
-const handleOpenPopup = (e: MouseEvent) => {
-  userContextMenu.value = {
-    x: e.clientX,
-    y: e.clientY,
-    isVisible: true,
-  };
 };
 
 await useAsyncData(
@@ -207,20 +192,9 @@ onUnmounted(() => {
           {{ status }}
         </div>
       </div>
-      <button
-        class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition cursor-pointer"
-        @click.stop="handleOpenPopup"
-      >
+      <Dropdown :dropdown-items="dropdownItems" vertical="up">
         <Icon name="ellipsis-horizontal" size="24" />
-      </button>
-      <ContextMenu
-        :is-visible="userContextMenu.isVisible"
-        :position-x="userContextMenu.x"
-        :position-y="userContextMenu.y"
-        :events="contextEvents"
-        vertical-side="top"
-        side="left"
-      />
+      </Dropdown>
     </div>
   </div>
 </template>

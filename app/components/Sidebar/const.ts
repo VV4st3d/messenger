@@ -1,15 +1,20 @@
-import { navigateTo, useAuthStore } from '#imports';
+import { useAuthStore } from '#imports';
 import { RouteNames, ROUTES } from '~/shared/const';
 
 const authStore = useAuthStore();
-export const contextEvents: { label: string; callback: () => void }[] = [
+
+export const dropdownItems: {
+  label: string;
+  href?: string;
+  disabled?: boolean;
+  onClick?: () => void;
+}[] = [
   {
     label: 'Профиль',
-    callback: () =>
-      navigateTo(ROUTES.getRouteProfile(authStore.user?.id ?? RouteNames.AUTH)),
+    href: ROUTES.getRouteProfile(authStore.user?.id ?? RouteNames.AUTH),
   },
   {
     label: 'Выход',
-    callback: () => authStore.logout(),
+    onClick: () => authStore.logout(),
   },
 ];

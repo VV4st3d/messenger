@@ -82,7 +82,7 @@ const sendMessage = () => {
       <input
         :ref="FILE_INPUT"
         type="file"
-        accept="image/*,video/*,.pdf"
+        accept="image/*, video/*, .docx, application/pdf"
         class="hidden"
         @change="handleSetFile"
       >

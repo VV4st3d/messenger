@@ -22,8 +22,6 @@ const playStickerAnimation = () => {
 useIntersectionObserver(lottieContainer, async ([entry]) => {
   if (!entry) return;
   if (entry?.isIntersecting) {
-    console.log(entry);
-
     isVisible.value = true;
   }
 });
