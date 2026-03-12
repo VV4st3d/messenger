@@ -15,7 +15,7 @@ const fileExtension =
     loading="lazy"
     :src="getUploadsRoute(`/uploads${file.filePath}`)"
     alt="attachment"
-    class="w-full h-full object-cover block max-w-[320px] aspect-[4/5] sm:aspect-[5/6] bg-gray-100 dark:bg-gray-800 rounded-xl transition-opacity hover:opacity-90"
+    class="w-full h-full object-cover block max-w-[320px] aspect-[4/5] sm:aspect-[5/6] bg-gray-100 dark:bg-gray-800 transition-opacity hover:opacity-90"
   >
 
   <div

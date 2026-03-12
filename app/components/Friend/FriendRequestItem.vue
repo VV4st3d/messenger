@@ -3,6 +3,7 @@ import type { IFriendIncoming, IFriendOutgoing } from '~/shared/types';
 import Avatar from '../ui/Avatar/Avatar.vue';
 import Icon from '../ui/Icon.vue';
 import { computed } from 'vue';
+import { ROUTES } from '~/shared/const';
 
 interface IProps {
   request: IFriendOutgoing | IFriendIncoming;
@@ -28,7 +29,8 @@ const cancel = (id: string) => {
 </script>
 
 <template>
-  <div
+  <NuxtLink
+    :to="ROUTES.getRouteProfile(user.id)"
     class="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-tertiary)] hover:bg-[var(--bg-tertiary-hover)] transition-colors"
   >
     <div class="relative">
@@ -57,5 +59,5 @@ const cancel = (id: string) => {
         <Icon name="x-mark" size="20" />
       </button>
     </div>
-  </div>
+  </NuxtLink>
 </template>

@@ -12,6 +12,7 @@ import TypingIndicator from '../ui/TypingIndicator.vue';
 import Avatar from '../ui/Avatar/Avatar.vue';
 import Icon from '../ui/Icon.vue';
 import SearchDropdown from '../SearchDropdown/SearchDropdown.vue';
+import { ROUTES } from '~/shared/const';
 
 interface IProps {
   chat: Omit<IChat, 'lastMessage'> | null;
@@ -55,12 +56,11 @@ watch(
   <header
     class="relative bg-[var(--bg-secondary)] border-b border-[var(--border)] px-4 py-3 flex items-center justify-between"
   >
-    <div class="flex items-center gap-3">
-      <button
-        class="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition md:hidden"
-      >
-        <Icon name="arrow-left" size="24" />
-      </button>
+    <NuxtLink
+      v-if="companion"
+      :to="ROUTES.getRouteProfile(companion.id)"
+      class="flex items-center gap-3"
+    >
       <div class="relative">
         <Avatar
           :src="companion?.avatarUrl"
@@ -77,7 +77,7 @@ watch(
           {{ status }}
         </p>
       </div>
-    </div>
+    </NuxtLink>
 
     <div class="flex items-center gap-3">
       <button

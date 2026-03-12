@@ -43,6 +43,14 @@ const wrapperClasses = computed(() => ({
   'pr-2': !isOwn.value,
 }));
 
+const sticker = computed(() =>
+  mapStickerToLottieName(props.message.content as keyof typeof emojiMap),
+);
+
+const isSoloImage = computed(
+  () => !props.message.content.length && props.message.type === 'image',
+);
+
 const bubbleClasses = computed(() => ({
   'flex flex-col rounded-2xl transition-all duration-200 min-h-[44px]': true,
   'bg-blue-100 message-own': isOwn.value,
@@ -50,17 +58,16 @@ const bubbleClasses = computed(() => ({
   'has-image rounded-xl bg-transparent': !!props.message.filePath,
   'generating-summary': isGenerating.value,
   isSticker: props.message.type === 'sticker',
+  relative: isSoloImage,
 }));
-
-const sticker = computed(() =>
-  mapStickerToLottieName(props.message.content as keyof typeof emojiMap),
-);
 </script>
 
 <template>
   <div
     class="flex flex-col message-card"
-    :class="{ 'highlight-active': isAnchor }"
+    :class="{
+      'highlight-active': isAnchor,
+    }"
   >
     <div :class="wrapperClasses" @contextmenu.prevent="onRightClick">
       <div :class="bubbleClasses">
@@ -71,7 +78,9 @@ const sticker = computed(() =>
         <div
           v-if="message.filePath"
           class="message-image overflow-hidden rounded-[0.75rem_0.75rem_0.4rem_0.4rem]"
-          :class="{ 'h-[380px]': message.type === 'image' }"
+          :class="{
+            'h-[380px]': message.type === 'image',
+          }"
         >
           <File :file="message" />
         </div>
@@ -87,6 +96,7 @@ const sticker = computed(() =>
           :is-own="isOwn"
           :time="formattedTime"
           :is-read="message.isRead"
+          :class="{ 'absolute bottom-0 right-0': isSoloImage }"
         />
       </div>
     </div>

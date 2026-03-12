@@ -4,20 +4,20 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import type {
   IFoundUser,
-  IUser,
+  IFriend,
   IFriendIncoming,
   IFriendOutgoing,
 } from '~/shared/types';
 
 export const useFriendsStore = defineStore('friends', () => {
-  const friends = ref<IUser[]>([]);
+  const friends = ref<IFriend[]>([]);
   const foundUsers = ref<IFoundUser[]>([]);
   const incomingRequests = ref<IFriendIncoming[]>([]);
   const outgoingRequests = ref<IFriendOutgoing[]>([]);
   const { $api } = useNuxtApp();
   const profileStore = useProfileStore();
 
-  const setFriends = (payload: IUser[]) => (friends.value = payload);
+  const setFriends = (payload: IFriend[]) => (friends.value = payload);
   const setFoundUsers = (payload: IFoundUser[]) => (foundUsers.value = payload);
   const setIncoming = (payload: IFriendIncoming[] = []) =>
     (incomingRequests.value = payload);

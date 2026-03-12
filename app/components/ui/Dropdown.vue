@@ -73,7 +73,13 @@ const positionClasses = computed(() => {
           </NuxtLink>
           <button
             v-else
-            class="flex w-full items-center rounded-[var(--radius-sm)] px-3 py-2 text-sm transition"
+            :class="[
+              'flex w-full items-center rounded-[var(--radius-sm)] px-3 py-2 text-sm transition',
+              active
+                ? 'bg-[var(--bg-tertiary)] text-[var(--text-primary)]'
+                : 'text-[var(--text-primary)]',
+              item.disabled && 'opacity-60 cursor-not-allowed',
+            ]"
             @click="item.onClick"
           >
             {{ item.label }}

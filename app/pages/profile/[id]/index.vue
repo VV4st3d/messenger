@@ -45,7 +45,7 @@ onMounted(() => {
 <template>
   <div
     v-if="profile"
-    class="overflow-auto min-h-screen bg-[var(--bg-primary)] font-[var(--font-primary)]"
+    class="overflow-auto bg-[var(--bg-primary)] font-[var(--font-primary)]"
   >
     <ProfileHeader
       :profile="profile"

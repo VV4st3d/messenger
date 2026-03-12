@@ -56,7 +56,7 @@ await useAsyncData(`profile-${profileId}`, async () => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[var(--bg-primary)] py-8 px-4 sm:px-6 lg:px-8">
+  <div class="bg-[var(--bg-primary)] py-8 px-4 sm:px-6 lg:px-8">
     <div class="max-w-3xl mx-auto">
       <div class="mb-10 text-center">
         <h1 class="text-3xl sm:text-4xl font-bold text-[var(--text-primary)]">

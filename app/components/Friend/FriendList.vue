@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import type { IUser, IFriendIncoming, IFriendOutgoing } from '~/shared/types';
+import type { IFriend, IFriendIncoming, IFriendOutgoing } from '~/shared/types';
 import FriendItem from './FriendItem.vue';
 import Icon from '../ui/Icon.vue';
 import { ROUTES } from '~/shared/const';
 
 interface IProps {
-  friends: IUser[];
+  friends: IFriend[];
   incomingRequests: IFriendIncoming[];
   outgoingRequests: IFriendOutgoing[];
 }
@@ -127,7 +127,7 @@ const emit = defineEmits<IEmits>();
         <NuxtLink
           v-for="friend in friends"
           :key="friend.id"
-          :to="`${ROUTES.getRouteProfile(friend.id)}`"
+          :to="ROUTES.getRouteProfile(friend.id)"
         >
           <FriendItem
             :friend="friend"
