@@ -30,6 +30,7 @@ export interface IChat {
   id: string;
   type: TCHatType;
   name: string;
+  creator_id: string | null;
   createdAt: string;
   updatedAt: string;
   participants: IParticipant[];

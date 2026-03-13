@@ -16,7 +16,6 @@ import FriendList from '../Friend/FriendList.vue';
 import { useChatsStore } from '~/stores/chats';
 import Icon from '../ui/Icon.vue';
 import { SEARCH_DELAY_MS } from '~/shared/const/delay';
-import SearchDropdown from '../SearchDropdown/SearchDropdown.vue';
 import Avatar from '../ui/Avatar/Avatar.vue';
 import { ROUTES } from '~/shared/const';
 import { dropdownItems } from './const';
@@ -25,6 +24,7 @@ import Dropdown from '../ui/Dropdown.vue';
 const activeTab = ref<TSidebarTabs>('chats');
 const queryInput = ref('');
 const isSidebarDropdownOpen = ref(false);
+const isModalGroupOpen = ref(false);
 
 const authStore = useAuthStore();
 const friendsStore = useFriendsStore();
@@ -72,7 +72,7 @@ const handleSearchFriendsDebounced = useDebounce(
   SEARCH_DELAY_MS,
 );
 
-const handleSearchGlobalMessages = () => {
+const searchGlobalMessagesHandler = () => {
   isSidebarDropdownOpen.value = true;
   handleSearchGlobalMessagesDebounced({ query: queryInput.value });
   handleSearchFriendsDebounced({ q: queryInput.value });
@@ -121,20 +121,16 @@ onUnmounted(() => {
 <template>
   <div class="flex flex-col h-full">
     <div class="relative p-4 border-b border-[var(--border)]">
-      <input
-        v-model="queryInput"
-        type="text"
-        placeholder="Поиск сообщений"
-        class="w-full px-4 py-3 bg-[var(--bg-tertiary)] border border-[var(--border)] rounded-[var(--radius)] text-sm focus:outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent)]/30 transition placeholder:text-[var(--text-tertiary)]"
-        @input="handleSearchGlobalMessages"
-      >
-      <SearchDropdown
-        v-if="isSidebarDropdownOpen"
-        :messages="globalFoundMessages"
+      <SidebarHeader
+        v-model:query-input="queryInput"
+        v-model:is-modal-create-group-open="isModalGroupOpen"
+        :is-sidebar-dropdown-open="isSidebarDropdownOpen"
         :found-users="friendsStore.foundUsers"
+        :global-found-messages="globalFoundMessages"
+        @add-friend="friendsStore.sendRequest"
         @message-click="foundMessageHandler"
         @open-chat="getOrCreateChatHandler"
-        @add-friend="friendsStore.sendRequest"
+        @search-global="searchGlobalMessagesHandler"
       />
     </div>
 
