@@ -4,13 +4,16 @@ const model = defineModel<string>();
 defineProps<{
   placeholder: string;
   onEnter?: () => Promise<void>;
-  label: string;
+  label?: string;
 }>();
 </script>
 
 <template>
   <div>
-    <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">
+    <label
+      v-if="label"
+      class="block text-sm font-medium text-[var(--text-secondary)] mb-2"
+    >
       {{ label }}
     </label>
     <input

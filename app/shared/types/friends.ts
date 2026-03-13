@@ -76,3 +76,15 @@ export interface IFoundUser {
 }
 
 type TRequestStatus = 'pending' | 'accepted' | 'rejected';
+
+export type TFriendEmitNames =
+  | 'open-chat'
+  | 'remove-friend'
+  | 'add-to-group'
+  | 'remove-from-group';
+
+export interface IFriendEvent {
+  name: TFriendEmitNames;
+  iconName: string;
+  isDanger?: boolean;
+}

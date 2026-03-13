@@ -10,6 +10,7 @@ import type {
   TMessageResponse,
   TPinnedMessagesResponse,
   TSummaryMessage,
+  TCreateGroupChatResponse,
 } from '~/shared/types';
 
 export function createChatsRepository(appFetch: typeof $fetch) {
@@ -61,6 +62,15 @@ export function createChatsRepository(appFetch: typeof $fetch) {
         method: 'POST',
         body: { otherUserId: body.companionId },
       });
+    },
+    createGroupChat(body: { name: string; participantIds: string[] }) {
+      return appFetch<TCreateGroupChatResponse>(
+        API_ROUTES.getRouteCreateChatGroup(),
+        {
+          method: 'POST',
+          body,
+        },
+      );
     },
     pinMessage(body: { chatId: string }, messageId: string) {
       return appFetch<TMessageResponse>(

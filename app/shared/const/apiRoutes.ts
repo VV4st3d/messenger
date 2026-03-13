@@ -86,6 +86,9 @@ export const API_ROUTES = {
   getRouteUploadProfilePhotos() {
     return 'users/profile/photo';
   },
+  getRouteCreateChatGroup() {
+    return 'chats/group';
+  },
 };
 
 export const getUploadsRoute = (payload: string) =>

@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import type { IFriend } from '~/shared/types';
+import type { IFriend, IFriendEvent, TFriendEmitNames } from '~/shared/types';
 import Avatar from '../ui/Avatar/Avatar.vue';
 import Icon from '../ui/Icon.vue';
 import { getStatus } from '#imports';
 
 const props = defineProps<{
   friend: IFriend;
+  emits: IFriendEvent[];
 }>();
 
 interface IEmits {
-  (e: 'open-chat' | 'remove-friend', id: string): void;
+  (e: TFriendEmitNames, id: string): void;
 }
 
 const status = getStatus(() => props.friend.isOnline);
@@ -33,18 +34,19 @@ const emit = defineEmits<IEmits>();
       </div>
     </div>
 
-    <div class="flex items-center gap-1">
+    <div v-if="emits" class="flex items-center gap-1">
       <button
+        v-for="event in emits"
+        :key="event.name"
         class="text-[var(--text-tertiary)] hover:text-[var(--accent)] transition p-1.5 rounded-full hover:bg-[rgba(var(--accent),0.1)] cursor-pointer"
-        @click="emit('open-chat', friend.id)"
+        :class="[
+          event.isDanger
+            ? 'hover:text-[var(--danger)] hover:bg-[rgba(var(--danger),0.1)]'
+            : 'hover:text-[var(--accent)] hover:bg-[rgba(var(--accent),0.1)]',
+        ]"
+        @click="emit(event.name, friend.id)"
       >
-        <Icon name="chat-bubble-left-right" size="20" />
-      </button>
-      <button
-        class="text-[var(--text-tertiary)] hover:text-[var(--danger)] transition p-1.5 rounded-full hover:bg-[rgba(var(--danger),0.1)] cursor-pointer"
-        @click="emit('remove-friend', friend.id)"
-      >
-        <Icon name="trash" size="20" />
+        <Icon :name="event.iconName" size="20" />
       </button>
     </div>
   </div>

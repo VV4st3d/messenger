@@ -1,5 +1,10 @@
 <script setup lang="ts">
-import type { IFriend, IFriendIncoming, IFriendOutgoing } from '~/shared/types';
+import type {
+  IFriend,
+  IFriendEvent,
+  IFriendIncoming,
+  IFriendOutgoing,
+} from '~/shared/types';
 import FriendItem from './FriendItem.vue';
 import Icon from '../ui/Icon.vue';
 import { ROUTES } from '~/shared/const';
@@ -18,6 +23,11 @@ interface IEmits {
 }
 defineProps<IProps>();
 const emit = defineEmits<IEmits>();
+
+const emits: IFriendEvent[] = [
+  { iconName: 'chat-bubble-left-right', isDanger: false, name: 'open-chat' },
+  { iconName: 'trash', isDanger: true, name: 'remove-friend' },
+];
 </script>
 <template>
   <div class="flex flex-col h-full divide-y divide-[var(--border-subtle)]">
@@ -130,6 +140,7 @@ const emit = defineEmits<IEmits>();
           :to="ROUTES.getRouteProfile(friend.id)"
         >
           <FriendItem
+            :emits="emits"
             :friend="friend"
             @open-chat="(id) => emit('open-chat', id)"
             @remove-friend="(id) => emit('remove-friend', id)"

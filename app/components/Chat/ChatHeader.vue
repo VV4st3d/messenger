@@ -57,7 +57,7 @@ watch(
     class="relative bg-[var(--bg-secondary)] border-b border-[var(--border)] px-4 py-3 flex items-center justify-between"
   >
     <NuxtLink
-      v-if="companion"
+      v-if="chat?.type === 'private' && companion?.id"
       :to="ROUTES.getRouteProfile(companion.id)"
       class="flex items-center gap-3"
     >
@@ -69,15 +69,15 @@ watch(
         />
       </div>
       <div>
-        <h2 class="font-semibold text-lg truncate max-w-[200px]">
-          {{ chat?.name }}
-        </h2>
         <TypingIndicator v-if="isTyping" :show="isTyping" />
         <p v-else class="text-xs text-[var(--text-secondary)]">
           {{ status }}
         </p>
       </div>
     </NuxtLink>
+    <h2 v-else class="font-semibold text-lg truncate max-w-[200px]">
+      {{ chat?.name }}
+    </h2>
 
     <div class="flex items-center gap-3">
       <button

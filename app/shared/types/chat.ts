@@ -19,6 +19,9 @@ export type TMessagesListById = IResponseBody<IFoundMessageData>;
 export type TChatInfo = IResponseBody<
   Omit<IChat, 'participants' | 'lastMessage'>
 >;
+export type TCreateGroupChatResponse = IResponseBody<
+  Omit<IChat, 'lastMessages'>
+>;
 
 export interface ISummaryMessage {
   summary: string;
