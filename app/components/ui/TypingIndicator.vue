@@ -1,6 +1,8 @@
 <script setup lang="ts">
-defineProps<{
+
+const props = defineProps<{
   show: boolean;
+  username?: string;
 }>();
 </script>
 
@@ -22,7 +24,7 @@ defineProps<{
         />
       </div>
       <span class="text-xs font-medium text-[var(--text-secondary)] ml-1"
-        >Печатает</span
+        >{{ username }} Печатает</span
       >
     </div>
   </Transition>

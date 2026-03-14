@@ -15,7 +15,7 @@ const fileExtension =
     loading="lazy"
     :src="getUploadsRoute(`/uploads${file.filePath}`)"
     alt="attachment"
-    class="w-full h-full object-cover block max-w-[320px] aspect-[4/5] sm:aspect-[5/6] bg-gray-100 dark:bg-gray-800 transition-opacity hover:opacity-90"
+    class="w-full h-full object-cover block max-w-[320px] aspect-[4/5] sm:aspect-[5/6] bg-gray-100 transition-opacity hover:opacity-90"
   >
 
   <div
@@ -29,12 +29,10 @@ const fileExtension =
     </div>
 
     <div class="flex flex-col overflow-hidden text-sm">
-      <span class="font-medium text-gray-900 dark:text-gray-100 truncate">
+      <span class="font-medium text-gray-900 truncate">
         {{ file.filePath?.split('/').pop() }}
       </span>
-      <span
-        class="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold"
-      >
+      <span class="text-xs text-gray-500 uppercase font-bold">
         {{ fileExtension }}
       </span>
     </div>

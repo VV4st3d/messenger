@@ -69,15 +69,23 @@ watch(
         />
       </div>
       <div>
+        <h2 class="font-semibold text-lg truncate max-w-[200px]">
+          {{ chat?.name }}
+        </h2>
         <TypingIndicator v-if="isTyping" :show="isTyping" />
         <p v-else class="text-xs text-[var(--text-secondary)]">
           {{ status }}
         </p>
       </div>
     </NuxtLink>
-    <h2 v-else class="font-semibold text-lg truncate max-w-[200px]">
-      {{ chat?.name }}
-    </h2>
+    <div v-else>
+      <h2 class="font-semibold text-lg truncate max-w-[200px]">
+        {{ chat?.name }}
+      </h2>
+      <p class="text-xs text-[var(--text-secondary)]">
+        {{ chat?.participants.length }} участника(-ов)
+      </p>
+    </div>
 
     <div class="flex items-center gap-3">
       <button

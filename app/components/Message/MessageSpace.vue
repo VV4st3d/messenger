@@ -256,6 +256,7 @@ watch(
                     id: item.id,
                   } as IRefPayload)
               "
+              :show-avatar="chat?.type === 'group'"
               :generated-summary="generatedSummary"
               :user-id="userId"
               :message="item"

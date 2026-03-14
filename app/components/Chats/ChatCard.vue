@@ -48,6 +48,7 @@ const formattedTime = computed(
         <TypingIndicator
           v-if="typing?.isTyping && typing.chatId === chat.id"
           :show="typing.isTyping"
+          :username="chat.type === 'group' ? typing.username : ''"
         />
 
         <span v-else>

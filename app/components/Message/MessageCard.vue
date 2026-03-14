@@ -8,12 +8,14 @@ import { mapStickerToLottieName } from '~/shared/const/emoji';
 import Sticker from './MessageCard/Message/Sticker.vue';
 import File from './MessageCard/Message/File.vue';
 import MessageMeta from './MessageCard/Message/MessageMeta.vue';
+import Avatar from '../ui/Avatar/Avatar.vue';
 
 interface IProps {
   message: IMessage;
   isAnchor?: boolean;
   userId: string | undefined;
   generatedSummary?: IGeneratedSummary;
+  showAvatar?: boolean;
 }
 
 const props = defineProps<IProps>();
@@ -70,6 +72,11 @@ const bubbleClasses = computed(() => ({
     }"
   >
     <div :class="wrapperClasses" @contextmenu.prevent="onRightClick">
+      <Avatar
+        v-if="!isOwn && showAvatar"
+        size="sm"
+        :src="message.sender.avatarUrl"
+      />
       <div :class="bubbleClasses">
         <div v-if="message.type === 'sticker' && sticker" class="h-[200px]">
           <Sticker :sticker-name="sticker" />

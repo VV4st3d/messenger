@@ -21,6 +21,8 @@ import { ROUTES } from '~/shared/const';
 import { dropdownItems } from './const';
 import Dropdown from '../ui/Dropdown.vue';
 
+const emit = defineEmits<{ (e: 'close'): void }>();
+
 const activeTab = ref<TSidebarTabs>('chats');
 const queryInput = ref('');
 const groupName = ref('');
@@ -152,14 +154,14 @@ onUnmounted(() => {
   <div class="flex flex-col h-full">
     <div class="relative p-4 border-b border-[var(--border)]">
       <SidebarHeader
+        v-model:query-input="queryInput"
+        v-model:is-modal-create-group-open="isModalGroupOpen"
+        v-model:group-name="groupName"
         :is-sidebar-dropdown-open="isSidebarDropdownOpen"
         :found-users="friendsStore.foundUsers"
         :global-found-messages="globalFoundMessages"
-        v-model:query-input="queryInput"
         :friends="friends"
-        v-model:is-modal-create-group-open="isModalGroupOpen"
         :group-participants="groupParticipantsIds"
-        v-model:group-name="groupName"
         @add-friend="friendsStore.sendRequest"
         @message-click="foundMessageHandler"
         @open-chat="getOrCreateChatHandler"
@@ -193,7 +195,7 @@ onUnmounted(() => {
         v-if="activeTab === 'chats'"
         class="divide-y divide-[var(--border-subtle)]"
       >
-        <Chats :is-typing="isTyping" :chats="chats" />
+        <Chats :is-typing="isTyping" :chats="chats" @close="emit('close')" />
       </div>
 
       <div

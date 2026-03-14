@@ -4,6 +4,7 @@ import type { IChat, ITyping } from '~/shared/types';
 import ChatCard from './ChatCard.vue';
 
 defineProps<{ chats: IChat[]; isTyping: ITyping | null }>();
+const emit = defineEmits<{ (e: 'close'): void }>();
 </script>
 
 <template>
@@ -11,6 +12,7 @@ defineProps<{ chats: IChat[]; isTyping: ITyping | null }>();
     v-for="chat in chats"
     :key="chat.id"
     class="chat-item flex items-center gap-4 hover:bg-[rgba(255,255,255,0.04)] transition-colors cursor-pointer"
+    @click="emit('close')"
   >
     <NuxtLink
       #="{ isActive }"
